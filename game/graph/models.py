@@ -1,10 +1,8 @@
 from django.db import models
 
-from uuidfield import UUIDField
-
 
 class Node(models.Model):
-    node_id = UUIDField(auto=True)
+    node_id = models.IntegerField(primary_key=True)
 
 
 class Edge(models.Model):

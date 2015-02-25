@@ -38,9 +38,19 @@
 
   <body>
     {% block content %}
+      <div class="jumbotron">
+        <div class="container">
+          <a id="save-graph-btn" class="btn btn-default" href="#" role="button">Save graph</a>
+          <a id="load-graph-btn" class="btn btn-default" href="#" role="button">Load graph</a>
+        </div>
+      </div>
+
+      <div class="container">
+        <iframe src="/graph/editor" id="graph-editor">
+        </iframe>
+      </div> <!-- /container -->
     {% endblock %}
 
-    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
@@ -48,6 +58,8 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
     <script src="http://d3js.org/d3.v3.min.js"></script>
+
     <script src="{% static 'graph/app.js' %}"></script>
+
   </body>
 </html>
