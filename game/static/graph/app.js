@@ -53,16 +53,21 @@ $.ajaxSetup({
 $('#save-graph-btn').click(function(evt) {
     nodes = document.getElementById('graph-editor').contentWindow.nodes;
     links = document.getElementById('graph-editor').contentWindow.links;
-    save_graph(nodes, links)
+    var name=prompt("Enter graph name");
+
+    if (!name) {
+        save_graph(nodes, links, name)
+    }
 });
 
 
-function save_graph(nodes, links) {
+function save_graph(nodes, links, name) {
     $.ajax({
         url : "/graph/create_graph/", // the endpoint
         type : "POST", // http method
         data : { 'nodes' : nodes,
-                 'links' : links
+                 'links' : links,
+                 'graph' : name
                },
         // data : { the_post : $('#post-text').val() }, // data sent with the post request
 
