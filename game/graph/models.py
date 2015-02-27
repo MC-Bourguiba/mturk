@@ -8,12 +8,11 @@ class Graph(models.Model):
 
 
 class Node(models.Model):
-    graph = models.ForeignKey(Graph)
+    graph = Graph()
     node_id = UUIDField(primary_key=True, auto=True)
 
 
 class Edge(models.Model):
-    from_node = models.ManyToManyField(Node)
-    to_node = models.ForeignKey(Node)
-    graph = models.ForeignKey(Graph)
+    from_node = Node()
+    to_node = Node()
     weight = models.FloatField(default=1.0)

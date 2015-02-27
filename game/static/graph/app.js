@@ -53,11 +53,11 @@ $.ajaxSetup({
 $('#save-graph-btn').click(function(evt) {
     nodes = document.getElementById('graph-editor').contentWindow.nodes;
     links = document.getElementById('graph-editor').contentWindow.links;
-    var name=prompt("Enter graph name");
+    // var name=prompt("Enter graph name");
 
-    if (!name) {
-        save_graph(nodes, links, name)
-    }
+    // if (!name) {
+    save_graph(nodes, links, 'dsfsd');
+    // }
 });
 
 

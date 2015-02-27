@@ -28,6 +28,8 @@ def editor(request):
 
 
 def create_graph(request):
+    print request
     generate_graph(request)
+    print 'Generating graph'
     to_json = dict()
     return JsonResponse(to_json)
