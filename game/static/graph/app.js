@@ -53,22 +53,88 @@ $.ajaxSetup({
 $('#save-graph-btn').click(function(evt) {
     nodes = document.getElementById('graph-editor').contentWindow.nodes;
     links = document.getElementById('graph-editor').contentWindow.links;
-    // var name=prompt("Enter graph name");
+    var name=prompt("Enter graph name");
 
-    // if (!name) {
-    save_graph(nodes, links, 'dsfsd');
-    // }
+    if (name) {
+        save_graph(nodes, links, name);
+    }
 });
+
+
+$('#load-graph-btn').click(function(evt) {
+    name = 'first'; // TODO: Show user list of graph names in database.
+    load_graph(name);
+});
+
+
+function load_graph(name) {
+    $.ajax({
+        url : "/graph/load_graph/",
+        type : "GET",
+        data : {
+            'name': name
+        },
+
+        success : function(json) {
+            graph_ui = JSON.parse(json['graph_ui']);
+            editor_window = document.getElementById('graph-editor').contentWindow;
+
+            for (i = 0; i < graph_ui.nodes.length; ++i) {
+                graph_ui.nodes[i].weight = 1.0;
+            }
+
+            for (i = 0; i < graph_ui.links.length; ++i) {
+                graph_ui.links[i].source.weight = 0;
+                graph_ui.links[i].target.weight = 0;
+
+                source_index = graph_ui.links[i].source.index;
+                target_index = graph_ui.links[i].target.index;
+
+                console.log(source_index);
+                console.log(target_index);
+
+                graph_ui.links[i].source = graph_ui.nodes[source_index];
+                graph_ui.links[i].target = graph_ui.nodes[target_index];
+            }
+
+            editor_window.nodes = graph_ui.nodes;
+            editor_window.links = graph_ui.links;
+            editor_window.force = d3.layout.force()
+                .nodes(graph_ui.nodes)
+                .links(graph_ui.links)
+                .size([editor_window.width, editor_window.height])
+                .linkDistance(150)
+                .charge(-500)
+                .on('tick', editor_window.tick);
+
+            editor_window.lastNodeId = json['last_node_id'];
+            editor_window.restart();
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            // $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+            //     " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+
+    // nodes = graph[0];
+    // links = graph[1];
+}
 
 
 function save_graph(nodes, links, name) {
     $.ajax({
         url : "/graph/create_graph/", // the endpoint
         type : "POST", // http method
-        data : { 'nodes' : nodes,
-                 'links' : links,
-                 'graph' : name
-               },
+        dataType: "json",
+        contentType: 'application/json', // JSON encoding
+        data : JSON.stringify({
+            'nodes' : nodes,
+            'links' : links,
+            'graph' : name
+        }),
         // data : { the_post : $('#post-text').val() }, // data sent with the post request
 
         // handle a successful response

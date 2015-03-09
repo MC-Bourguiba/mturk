@@ -1,41 +1,46 @@
-from models import Node, Edge
+from models import Node, Edge, Graph
 
+import json
 import re
 
-edge_source_key     = r'links[%d][target][id]'
-edge_target_key     = r'links[%d][source][id]'
-edge_number_pattern = r'links\[(\d+)\].*'
-node_id_pattern     = r'nodes\[(\d+)\]\[id\]'
 
-
-def generate_graph(request):
+# TODO: Clean this up
+def generate_graph(graph_dict):
     edges = set()
     edges_number = set()
-    gDict = request.POST.dict()
+
+    node_map = dict()
 
     node_id_uuid_map = dict()
 
-    nodes = []
-    for key in gDict.keys():
-        result = re.search(node_id_pattern, key)
-        if result:
-            node_id = int(result.group(1))
-            nodes.append(node_id)
-            node_id_uuid_map[node_id] = Node()
-            node_id_uuid_map[node_id].save()
+    graph = Graph(graph_dict['graph'])
+    graph.graph_ui = json.dumps(graph_dict)
+    graph.save()
 
-    for key in gDict.keys():
-        result = re.search(edge_number_pattern, key)
-        if result:
-            edge_point = int(result.group(1))
-            edges_number.add(edge_point)
+    for n_dict in graph_dict['nodes']:
+        node = Node()
+        node_id  = n_dict['id']
+        node.ui_id = node_id
+        node.graph = graph
+        node.save()
+        node_map[node_id] = node
 
-    for e in edges_number:
-        source_node = int(gDict[edge_source_key % e]) - 1
-        target_node = int(gDict[edge_target_key % e]) - 1
-        source = node_id_uuid_map[source_node]
-        target = node_id_uuid_map[target_node]
+    for e_dict in graph_dict['links']:
         edge = Edge()
-        edge.from_node = source
-        edge.to_node = target
+        source_node_id = e_dict['source']['id']
+        target_node_id = e_dict['target']['id']
+
+        edge.from_node = node_map[source_node_id]
+        edge.to_node = node_map[target_node_id]
+        edge.graph = graph
         edge.save()
+
+
+def sanitize_graph_json(graph_dict):
+    for i in range(len(graph_dict['nodes'])):
+        graph_dict['nodes'][i]['weight'] = 1.0
+        # del graph_dict['nodes'][i]['px']
+        # del graph_dict['nodes'][i]['py']
+        # del graph_dict['nodes'][i]['x']
+        # del graph_dict['nodes'][i]['y']
+    return graph_dict

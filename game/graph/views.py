@@ -10,9 +10,12 @@ from django.views.generic import FormView
 from django.views.generic.base import TemplateView
 from django.contrib import messages
 
-from utils import generate_graph
+from django.core.files import File
 
-import simplejson
+from utils import generate_graph, sanitize_graph_json
+from models import Graph, Node, Edge
+
+import simplejson as json
 
 
 def index(request):
@@ -28,8 +31,26 @@ def editor(request):
 
 
 def create_graph(request):
-    print request
-    generate_graph(request)
-    print 'Generating graph'
+    # print json.loads(request.body)
+    graph_dict = json.loads(request.body)
+    generate_graph(graph_dict)
+    # with open('request.txt', 'w') as f:
+    #     my_file = File(f)
+    #     my_file.write(str(request))
     to_json = dict()
     return JsonResponse(to_json)
+
+
+def load_graph(request):
+    g_name = request.GET.dict()['name']
+    print g_name
+    graph = Graph.objects.get(name=g_name)
+    # graph = Graph.objects.get(name=g_name)
+    response = dict()
+    response['graph_ui'] = json.dumps(sanitize_graph_json(json.loads(graph.graph_ui)))
+    print response
+    last_node_id = None
+    for node in json.loads(graph.graph_ui)['nodes']:
+        last_node_id = max(node['id'], last_node_id)
+    response['last_node_id'] = last_node_id
+    return JsonResponse(response)
