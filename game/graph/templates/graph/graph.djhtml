@@ -1,0 +1,16 @@
+{% extends "graph/index.djhtml" %}
+{% load staticfiles %}
+{% load bootstrap %}
+
+{% block graph_list %}
+<div class="list-group">
+  <a href="#" class="list-group-item active">
+    {{ selected_graph_name }}
+  </a>
+
+  {% for name in graph_names %}
+    <a href="#" class="list-group-item"> {{name}} </a>
+  {% endfor %}
+</div>
+
+{% endblock %}

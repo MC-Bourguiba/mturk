@@ -14,11 +14,11 @@
     <link href="{% static 'graph/app.css' %}" rel="stylesheet">
     <link href="{% static 'slider/bootstrap-slider.css' %}" rel="stylesheet">
     <script>
-        function printValue(sliderID, textbox) {
-            var x = document.getElementById(textbox);
-            var y = document.getElementById(sliderID);
-            x.value = y.value;
-        }
+     function printValue(sliderID, textbox) {
+       var x = document.getElementById(textbox);
+       var y = document.getElementById(sliderID);
+       x.value = y.value;
+     }
     </script>
   </head>
 
@@ -37,15 +37,12 @@
         <ul class="nav navbar-nav">
           <li ><a href="/">Simple Interface</a></li>
           <li ><a class="active" href="/">Graph</a></li>
-          <!-- <li><a href="#about">About</a></li>
-          <li><a href="#contact">Contact</a></li> -->
         </ul>
       </div><!--/.nav-collapse -->
     </div>
   </nav>
 
   <body>
-    {% block content %}
       <div class="jumbotron">
         <div class="container">
           <a id="save-graph-btn" class="btn btn-default" href="#" role="button">Save graph</a>
@@ -53,30 +50,31 @@
           <a id="start-game-btn" class="btn btn-default" href="#" role="button">Start Game</a>
         </div>
       </div>
-
-
-      <div class="container">
-        <div class="col-md-10" id="leftcolumn">
+      <div class="container-fluid">
+        <!-- <div class="container" > -->
+        <div class="sidebar left">
+          <div class="well" id="graph-list">
+            {% block graph_list %}
+              <!-- <div class="col-md-1" id="leftcolumn"> -->
+            {% endblock %}
+          </div>
+        </div>
+        <div class="sidebar right">
+          <div class="well">
+            <!-- <div class="col-md-2" id="rightcolumn"> -->
+            <div id="path-display">
+              <div id="path-display-list">
+              </div>
+              <a id="submit-game-btn" class="btn btn-default" href="#" role="button">Submit</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-8" id="middlecolumn">
           <iframe src="/graph/editor" id="graph-editor">
           </iframe>
         </div>
-        <div class="col-md-2" id="rightcolumn">
-          <div id="path-display">
-          </div>
-          <!-- <ul style="list-style-type:none" id="path-list">
-          <li>
-          <a href='#'><input id="path-list-1" type="hidden" value="1">Path 1</a>
-          <div style="float:left;">
-          <input id="ex1" type="range" name="points" min="0" max="1" step="0.01" onchange="printValue('ex1', 'rangeValue1')">
-          </div>
-          <div style="display:inline-block;">
-          <input id="rangeValue1" type="text" size="5">
-          </div>
-          </li>
-          <!-- <li>1 </li> -->
-        </div>
       </div> <!-- /container -->
-    {% endblock %}
+
 
 
     <!-- Bootstrap core JavaScript

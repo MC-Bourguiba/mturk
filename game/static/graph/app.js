@@ -18,6 +18,9 @@ var csrftoken = getCookie('csrftoken');
 var current_graph = null;
 var generated_paths = [];
 var path_list_regex = /path-list-(\d+)/;
+var editor_window = document.getElementById('graph-editor').contentWindow;
+
+$("#path-display").hide();
 
 /*
 The functions below will create a header with csrftoken
@@ -83,14 +86,12 @@ $('#path-list li a').on('click', function(e) {
     e.preventDefault();
     var num = $(this).html();
     console.log(num);
-    editor_window = document.getElementById('graph-editor').contentWindow;
     editor_window.highlighted_links = generated_paths[num];
     editor_window.restart();
 });
 
 
 function highlight_link(link_to_highlight) {
-    editor_window = document.getElementById('graph-editor').contentWindow;
     editor_window.highlighted_links = generated_paths[link_to_highlight];
     editor_window.restart();
 }
@@ -108,15 +109,16 @@ function start_game() {
         success : function(json) {
             paths = json.paths;
             generated_paths = paths;
-            $("#path-display").html(json.html);
+            $("#path-display-list").html(json.html);
             $("a[id*='path-list']").on('click', function(e) {
                 e.preventDefault();
                 var match = path_list_regex.exec(this.id);
                 var num = match[1];
-                editor_window = document.getElementById('graph-editor').contentWindow;
                 editor_window.highlighted_links = generated_paths[num];
                 editor_window.restart();
             });
+
+            $("#path-display").show();
         },
 
         // handle a non-successful response
@@ -139,7 +141,7 @@ function load_graph(name) {
             // console.log(json);
             graph_ui = JSON.parse(json['graph_ui']);
             console.log(graph_ui);
-            editor_window = document.getElementById('graph-editor').contentWindow;
+
 
             for (i = 0; i < graph_ui.nodes.length; ++i) {
                 graph_ui.nodes[i].weight = 1.0;
@@ -208,4 +210,9 @@ function save_graph(nodes, links, name) {
             console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
         }
     });
+};
+
+
+editor_window.onload = function() {
+     // load_graph("name");
 };

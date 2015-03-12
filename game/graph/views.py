@@ -20,8 +20,11 @@ import simplejson as json
 
 
 def index(request):
-    template = 'graph/index.djhtml'
+    template = 'graph/graph.djhtml'
+    graphs = map(lambda g: g.name, Graph.objects.all())
     context = dict()
+    context['selected_graph_name'] = graphs[0]
+    context['graph_names'] = graphs[1:]
     return render(request, template, context)
 
 

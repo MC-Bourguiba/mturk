@@ -69,3 +69,22 @@ iframe {
     float: none;
     margin: 0 auto;
 }
+
+.container-fluid > .sidebar {
+    position: relative;
+    top: 0;
+    left:auto;
+    width: 200px;
+}
+
+.left {
+    float:left;
+}
+
+.right {
+    float:right;
+}
+
+.container-fluid > .content {
+    margin: 0 140px;
+}
