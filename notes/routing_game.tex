@@ -1,0 +1,88 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath, amsfonts, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{enumerate}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage[left=1.5in,right=1.5in,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{wrapfig}
+\usepackage{subcaption}
+
+\input{latex_commands_n.tex}
+\newcommand \bepsilon{{\boldsymbol \epsilon}}
+
+
+% theorems
+\newtheorem{definition}{Definition}[section]
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
+\newtheorem{conjecture}{Conjecture}
+\newtheorem{rem}{Remark}
+\newtheorem{fact}{Fact}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+\newtheorem{assumption}{Assumption}
+
+
+%============================================================================================
+\title{Routing games}
+\date{}
+
+
+%============================================================================================
+\begin{document}
+
+\maketitle
+
+%============================================================================================
+
+The game is given by a directed graph $G = (V, E)$, a set of edge cost functions $(c_e)_{e \in \Ecal}$, and a finite number of players, indexed by $k \in \{1, \dots, K\}$.
+
+\begin{itemize}
+\item The cost function of an edge $e$ is a function $c_e : \Rbb_+ \to \Rbb_+$. It determines the cost of the edge given the total flow on that edge.
+\item A player $k$ is given by: a source node $s_k \in V$, a destination node $d_k \in V$, and a total flow $F_k$ (i.e. the total mass of traffic that this player is allocating). The action set of the player is the paths that connect $s_k$ to $d_k$, denoted by $\Pcal_k$.
+\item At iteration, each player $k$ chooses a flow distribution $f_k \in \Rbb_+^{\Pcal_k}$, such that $\sum_{p \in \Pcal_k} f_{k,p} = F_k$. The flow distributions of all players determine the edge flows as follows: for an edge $e$, the edge flow is
+\[
+\phi_e = \sum_k \sum_{p \in \Pcal_k : e \in p} f_{k, p}
+\]
+Another way to write this is
+\[
+\phi = \sum_{k} M^k f_k
+\]
+where $M^k$ is an incidence matrix for player $k$, defined as follows: $M^k \in \Rbb^{\Ecal \times \Pcal_k}$, such that 
+\[
+M^k_{e, p} = \begin{cases}
+1 & \text{if $e \in p$} \\
+0 & \text{otherwise}
+\end{cases}
+\]
+Once we have the edge flows, we can compute the edge costs simply by applying the edge cost functions. Let $y$ be the vector in $\Rbb^{E}$ defined by
+\[
+y_e = c_e(\phi_e)
+\]
+Then we compute the path costs by summing the edge costs along the path. So for all $k$, and all $p \in \Pcal_k$, the path cost is
+\al{
+\ell^k_p = \sum_{e \in p} y_e
+}
+so the path costs for player $k$ can be written simply in terms of the incidence matrix
+\[
+\ell^k = (M^k)^T y
+\]
+\end{itemize}
+
+To summarize, when we construct the graph, we need: the node set $V$, the edge set $E$, the edge cost functions $c_e, e \in E$, and the player description $(s_k, d_k, F_k)$ for each $k$. From this, we can compute the paths $\Pcal_k$ and compute the incidence matrices $M_k$. 
+
+Then, at each iteration, each player chooses a path flow distribution $f_k$, which we use to compute:
+\begin{enumerate}
+\item the edge flows $\phi$
+\item the edge costs $y$
+\item the path costs $\ell_k$ for each $k$
+\end{enumerate}
+
+Once this is done we reveal to each player $k$ the path cost vector $\ell_k$ and we start the next round.
+
+\end{document}

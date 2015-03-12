@@ -56,3 +56,27 @@ target/
 
 ECC-MD.pdf
 *.sqlite3
+
+.idea/.name
+
+.idea/encodings.xml
+
+.idea/misc.xml
+
+.idea/modules.xml
+
+.idea/RoutingExperiment.iml
+
+.idea/scopes/scope_settings.xml
+
+.idea/vcs.xml
+
+.idea/workspace.xml
+
+notes/routing_game.synctex.gz
+
+notes/routing_game.fls
+
+notes/routing_game.fdb_latexmk
+
+notes/routing_game.aux

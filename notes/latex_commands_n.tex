@@ -1,0 +1,215 @@
+% Sets
+\newcommand{\Fbb}{\mathbb{F}}
+\newcommand{\Rbb}{\mathbb{R}}
+\newcommand{\Cbb}{\mathbb{C}}
+\newcommand{\Nbb}{\mathbb{N}}
+\newcommand{\Qbb}{\mathbb{Q}}
+\newcommand{\Zbb}{\mathbb{Z}}
+
+\newcommand{\Acal}{\mathcal{A}}
+\newcommand{\Bcal}{\mathcal{B}}
+\newcommand{\Ccal}{\mathcal{C}}
+\newcommand{\Dcal}{\mathcal{D}}
+\newcommand{\Ecal}{\mathcal{E}}
+\newcommand{\Fcal}{\mathcal{F}}
+\newcommand{\Gcal}{\mathcal{G}}
+\newcommand{\Hcal}{\mathcal{H}}
+\newcommand{\Ical}{\mathcal{I}}
+\newcommand{\Jcal}{\mathcal{J}}
+\newcommand{\Kcal}{\mathcal{K}}
+\newcommand{\Lcal}{\mathcal{L}}
+\newcommand{\Mcal}{\mathcal{M}}
+\newcommand{\Ncal}{\mathcal{N}}
+\newcommand{\Ocal}{\mathcal{O}}
+\newcommand{\Pcal}{\mathcal{P}}
+\newcommand{\Qcal}{\mathcal{Q}}
+\newcommand{\Rcal}{\mathcal{R}}
+\newcommand{\Scal}{\mathcal{S}}
+\newcommand{\Tcal}{\mathcal{T}}
+\newcommand{\Ucal}{\mathcal{U}}
+\newcommand{\Vcal}{\mathcal{V}}
+\newcommand{\Wcal}{\mathcal{W}}
+\newcommand{\Xcal}{\mathcal{X}}
+\newcommand{\Ycal}{\mathcal{Y}}
+\newcommand{\Zcal}{\mathcal{Z}}
+
+\newcommand{\bigO}{\Ocal}
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+% operators
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\cart}{\times}
+\DeclareMathOperator*{\card}{card}
+\DeclareMathOperator*{\superset}{\supset}
+\DeclareMathOperator*{\support}{support}
+\newcommand\eqDef{\overset{\Delta}{=}}
+
+% calculus
+\newcommand \ddt[1]{\frac{d #1}{dt}}
+\newcommand \ppx[1]{\frac{\partial #1}{\partial x}}
+\newcommand \ppxn[2]{\frac{\partial^{#2} #1}{\partial^{#2} x}}
+\newcommand \ddtn[2]{\frac{d^{#2} #1}{dt^{#2}}}
+
+% topology
+\DeclareMathOperator*{\bd}{bd}
+\DeclareMathOperator*{\osc}{osc}
+\DeclareMathOperator*{\disc}{disc}
+\DeclareMathOperator*{\cl}{cl}
+\DeclareMathOperator*{\interior}{int}
+
+% linear albegra
+\DeclareMathOperator*{\dm}{dim}
+\DeclareMathOperator*{\spn}{span}
+\DeclareMathOperator*{\trace}{trace}
+\DeclareMathOperator*{\Tr}{Tr}
+\DeclareMathOperator*{\diag}{diag}
+
+% probability
+\DeclareMathOperator*{\cov}{cov}
+\DeclareMathOperator*{\var}{var}
+\DeclareMathOperator*{\Exp}{\mathbb{E}}
+\newcommand\Expsq[1]{\Exp\sqbr{#1}}
+\DeclareMathOperator*{\Pro}{\mathbb{P}}
+\DeclareMathOperator*{\Prob}{\mathbb{P}}
+\newcommand \convL[1]{\overset{L^{#1}}{\rightarrow} }
+\newcommand \convP{\overset{\text{P}}{\rightarrow} }
+\newcommand \convAS{\overset{\text{a.s.}}{\rightarrow} }
+
+
+
+%convex optimization
+\DeclareMathOperator*{\Co}{Co}
+\DeclareMathOperator*{\conv}{conv}
+\DeclareMathOperator*{\diam}{diam}
+
+%complex
+\DeclareMathOperator*{\Real}{Re}
+\DeclareMathOperator*{\Imag}{Im}
+\newcommand\contains{\ni}
+
+
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+% text
+\newcommand{\by}{\text{ by }}
+\newcommand{\pf}{\paragraph{\emph{proof}}}
+\newcommand\p[1]{\paragraph{#1}}
+\newcommand{\ans}{\paragraph{\emph{answer}}}
+\newcommand{\subjectto}{\text{subject to}}
+\newcommand\ind[1]{1_{#1}}
+
+\newcommand\emp[1]{{\color{Red} #1}}
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+% matrices and equations
+
+\newcommand \func[5]{
+\[
+\begin{aligned}
+#1: #2 &\rightarrow #3 \\
+#4 &\mapsto #5
+\end{aligned}
+\]
+}
+
+\newcommand \al[1]{\begin{align*}
+#1
+\end{align*}
+}
+
+\newcommand \aln[1]{\begin{align}
+#1
+\end{align}
+}
+
+\newcommand \ald[1]{
+\[
+\begin{aligned}
+#1
+\end{aligned}
+\]
+}
+
+\newcommand \aldn[1]{
+\begin{equation}
+\begin{aligned}
+#1
+\end{aligned}
+\end{equation}
+}
+
+
+\newcommand \mat[1]{
+\left(
+\begin{array}
+#1
+\end{array}
+\right)
+}
+
+\newcommand \Det[1]{
+\left|
+\begin{array}
+#1
+\end{array}
+\right|
+}
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+%other
+\newcommand{\horline}{
+\begin{center}
+\line(1,0){500}
+\end{center}
+}
+
+\newcommand \vs{\vspace{40pt}}
+
+\newcommand \imp{\Rightarrow}
+\newcommand \eqv{\Leftrightarrow}
+
+
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+% parenthesis and such
+\newcommand \floor[1]{\lfloor #1 \rfloor}
+\newcommand \ceil[1]{\left\lceil #1 \right\rceil}
+\newcommand \bra{\left\langle}
+\newcommand \ket{\right\rangle}
+\newcommand \braket[2]{\bra #1, #2 \ket}
+\newcommand{\psh}[2]{\ensuremath{\langle #1,#2\rangle}}
+\newcommand \parenth[1]{\left( #1 \right)}
+\newcommand \curl[1]{\left\{ #1 \right\}}
+\newcommand \sqbr[1]{\left[ #1 \right]}
+\newcommand \sqbra[1]{\left[ #1 \right]}
+
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+% Algorithms
+\usepackage{listings} % for algorithms
+\usepackage{framed}
+% setup of the lst
+\lstset{ %
+  basicstyle=\footnotesize,
+  commentstyle=\color{gray},
+  extendedchars=true,
+  frame=single,
+  keywordstyle=\color{blue},
+  language=Java,
+  morekeywords={trait, def, val},
+  numbers=left,
+  numbersep=5pt,
+  numberstyle=\tiny\color{gray},
+  tabsize=2
+}
+
+
+
