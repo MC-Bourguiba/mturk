@@ -12,29 +12,37 @@
           rel="stylesheet" media="screen">
     <link href="{% static 'bootstrap/css/jumbotron.css' %}" rel="stylesheet">
     <link href="{% static 'graph/app.css' %}" rel="stylesheet">
+    <link href="{% static 'slider/bootstrap-slider.css' %}" rel="stylesheet">
+    <script>
+        function printValue(sliderID, textbox) {
+            var x = document.getElementById(textbox);
+            var y = document.getElementById(sliderID);
+            x.value = y.value;
+        }
+    </script>
   </head>
 
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="/">Routing game</a>
-        </div>
-        <div id="navbar" class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li ><a href="/">Simple Interface</a></li>
-            <li ><a class="active" href="/">Graph</a></li>
-            <!-- <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li> -->
-          </ul>
-        </div><!--/.nav-collapse -->
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">Routing game</a>
       </div>
-    </nav>
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li ><a href="/">Simple Interface</a></li>
+          <li ><a class="active" href="/">Graph</a></li>
+          <!-- <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li> -->
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </nav>
 
   <body>
     {% block content %}
@@ -42,12 +50,31 @@
         <div class="container">
           <a id="save-graph-btn" class="btn btn-default" href="#" role="button">Save graph</a>
           <a id="load-graph-btn" class="btn btn-default" href="#" role="button">Load graph</a>
+          <a id="start-game-btn" class="btn btn-default" href="#" role="button">Start Game</a>
         </div>
       </div>
 
+
       <div class="container">
-        <iframe src="/graph/editor" id="graph-editor">
-        </iframe>
+        <div class="col-md-10" id="leftcolumn">
+          <iframe src="/graph/editor" id="graph-editor">
+          </iframe>
+        </div>
+        <div class="col-md-2" id="rightcolumn">
+          <div id="path-display">
+          </div>
+          <!-- <ul style="list-style-type:none" id="path-list">
+          <li>
+          <a href='#'><input id="path-list-1" type="hidden" value="1">Path 1</a>
+          <div style="float:left;">
+          <input id="ex1" type="range" name="points" min="0" max="1" step="0.01" onchange="printValue('ex1', 'rangeValue1')">
+          </div>
+          <div style="display:inline-block;">
+          <input id="rangeValue1" type="text" size="5">
+          </div>
+          </li>
+          <!-- <li>1 </li> -->
+        </div>
       </div> <!-- /container -->
     {% endblock %}
 
@@ -55,10 +82,13 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
+
+
     <script src="{% static 'jquery/jquery.min.js' %}"></script>
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'd3/d3.v3.min.js' %}"></script>
     <script src="{% static 'graph/app.js' %}"></script>
 
+    <script src="{% static 'slider/bootstrap-slider.js' %}"></script>
   </body>
 </html>

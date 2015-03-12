@@ -15,6 +15,9 @@ function getCookie(name) {
     return cookieValue;
 }
 var csrftoken = getCookie('csrftoken');
+var current_graph = null;
+var generated_paths = [];
+var path_list_regex = /path-list-(\d+)/;
 
 /*
 The functions below will create a header with csrftoken
@@ -24,6 +27,7 @@ function csrfSafeMethod(method) {
     // these HTTP methods do not require CSRF protection
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
+
 function sameOrigin(url) {
     // test that a given url is a same-origin URL
     // url could be relative or scheme relative or absolute
@@ -63,8 +67,64 @@ $('#save-graph-btn').click(function(evt) {
 
 $('#load-graph-btn').click(function(evt) {
     name = 'first'; // TODO: Show user list of graph names in database.
-    load_graph(name);
+
+    var name=prompt("Enter graph name");
+
+    if (name) {
+        load_graph(name);
+    }
 });
+
+$('#start-game-btn').click(function(evt) {
+    start_game();
+});
+
+$('#path-list li a').on('click', function(e) {
+    e.preventDefault();
+    var num = $(this).html();
+    console.log(num);
+    editor_window = document.getElementById('graph-editor').contentWindow;
+    editor_window.highlighted_links = generated_paths[num];
+    editor_window.restart();
+});
+
+
+function highlight_link(link_to_highlight) {
+    editor_window = document.getElementById('graph-editor').contentWindow;
+    editor_window.highlighted_links = generated_paths[link_to_highlight];
+    editor_window.restart();
+}
+
+function start_game() {
+    $.ajax({
+        url : "/graph/generate_paths/",
+        type : "GET",
+        data : {
+            'graph': current_graph,
+            'source': 5,
+            'destination': 1
+        },
+
+        success : function(json) {
+            paths = json.paths;
+            generated_paths = paths;
+            $("#path-display").html(json.html);
+            $("a[id*='path-list']").on('click', function(e) {
+                e.preventDefault();
+                var match = path_list_regex.exec(this.id);
+                var num = match[1];
+                editor_window = document.getElementById('graph-editor').contentWindow;
+                editor_window.highlighted_links = generated_paths[num];
+                editor_window.restart();
+            });
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+}
 
 
 function load_graph(name) {
@@ -76,7 +136,9 @@ function load_graph(name) {
         },
 
         success : function(json) {
+            // console.log(json);
             graph_ui = JSON.parse(json['graph_ui']);
+            console.log(graph_ui);
             editor_window = document.getElementById('graph-editor').contentWindow;
 
             for (i = 0; i < graph_ui.nodes.length; ++i) {
@@ -89,9 +151,6 @@ function load_graph(name) {
 
                 source_index = graph_ui.links[i].source.index;
                 target_index = graph_ui.links[i].target.index;
-
-                console.log(source_index);
-                console.log(target_index);
 
                 graph_ui.links[i].source = graph_ui.nodes[source_index];
                 graph_ui.links[i].target = graph_ui.nodes[target_index];
@@ -107,20 +166,19 @@ function load_graph(name) {
                 .charge(-500)
                 .on('tick', editor_window.tick);
 
+
             editor_window.lastNodeId = json['last_node_id'];
             editor_window.restart();
+            editor_window.force.start();
+
+            current_graph = name;
         },
 
         // handle a non-successful response
         error : function(xhr,errmsg,err) {
-            // $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
-            //     " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
             console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
         }
     });
-
-    // nodes = graph[0];
-    // links = graph[1];
 }
 
 
@@ -142,12 +200,11 @@ function save_graph(nodes, links, name) {
             // $('#post-text').val(''); // remove the value from the input
             // console.log(json); // log the returned json to the console
             console.log("success"); // another sanity check
+            current_graph = name;
         },
 
         // handle a non-successful response
         error : function(xhr,errmsg,err) {
-            // $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
-            //     " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
             console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
         }
     });

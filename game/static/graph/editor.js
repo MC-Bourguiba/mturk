@@ -1,6 +1,15 @@
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4();
+}
+
 // set up SVG for D3
 var width  = 960,
-    height = 380,
+    height = 560,
     colors = d3.scale.category10();
 
 var svg = d3.select('body')
@@ -14,9 +23,11 @@ var svg = d3.select('body')
 //  - links are always source < target; edge directions are set by 'left' and 'right'.
 var nodes = [
 ],
-lastNodeId = null;
-links = [
-];
+    lastNodeId = null,
+    links = [
+    ],
+    highlighted_links = []
+    ;
 
 // init D3 force layout
 var force = d3.layout.force()
@@ -24,7 +35,7 @@ var force = d3.layout.force()
     .links(links)
     .size([width, height])
     .linkDistance(150)
-    .charge(-500)
+    .charge(0)
     .on('tick', tick)
 
 // define arrow markers for graph links
@@ -105,7 +116,6 @@ function restart() {
         .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
         .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; });
 
-
     // add new links
     path.enter().append('svg:path')
         .attr('class', 'link')
@@ -122,6 +132,8 @@ function restart() {
             selected_node = null;
             restart();
         });
+
+    path.style('stroke', function(d) {return highlighted_links.indexOf(d.id) > -1 ? 'red' :  'black'});
 
     // remove old links
     path.exit().remove();
@@ -187,6 +199,8 @@ function restart() {
             // unenlarge target node
             d3.select(this).attr('transform', '');
 
+            // WTF, this is so dumb. |
+            //                       |
             // add link to graph (update if exists)
             // NB: links are strictly source < target; arrows separately specified by booleans
             var source, target, direction;
@@ -210,6 +224,7 @@ function restart() {
             } else {
                 link = {source: source, target: target, left: false, right: false};
                 link[direction] = true;
+                link.id = guid();
                 links.push(link);
             }
 

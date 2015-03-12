@@ -17,7 +17,7 @@ class Node(models.Model):
 class Edge(models.Model):
     edge_id = UUIDField(primary_key=True, auto=True)
     graph = models.ForeignKey('Graph')
-    from_node = models.ForeignKey('Node', related_name='from')
-    to_node = models.ForeignKey('Node', related_name='to')
+    from_node = models.ForeignKey('Node', related_name='from_node')
+    to_node = models.ForeignKey('Node', related_name='to_node')
 
     weight_function = models.TextField()
