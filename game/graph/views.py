@@ -23,8 +23,7 @@ def index(request):
     template = 'graph/graph.djhtml'
     graphs = map(lambda g: g.name, Graph.objects.all())
     context = dict()
-    context['selected_graph_name'] = graphs[0]
-    context['graph_names'] = graphs[1:]
+    context['graph_names'] = graphs
     return render(request, template, context)
 
 

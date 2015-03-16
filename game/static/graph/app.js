@@ -69,18 +69,25 @@ $('#save-graph-btn').click(function(evt) {
 
 
 $('#load-graph-btn').click(function(evt) {
-    name = 'first'; // TODO: Show user list of graph names in database.
+    evt.preventDefault();
+    graph_name = "";
 
-    var name=prompt("Enter graph name");
+    $("#graph-list-display").children().each(function(i) {
+        if ($(this).hasClass("active")) {
+            graph_name = $(this).text();
+        }
+    });
 
-    if (name) {
-        load_graph(name);
+    if (graph_name) {
+        load_graph(graph_name);
     }
 });
+
 
 $('#start-game-btn').click(function(evt) {
     start_game();
 });
+
 
 $('#path-list li a').on('click', function(e) {
     e.preventDefault();
@@ -95,6 +102,7 @@ function highlight_link(link_to_highlight) {
     editor_window.highlighted_links = generated_paths[link_to_highlight];
     editor_window.restart();
 }
+
 
 function start_game() {
     $.ajax({

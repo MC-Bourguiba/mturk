@@ -3,13 +3,9 @@
 {% load bootstrap %}
 
 {% block graph_list %}
-<div class="list-group">
-  <a href="#" class="list-group-item active">
-    {{ selected_graph_name }}
-  </a>
-
+<div class="list-group" id="graph-list-display">
   {% for name in graph_names %}
-    <a href="#" class="list-group-item"> {{name}} </a>
+    <a href="#" class="list-group-item">{{name}}</a>
   {% endfor %}
 </div>
 
