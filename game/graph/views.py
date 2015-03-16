@@ -16,10 +16,51 @@ from django.core.files import File
 from utils import generate_graph, sanitize_graph_json, generate_paths
 from models import Graph, Node, Edge
 
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
+
 import simplejson as json
 
 
+    # if request.method == 'POST':
+    #     form = UserCreationForm(request.POST)
+    #     if form.is_valid():
+    #         new_user = form.save()
+    #         return HttpResponseRedirect("/books/")
+    # else:
+    #     form = UserCreationForm()
+    # return render(request, "graph/login.djhtml", {
+    #     'form': form,
+    # })
+
+    # template = 'graph/login.djhtml'
+    # context = dict()
+    # return render(request, template, context)
+
+
+def create_account(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            new_user = form.save()
+            return HttpResponseRedirect("/graph/index")
+    else:
+        form = UserCreationForm()
+    return render(request, "graph/register.djhtml", {
+        'form': form,
+    })
+
+
 def index(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect("/graph/accounts/profile")
+    else:
+        return HttpResponseRedirect("/graph/accounts/login")
+
+
+@login_required
+def show_graph(request):
     template = 'graph/graph.djhtml'
     graphs = map(lambda g: g.name, Graph.objects.all())
     context = dict()
@@ -27,12 +68,14 @@ def index(request):
     return render(request, template, context)
 
 
+@login_required
 def editor(request):
     template = 'graph/editor.djhtml'
     context = dict()
     return render(request, template, context)
 
 
+@login_required
 def create_graph(request):
     graph_dict = json.loads(request.body)
     generate_graph(graph_dict)
@@ -40,6 +83,7 @@ def create_graph(request):
     return JsonResponse(to_json)
 
 
+@login_required
 def load_graph(request):
     g_name = request.GET.dict()['name']
     graph = Graph.objects.get(name=g_name)

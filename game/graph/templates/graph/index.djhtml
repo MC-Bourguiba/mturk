@@ -1,5 +1,7 @@
 {% load staticfiles %}
 
+<!-- Why can't we do this using base.djhtml??? (Alignment comes out pretty weird D:) -->
+
 <html>
   <head>
     <meta charset="utf-8">
@@ -36,7 +38,7 @@
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
           <li ><a href="/">Simple Interface</a></li>
-          <li ><a class="active" href="/">Graph</a></li>
+          <li ><a class="active" href="/graph">Graph</a></li>
         </ul>
       </div><!--/.nav-collapse -->
     </div>
@@ -48,6 +50,7 @@
         <a id="save-graph-btn" class="btn btn-default" href="#" role="button">Save graph</a>
         <a id="load-graph-btn" class="btn btn-default" href="#" role="button">Load graph</a>
         <a id="start-game-btn" class="btn btn-default" href="#" role="button">Start Game</a>
+        <a id="start-game-btn" class="btn btn-default" href="/graph/accounts/logout" role="button">Logout</a>
       </div>
     </div>
     <div class="container-fluid">
@@ -59,10 +62,10 @@
           {% endblock %}
         </div>
       </div>
-      <div class="sidebar right">
+      <div class="sidebar right" id="path-display">
         <div class="well">
           <!-- <div class="col-md-2" id="rightcolumn"> -->
-          <div id="path-display">
+          <div>
             <div id="path-display-list">
             </div>
             <a id="submit-game-btn" class="btn btn-default" href="#" role="button">Submit</a>
