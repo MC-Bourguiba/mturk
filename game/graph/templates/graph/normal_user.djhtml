@@ -47,29 +47,19 @@
   <body>
     <div class="jumbotron">
       <div class="container">
-        <a id="save-graph-btn" class="btn btn-default" href="#" role="button">Save graph</a>
-        <a id="load-graph-btn" class="btn btn-default" href="#" role="button">Load graph</a>
+        <a id="start-game-btn" class="btn btn-default" href="#" role="button">Start Game</a>
         <a id="start-game-btn" class="btn btn-default" href="/graph/accounts/logout" role="button">Logout</a>
       </div>
     </div>
     <div class="container-fluid">
-      <!-- <div class="container" > -->
-      <div class="sidebar left">
-        <div class="well" id="graph-list">
-          {% block graph_list %}
-            <!-- <div class="col-md-1" id="leftcolumn"> -->
-          {% endblock %}
-        </div>
-      </div>
       <div class="sidebar right" id="path-display">
         <div class="well">
           <!-- <div class="col-md-2" id="rightcolumn"> -->
           <div>
-            <div id="user-display-list">
-              {% for name in user_names %}
-                <a href="#" class="list-group-item">{{ name }}</a>
-              {% endfor %}
+            <div id="path-display-list">
             </div>
+            <a id="submit-game-btn" class="btn btn-default" href="#" role="button">Submit</a>
+            <a id="show-cost-btn" class="btn btn-default" href="#" role="button">Show cost</a>
           </div>
         </div>
       </div>
@@ -83,7 +73,7 @@
     <script src="{% static 'jquery/jquery.min.js' %}"></script>
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'd3/d3.v3.min.js' %}"></script>
-    <script src="{% static 'graph/app.js' %}"></script>
+    <script src="{% static 'graph/user.js' %}"></script>
 
     <script src="{% static 'slider/bootstrap-slider.js' %}"></script>
     <script src="{% static 'graph/ui.js' %}"></script>

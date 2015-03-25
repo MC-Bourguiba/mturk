@@ -14,7 +14,6 @@ function getCookie(name) {
     }
     return cookieValue;
 }
-
 var csrftoken = getCookie('csrftoken');
 var current_graph = null;
 var generated_paths = [];
@@ -224,5 +223,5 @@ function save_graph(nodes, links, name) {
 
 
 editor_window.onload = function() {
-     // load_graph("name");
+     load_graph("test");
 };

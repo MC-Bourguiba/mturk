@@ -9,6 +9,9 @@ from graph_tools import *
 import networkx as nx
 
 
+root_username = 'root'
+
+
 # TODO: Clean this up
 def generate_graph(graph_dict):
     edges = set()

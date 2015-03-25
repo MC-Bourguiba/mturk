@@ -1,6 +1,4 @@
 from django.shortcuts import render
-
-from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template import RequestContext, loader
 from django.template.loader import render_to_string
@@ -13,30 +11,16 @@ from django.contrib import messages
 
 from django.core.files import File
 
-from utils import generate_graph, sanitize_graph_json, generate_paths
+from utils import generate_graph, sanitize_graph_json, generate_paths, root_username
 from models import Graph, Node, Edge
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 
+from django.contrib.auth.models import User
+
 import simplejson as json
-
-
-    # if request.method == 'POST':
-    #     form = UserCreationForm(request.POST)
-    #     if form.is_valid():
-    #         new_user = form.save()
-    #         return HttpResponseRedirect("/books/")
-    # else:
-    #     form = UserCreationForm()
-    # return render(request, "graph/login.djhtml", {
-    #     'form': form,
-    # })
-
-    # template = 'graph/login.djhtml'
-    # context = dict()
-    # return render(request, template, context)
 
 
 def create_account(request):
@@ -62,8 +46,12 @@ def index(request):
 @login_required
 def show_graph(request):
     template = 'graph/graph.djhtml'
+    if request.user.username != root_username:
+        template = 'graph/normal_user.djhtml'
+
     graphs = map(lambda g: g.name, Graph.objects.all())
     context = dict()
+    context['user_names'] = map(lambda u: u.get_username(), User.objects.all())
     context['graph_names'] = graphs
     return render(request, template, context)
 
