@@ -20,6 +20,12 @@ ssh bayen@104.131.132.100
 
 and enter password when prompted
 
+The credentials for the "master" user:
+
+username: root
+
+password: root
+
 
 Install everything in requirements.txt
 
