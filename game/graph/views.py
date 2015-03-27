@@ -28,15 +28,17 @@ def create_account(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             new_user = form.save()
-            pm = PlayerModel.objects.filter(in_use=False)[:1].get()
 
-            pm.in_use = True
-            player = Player()
-            player.user = new_user
-            player.player_model = pm
-
-            pm.save()
-            player.save()
+            try:
+                pm = PlayerModel.objects.filter(in_use=False)[:1].get()
+                pm.in_use = True
+                player = Player()
+                player.user = new_user
+                player.player_model = pm
+                pm.save()
+                player.save()
+            except:
+                pass
 
             return HttpResponseRedirect("/graph/index")
     else:
