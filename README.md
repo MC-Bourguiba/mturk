@@ -38,6 +38,16 @@ supervisord -c supervisor.conf
 
 ```
 
+Use supervisorctl for managing the server
+
+
+``bash
+
+supervisorctl -c supervisor.conf
+
+```
+
+
 Using fabric:
 
 * Deployment: (Need to be contributor on Github repository and setup SSH ForwardAgent).
@@ -90,3 +100,6 @@ TODO (need to be updated):
     * History:
       * Cumulative cost
       * Show last cost and cumulative
+
+* Styling
+** Use CSS
