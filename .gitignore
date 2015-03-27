@@ -80,3 +80,4 @@ notes/routing_game.fls
 notes/routing_game.fdb_latexmk
 
 notes/routing_game.aux
+/game/game/local_settings.py
