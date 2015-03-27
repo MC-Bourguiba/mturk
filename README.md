@@ -70,16 +70,16 @@ TODO (need to be updated):
 
 * Root
 * Create user
-** Origin, destination, flow
-** Number of iterations
-** Can end and start the game
+  * Origin, destination, flow
+  * Number of iterations
+  * Can end and start the game
 
 * Client
-** Normal User
-** Assigned next available positions
-** Notifcation that game has started
-*** iteration goes from 0 to 1?
-*** Can start input decisions
-*** History:
-**** Cumulative cost
-**** Show last cost and cumulative
+  * Normal User
+  * Assigned next available positions
+  * Notifcation that game has started
+    * iteration goes from 0 to 1?
+    * Can start input decisions
+    * History:
+      * Cumulative cost
+      * Show last cost and cumulative
