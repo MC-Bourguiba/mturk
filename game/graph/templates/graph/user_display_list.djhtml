@@ -1,7 +1,0 @@
-<ul style="list-style-type:none" id="user-display-list">
-  <div class="list-group">
-    {% for name in user_names %}
-      <a href="#" class="list-group-item">{{ name }}</a>
-    {% endfor %}
-  </div>
-</ul>

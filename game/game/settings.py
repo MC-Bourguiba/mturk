@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'djangojs',
     'id_counter',
     'bootstrapform',
     'graph',
@@ -55,7 +56,6 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'game.urls'
 
 WSGI_APPLICATION = 'game.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
@@ -98,3 +98,6 @@ STATICFILES_DIRS = (
     ),
     os.path.join(BASE_DIR, "static"),
 )
+
+
+APPEND_SLASH = True

@@ -1,10 +1,10 @@
 function guid() {
-  function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1);
-  }
-  return s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4();
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+    }
+    return s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4();
 }
 
 // set up SVG for D3
@@ -27,7 +27,10 @@ var nodes = [
     links = [
     ],
     highlighted_links = []
-    ;
+;
+
+// var node_selected_callbacks = [];
+// var edge_click_callbacks = [];
 
 // init D3 force layout
 var force = d3.layout.force()
@@ -129,6 +132,7 @@ function restart() {
             mousedown_link = d;
             if(mousedown_link === selected_link) selected_link = null;
             else selected_link = mousedown_link;
+            window.top.on_edge_selected(selected_link);
             selected_node = null;
             restart();
         });
@@ -172,8 +176,18 @@ function restart() {
 
             // select node
             mousedown_node = d;
-            if(mousedown_node === selected_node) selected_node = null;
-            else selected_node = mousedown_node;
+            if(mousedown_node === selected_node) {
+                selected_node = null;
+            } else {
+                selected_node = mousedown_node;
+            }
+
+            window.top.on_node_selected(selected_node);
+
+            // node_selected_callbacks.forEach(function(f) {
+            //     f(selected_node);
+            // });
+
             selected_link = null;
 
             // reposition drag line
@@ -201,6 +215,7 @@ function restart() {
 
             // WTF, this is so dumb. |
             //                       |
+            //                      \ /
             // add link to graph (update if exists)
             // NB: links are strictly source < target; arrows separately specified by booleans
             var source, target, direction;
@@ -230,7 +245,13 @@ function restart() {
 
             // select new link
             selected_link = link;
+
+            window.top.on_edge_selected(selected_link);
+
             selected_node = null;
+
+            // window.top.on_node_selected(selected_node);
+
             restart();
         });
 

@@ -1,4 +1,7 @@
 {% load staticfiles %}
+{% load js %}
+{% django_js %}
+
 <html>
   <head>
     <meta charset="utf-8">
@@ -10,7 +13,12 @@
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}"
           rel="stylesheet" media="screen">
     <link href="{% static 'bootstrap/css/jumbotron.css' %}" rel="stylesheet">
-  </head>
+    <link href="{% static 'graph/app.css' %}" rel="stylesheet">
+    <link href="{% static 'slider/bootstrap-slider.css' %}" rel="stylesheet">
+    <link href="{% static 'bootstrap-switch/bootstrap-switch.css' %}" rel="stylesheet">
+    <!-- <link href="{% static 'bootstrap-switch/doc.min.css' %}" rel="stylesheet"> -->
+
+ </head>
 
   <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
@@ -26,11 +34,9 @@
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
           <li ><a href="/">Simple Interface</a></li>
-          <li ><a class="active" href="/graph">Graph</a></li>
-          <!-- <li><a href="#about">About</a></li>
-          <li><a href="#contact">Contact</a></li> -->
+          <li ><a class="active" href="{% url 'graph' %}">Graph</a></li>
         </ul>
-      </div><!--/.nav-collapse -->
+      </div>
     </div>
   </nav>
 
@@ -41,4 +47,11 @@
 
   <script src="{% static 'jquery/jquery.min.js' %}"></script>
   <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'jquery/jquery.min.js' %}"></script>
+  <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'd3/d3.v3.min.js' %}"></script>
+  <script src="{% static 'graph/app.js' %}"></script>
+  <script src="{% static 'slider/bootstrap-slider.js' %}"></script>
+  <script src="{% static 'graph/ui.js' %}"></script>
+  <script src="{% static 'bootstrap-switch/bootstrap-switch.js' %}"></script>
 </html>

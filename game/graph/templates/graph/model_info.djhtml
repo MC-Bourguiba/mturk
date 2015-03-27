@@ -1,0 +1,7 @@
+<div>
+  <p> Player model: <span id="model-info-username"> {{ name }} </span> </p>
+  <p> Graph: <span id="model-info-graph"> {{ graph_name }} </span> </p>
+  <p> Start Node: <span id="model-info-start"> {{ start }} </span> </p>
+  <p> Destination Node: <span id="model-info-destination"> {{ destination }} </span> </p>
+  <p> Model Total flow: <span id="model-info-slow"> {{ flow }} </span> </p>
+</div>

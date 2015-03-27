@@ -1,0 +1,27 @@
+{% extends "graph/base.djhtml" %}
+{% load staticfiles %}
+
+{% block content %}
+  <div class="jumbotron">
+    <div class="container">
+      <a id="start-game-btn" class="btn btn-default" href="#" role="button">Start Game</a>
+      <a id="start-game-btn" class="btn btn-default" href="{% url 'logout' %}" role="button">Logout</a>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div class="sidebar right" id="path-display">
+      <div class="well">
+        <div>
+          <div id="path-display-list">
+          </div>
+          <a id="submit-game-btn" class="btn btn-default" href="#" role="button">Submit</a>
+          <a id="show-cost-btn" class="btn btn-default" href="#" role="button">Show cost</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8" id="middlecolumn">
+      <iframe src="/graph/editor" id="graph-editor">
+      </iframe>
+    </div>
+  </div> <!-- /container -->
+{% endblock %}
