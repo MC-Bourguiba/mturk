@@ -38,4 +38,6 @@ urlpatterns = patterns('',
                            name='assign_edge_cost'),
                        url(r'^assign_all_edge_cost/$', views.assign_all_edge_cost,
                            name='assign_all_edge_cost'),
+                       url(r'^user_info/(?P<username>[a-zA-Z0-9_]+)$', views.get_user_info,
+                           name='get_user_info'),
 )

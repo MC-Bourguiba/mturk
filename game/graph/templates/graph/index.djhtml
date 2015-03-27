@@ -10,6 +10,7 @@
        role="button">Logout</a>
   </div>
 </div>
+
 <div class="container-fluid">
   <div class="row-fluid">
     {% block center_content %}

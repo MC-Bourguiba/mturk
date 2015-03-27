@@ -1,6 +1,4 @@
 {% load staticfiles %}
-{% load js %}
-{% django_js %}
 
 <html>
   <head>
@@ -50,8 +48,10 @@
   <script src="{% static 'jquery/jquery.min.js' %}"></script>
   <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
   <script src="{% static 'd3/d3.v3.min.js' %}"></script>
-  <script src="{% static 'graph/app.js' %}"></script>
   <script src="{% static 'slider/bootstrap-slider.js' %}"></script>
   <script src="{% static 'graph/ui.js' %}"></script>
   <script src="{% static 'bootstrap-switch/bootstrap-switch.js' %}"></script>
+  <script src="{% static 'graph/common.js' %}"></script>
+  {% block scripts %}
+  {% endblock %}
 </html>

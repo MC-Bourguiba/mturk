@@ -56,15 +56,19 @@ def index(request):
 @login_required
 def show_graph(request):
     template = 'graph/root.djhtml'
-    if request.user.username != root_username:
-        template = 'graph/user.djhtml'
 
-    graphs = map(lambda g: g.name, Graph.objects.all())
     context = dict()
 
-    context['usernames'] = User.objects.values_list('username', flat=True)
-    context['model_names'] = PlayerModel.objects.values_list('name', flat=True)
-    context['graph_names'] = graphs
+    if request.user.username != root_username:
+        template = 'graph/user.djhtml'
+        user = User.objects.get(username=request.user.username)
+        context['graph'] = user.player.player_model.graph.name
+        context['username'] = user.username
+    else:
+        graphs = map(lambda g: g.name, Graph.objects.all())
+        context['usernames'] = User.objects.values_list('username', flat=True)
+        context['model_names'] = PlayerModel.objects.values_list('name', flat=True)
+        context['graph_names'] = graphs
 
     return render(request, template, context)
 
@@ -266,4 +270,13 @@ def assign_all_edge_cost(request):
         edge.save()
 
     response = dict()
+    return JsonResponse(response)
+
+
+def get_user_info(request, username):
+    user = User.objects.get(username=username)
+
+    response = dict()
+    response['graph'] = user.player.player_model.graph.name
+
     return JsonResponse(response)

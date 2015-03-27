@@ -1,4 +1,5 @@
 {% extends "graph/index.djhtml" %}
+{% load staticfiles %}
 
 {% block left_list %}
 <div class="btn-group btn-toggle" id="graph-user-btn">
@@ -85,4 +86,9 @@
   </div>
 </div>
 
+{% endblock %}
+
+
+{% block scripts %}
+  <script src="{% static 'graph/root.js' %}"></script>
 {% endblock %}

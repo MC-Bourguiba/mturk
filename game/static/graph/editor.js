@@ -184,10 +184,6 @@ function restart() {
 
             window.top.on_node_selected(selected_node);
 
-            // node_selected_callbacks.forEach(function(f) {
-            //     f(selected_node);
-            // });
-
             selected_link = null;
 
             // reposition drag line
