@@ -39,7 +39,8 @@ supervisord -c supervisor.conf
 ```
 
 Using fabric:
-  Deployment: (Need to be contributor on Github repository and setup SSH ForwardAgent).
+
+* Deployment: (Need to be contributor on Github repository and setup SSH ForwardAgent).
 
   ```bash
 
@@ -47,7 +48,7 @@ Using fabric:
 
   ```
 
-  Database: Schema migrations
+*  Database: Schema migrations
 
   ```bash
 
