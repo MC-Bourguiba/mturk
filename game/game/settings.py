@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 
 
 # Quick-start development settings - unsuitable for production
@@ -69,6 +70,53 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': ('%(levelname)s %(asctime)s %(process)d'
+                       ': %(message)s')
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'logfile': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': PROJECT_PATH + '/../logs/bayen.log',
+            'maxBytes': 1024 * 1024 * 20,  # 20MB
+            'backupCount': 10,
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['logfile'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+        'django.db.backends': {
+            'handlers': ['logfile'],
+            'level': 'ERROR',
+            'propagate': False
+        },
+    }
+}
 
 
 # Static files (CSS, JavaScript, Images)
