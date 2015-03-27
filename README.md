@@ -13,9 +13,7 @@ password: bayen
 ssh using:
 
 ```bash
-
 ssh bayen@104.131.132.100
-
 ```
 
 and enter password when prompted
@@ -33,18 +31,14 @@ Install everything in requirements.txt
 If supervisor is down, then cd to /home/bayen/bayen/game and:
 
 ```bash
-
 supervisord -c supervisor.conf
-
 ```
 
 Use supervisorctl for managing the server
 
 
-``bash
-
+```bash
 supervisorctl -c supervisor.conf
-
 ```
 
 
@@ -53,18 +47,14 @@ Using fabric:
 * Deployment: (Need to be contributor on Github repository and setup SSH ForwardAgent).
 
   ```bash
-
     fab prod deploy
-
   ```
 
 *  Database: Schema migrations
 
   ```bash
-
     fab prod migrate_schema
     fab prod migrate
-
   ```
 
 
