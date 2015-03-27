@@ -103,3 +103,5 @@ TODO (need to be updated):
 
 * Styling
 ** Use CSS
+
+* Caching? (Probably not needed?)
