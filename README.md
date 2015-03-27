@@ -76,7 +76,7 @@ Use pgAdmin3 and follow this setup:
 TODO (need to be updated):
 
 * Root
-* Create user
+  * Create user
   * Origin, destination, flow
   * Number of iterations
   * Can end and start the game
