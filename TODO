@@ -16,3 +16,8 @@
 *** History:
 **** Cumulative cost
 **** Show last cost and cumulative
+
+
+* Deployment / general stuff
+** Use supervisord for process management
+** Some way to display statistics (?)
