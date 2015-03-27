@@ -219,16 +219,18 @@ $("#add-model").click(function(e) {
             // console.log(json); // log the returned json to the console
             console.log(json); // another sanity check
 
-            html = "<a href='#' class='list-group-item'>" + model_name  + "</a>";
+            if (json['success']) {
+                html = "<a href='#' class='list-group-item'>" + model_name  + "</a>";
 
-            $("#model-display-list").append(html);
+                $("#model-display-list").append(html);
 
-            $('#model-display-list a').click(function(e) {
-                e.preventDefault();
-                listActivate($(this), e);
-                $("#user-operation-pane").removeClass('hidden');
-                get_model_info($.trim(this.text));
-            });
+                $('#model-display-list a').click(function(e) {
+                    e.preventDefault();
+                    listActivate($(this), e);
+                    $("#user-operation-pane").removeClass('hidden');
+                    get_model_info($.trim(this.text));
+                });
+            }
         },
 
         // handle a non-successful response

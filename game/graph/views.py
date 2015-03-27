@@ -114,9 +114,6 @@ def get_model_info(request, modelname):
         model_dict['graph_name'] = player_model.graph.name
         model_dict['flow'] = player_model.flow
 
-        # import ipdb; ipdb.set_trace()
-
-
     html = render_to_string('graph/model_info.djhtml', model_dict)
 
     response = dict()
@@ -162,11 +159,15 @@ def assign_model_graph(request):
 @login_required
 def add_model(request):
     data = json.loads(request.body)
-
-    player_model = PlayerModel(name=data['model_name'])
-    player_model.save()
-
     response = dict()
+
+    if PlayerModel.objects.filter(name=data['model_name']).count() > 0:
+        response['success'] = False
+    else:
+        player_model = PlayerModel(name=data['model_name'])
+        player_model.save()
+        response['success'] = True
+
     return JsonResponse(response)
 
 
