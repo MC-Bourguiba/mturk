@@ -9,6 +9,7 @@ from graph_tools import *
 import parser
 
 import networkx as nx
+import uuid
 
 
 root_username = 'root'
@@ -29,6 +30,7 @@ def generate_and_save_graph(graph_dict):
 
     for n_dict in graph_dict['nodes']:
         node = Node()
+        node.node_id = str(uuid.uuid4())
         node_id  = n_dict['id']
         node.ui_id = node_id
         node.graph = graph
