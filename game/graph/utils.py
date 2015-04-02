@@ -1,10 +1,12 @@
-from models import Node, Edge, Graph
+from models import *
 
 import json
 import re
 import copy
 
 from graph_tools import *
+
+import parser
 
 import networkx as nx
 
@@ -13,7 +15,7 @@ root_username = 'root'
 
 
 # TODO: Clean this up
-def generate_graph(graph_dict):
+def generate_and_save_graph(graph_dict):
     edges = set()
     edges_number = set()
 
@@ -48,6 +50,56 @@ def generate_graph(graph_dict):
         edge.graph = graph
         edge.save()
 
+    return graph
+
+
+def is_turn_complete(game):
+    players = Player.objects.filter(game=game)
+
+    for player in players:
+        if not player.completed_task:
+            return False
+
+    return True
+
+
+def evalFunc(func, xVal):
+    x = xVal
+    return eval(func)
+
+
+def update_cost(game):
+    edge_flow = dict()
+    current_turn = game.current_turn
+    flow_distributions = current_turn.flow_distributions
+
+    for e in Edge.objects.filter(graph=game.graph):
+        edge_flow[e] = 0.0
+
+    for flow_distribution in flow_distributions.all():
+        for path_assignment in flow_distribution.path_assignments.all():
+            for e in path_assignment.path.edges.all():
+                edge_flow[e] += path_assignment.flow
+
+    graph_cost = GraphCost(graph=game.graph)
+    graph_cost.save()
+
+    for e in Edge.objects.filter(graph=game.graph):
+        cost_f = parser.expr(e.cost_function).compile()
+        cost = evalFunc(cost_f, edge_flow[e])
+
+        print cost
+
+        edge_cost = EdgeCost()
+        edge_cost.edge = e
+        edge_cost.cost = cost
+        edge_cost.save()
+        graph_cost.edge_costs.add(edge_cost)
+
+    graph_cost.save()
+    current_turn.graph_cost = graph_cost
+    current_turn.save()
+
 
 def sanitize_graph_json(graph_dict):
     for i in range(len(graph_dict['nodes'])):
@@ -55,10 +107,10 @@ def sanitize_graph_json(graph_dict):
     return graph_dict
 
 
-def generate_paths(graph_name, source_ui_id, destination_ui_id):
-    source_node = Node.objects.get(graph__name=graph_name, ui_id=source_ui_id)
-    target_node = Node.objects.get(graph__name=graph_name, ui_id=destination_ui_id)
-    graph = Graph.objects.get(name=graph_name)
+def generate_paths(graph, source_node, destination_node, player_model):
+    # source_node = Node.objects.get(graph__name=graph_name, ui_id=source_ui_id)
+    # target_node = Node.objects.get(graph__name=graph_name, ui_id=destination_ui_id)
+    # graph = Graph.objects.get(name=graph_name)
 
     G = nx.DiGraph()
 
@@ -67,12 +119,24 @@ def generate_paths(graph_name, source_ui_id, destination_ui_id):
 
     path_edges = dict()
 
-    for idx, p in enumerate(nx.all_simple_paths(G, source_ui_id, destination_ui_id)):
-        path = []
+    # path_m = Path()
+    # path_m.save()
+
+    for idx, p in enumerate(nx.all_simple_paths(G, source_node.ui_id, destination_node.ui_id)):
+        path = Path()
+        path.graph = graph
+        path.player_model = player_model
+        path.save()
+
+        # path = []
         for c, v in zip(p, p[1:]):
-            e = Edge.objects.get(graph__name=graph_name,
-                                from_node__ui_id=c,
-                                to_node__ui_id=v)
-            path.append(str(e.edge_id))
-        path_edges[idx] = path
-    return path_edges
+            e = Edge.objects.get(graph__name=graph.name,
+                                 from_node__ui_id=c,
+                                 to_node__ui_id=v)
+            # path.append(str(e.edge_id))
+            # path_m.edges.add(e)
+            path.edges.add(e)
+
+        # path_edges[idx] = path
+
+    # return path_edges

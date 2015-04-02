@@ -1,90 +1,97 @@
 {% extends "graph/index.djhtml" %}
 {% load staticfiles %}
 
+{% block jumbotron %}
+  <a id="save-graph-btn" class="btn btn-default" href="#" role="button">Save graph</a>
+  <a id="load-graph-btn" class="btn btn-default" href="#" role="button">Load graph</a>
+  <a id="start-game-btn" class="btn btn-default" href="{% url 'logout' %}"
+     role="button">Logout</a>
+{% endblock %}
+
 {% block left_list %}
-<div class="btn-group btn-toggle" id="graph-user-btn">
-  <button class="btn btn-primary active" id="show-graphs-btn">Graphs</button>
-  <button class="btn btn-default" id="show-users-btn">Users</button>
-</div>
+  <div class="btn-group btn-toggle" id="graph-user-btn">
+    <button class="btn btn-primary active" id="show-graphs-btn">Graphs</button>
+    <button class="btn btn-default" id="show-users-btn">Users</button>
+  </div>
 
-<div class="list-group" id="graph-list-display">
-  {% for name in graph_names %}
-  <a href="#" class="list-group-item">{{ name }}</a>
-  {% endfor %}
-</div>
+  <div class="list-group" id="graph-list-display">
+    {% for name in graph_names %}
+      <a href="#" class="list-group-item">{{ name }}</a>
+    {% endfor %}
+  </div>
 
-<div class="list-group hidden" id="user-list-display">
-  {% for name in usernames %}
-  <a href="#" class="list-group-item">{{ name }}</a>
-  {% endfor %}
-</div>
+  <div class="list-group hidden" id="user-list-display">
+    {% for name in usernames %}
+      <a href="#" class="list-group-item">{{ name }}</a>
+    {% endfor %}
+  </div>
 
 {% endblock %}
 
 {% block right_list %}
-<div>
-  <span class="label label-default" >Player Model</span>
-  <div class="control-group" id="fields">
-    <div class="controls" id="profs">
-      <form class="input-append">
-        <div id="field">
-          <input autocomplete="off" class="input" id="model-name" name="model_name" type="text" placeholder="Model name"/>
-          <button id="add-model" class="btn add-more" type="button">+</button>
-        </div>
-      </form>
+  <div>
+    <span class="label label-default" >Player Model</span>
+    <div class="control-group" id="fields">
+      <div class="controls" id="profs">
+        <form class="input-append">
+          <div id="field">
+            <input autocomplete="off" class="input" id="model-name" name="model_name" type="text" placeholder="Model name"/>
+            <button id="add-model" class="btn add-more" type="button">+</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div id="model-display-list">
+      {% for name in model_names %}
+        <a href="#" class="list-group-item">
+          {{ name }}
+        </a>
+      {% endfor %}
     </div>
   </div>
-  <div id="model-display-list">
-    {% for name in model_names %}
-    <a href="#" class="list-group-item">
-      {{ name }}
-    </a>
-    {% endfor %}
   </div>
-</div>
-</div>
 
 {% endblock %}
 
 {% block center_content %}
-<div class="container-fluid" id="user-operation-pane" class="hidden">
-  <div class="row-fluid">
-    <div class="col-md-3">
-      <a id="assign-user-model" class="btn btn-default" href="#" role="button">Assign model to user</a>
-      <div class="input-group" style="margin-top: 10px; margin-bottom: 10px;">
-        <input type="text" class="form-control bfh-number" data-bind="value:replyNumber"
-               id="flow-input"/>
+  <div class="container-fluid" id="user-operation-pane" class="hidden">
+    <div class="row-fluid">
+      <div class="col-md-3">
+        <a id="assign-user-model" class="btn btn-default" href="#" role="button">Assign model to user</a>
+        <div class="input-group" style="margin-top: 10px; margin-bottom: 10px;">
+          <input type="text" class="form-control bfh-number" data-bind="value:replyNumber"
+                 id="flow-input"/>
           <span class="input-group-btn">
             <button class="btn btn-default" type="button" id="assign-flow-btn">Assign flow</button>
           </span>
-      </div>
-      <span class="label label-primary">Simple cost in terms of x. Example: x + 1</span>
-      <div class="input-group" style="margin-top: 10px; margin-bottom: 10px;">
-        <input type="text" class="form-control"
-               id="cost-input"/>
+        </div>
+        <span class="label label-primary">Simple cost in terms of x. Example: x + 1</span>
+        <div class="input-group" style="margin-top: 10px; margin-bottom: 10px;">
+          <input type="text" class="form-control"
+                 id="cost-input"/>
           <span class="input-group-btn">
             <button class="btn btn-default" type="button" id="assign-cost-btn">Assign cost </button>
           </span>
-      </div>
-            <button class="btn btn-default" type="button" id="assign-all-cost-btn">Assign cost to all </button>
+        </div>
+        <button class="btn btn-default" type="button" id="assign-all-cost-btn">Assign cost to all </button>
 
-    </div>
-    <div class="col-md-4" style="overflow: hidden;">
-      <div id="user-model-info-pane" style="float: left; margin-right: 10px;" align="left">
       </div>
-      <div id="model-info-pane" align="right">
+      <div class="col-md-4" style="overflow: hidden;">
+        <div id="user-model-info-pane" style="float: left; margin-right: 10px;" align="left">
+        </div>
+        <div id="model-info-pane" align="right">
+        </div>
       </div>
-    </div>
-    <div class="col-md-5" >
-      <a id="assign-start-node" class="btn btn-default" href="#" role="button">Assign start node</a>
-      <a id="assign-destination-node" class="btn btn-default" href="#" role="button">Assign destination node</a>
-      <a id="assign-graph" class="btn btn-default" href="#" role="button">Assign graph</a>
-      <p> Selected node:  <span id="selected-node"></span>  </p>
-      <p> Selected edge: <span id="selected-edge"></span> </p>
-      <p> Edge cost function: <span id="edge-cost-function"></span> </p>
+      <div class="col-md-5" >
+        <a id="assign-start-node" class="btn btn-default" href="#" role="button">Assign start node</a>
+        <a id="assign-destination-node" class="btn btn-default" href="#" role="button">Assign destination node</a>
+        <a id="assign-graph" class="btn btn-default" href="#" role="button">Assign graph</a>
+        <p> Selected node:  <span id="selected-node"></span>  </p>
+        <p> Selected edge: <span id="selected-edge"></span> </p>
+        <p> Edge cost function: <span id="edge-cost-function"></span> </p>
+      </div>
     </div>
   </div>
-</div>
 
 {% endblock %}
 

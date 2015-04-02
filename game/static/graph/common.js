@@ -20,11 +20,13 @@ var csrftoken = null;
 var current_graph = null;
 var generated_paths = [];
 var path_list_regex = /path-list-(\d+)/;
-var editor_window = null;
 var selected_node = null;
 var current_modelname = null;
 var current_username = null;
 var current_edge = null;
+var editor_window = document.getElementById("graph-editor").contentWindow;
+
+csrftoken = getCookie('csrftoken');
 
 
 /*
@@ -73,7 +75,9 @@ function load_graph(name) {
         success : function(json) {
             // console.log(json);
             graph_ui = JSON.parse(json['graph_ui']);
-            console.log(graph_ui);
+            // console.log(graph_ui);
+
+            editor_window = document.getElementById('graph-editor').contentWindow;
 
 
             for (i = 0; i < graph_ui.nodes.length; ++i) {
@@ -115,9 +119,3 @@ function load_graph(name) {
         }
     });
 }
-
-
-$("#graph-editor").ready(function() {
-    csrftoken = getCookie('csrftoken');
-    editor_window = document.getElementById('graph-editor').contentWindow;
-});

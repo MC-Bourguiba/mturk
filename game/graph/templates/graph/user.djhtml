@@ -1,37 +1,40 @@
-{% extends "graph/base.djhtml" %}
+{% extends "graph/index.djhtml" %}
 {% load staticfiles %}
 
-{% block content %}
-<div class="jumbotron">
-  <div class="container">
-    <a id="start-game-btn" class="btn btn-default" href="#" role="button">Start Game</a>
-    <a id="start-game-btn" class="btn btn-default" href="{% url 'logout' %}" role="button">Logout</a>
-  </div>
-</div>
-
-<input id="graph-hidden" type="hidden" name="graph" value="{{ graph }}" />
-<input id="username-hidden" type="hidden" name="graph" value="{{ username }}" />
+{% block jumbotron %}
+  <!-- <a id="start-game-btn" class="btn btn-default" href="#" role="button">Start Game</a> -->
+  <a id="start-game-btn" class="btn btn-default" href="{% url 'logout' %}" role="button">Logout</a>
+  <input id="graph-hidden" type="hidden" name="graph" value="{{ graph }}" />
+  <input id="username-hidden" type="hidden" name="graph" value="{{ username }}" />
+  <input id="source-hidden" type="hidden" name="graph" value="{{ start }}" />
+  <input id="destination-hidden" type="hidden" name="graph" value="{{ destination }}" />
+{% endblock %}
 
 
-<div class="container-fluid">
-  <div class="sidebar right" id="path-display">
-    <div class="well">
-      <div>
-        <div id="path-display-list">
-        </div>
-        <a id="submit-game-btn" class="btn btn-default" href="#" role="button">Submit</a>
-        <a id="show-cost-btn" class="btn btn-default" href="#" role="button">Show cost</a>
-      </div>
+{% block right_list %}
+  <div>
+    <div id="path-display-list">
+    </div>
+    <div id="path-btns" style="display: none">
+      <a id="submit-game-btn" class="btn btn-default" href="#" role="button">Submit</a>
+      <!-- <a id="show-cost-btn" class="btn btn-default" href="#" role="button">Show cost</a> -->
+    </div>
+    <div id="completed-turn" style="display: none">
+      <p> You finished your turn! </p>
     </div>
   </div>
-  <div class="col-md-8" id="middlecolumn">
-    <iframe src="{% url 'graph_editor' %}" id="graph-editor">
-    </iframe>
-  </div>
-</div> <!-- /container -->
+{% endblock %}
+
+
+{% block center_content %}
+  <p> User: {{ username }} </p>
+  <p> Graph: {{ graph }} </p>
+  <p> Start: {{ start }} </p>
+  <p> Destination: {{ destination }} </p>
+  <p> Flow: {{ flow }} </p>
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'graph/user.js' %}"></script>
-
+  <script src="{% static 'graph/user.js' %}">
+  </script>
 {% endblock %}

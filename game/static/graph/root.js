@@ -176,26 +176,28 @@ function on_edge_selected(edge) {
 }
 
 function update_edge_info(edge_id) {
-    $.ajax({
-        url : '/graph/get_edge_cost/' + edge_id + '/',
-        type : "GET", // http method
-        // data : { the_post : $('#post-text').val() }, // data sent with the post request
+    if (current_graph != null) {
+        $.ajax({
+            url : '/graph/get_edge_cost/' + edge_id + '/',
+            type : "GET", // http method
+            // data : { the_post : $('#post-text').val() }, // data sent with the post request
 
-        // handle a successful response
-        success : function(json) {
-            console.log(json);
-            console.log("success"); // another sanity check
+            // handle a successful response
+            success : function(json) {
+                console.log(json);
+                console.log("success"); // another sanity check
 
-            current_edge = edge_id;
-            $("#edge-cost-function").text(json['cost']);
-            $("#selected-edge").text(json['from_node'] + " -> " + json['to_node']);
-        },
+                current_edge = edge_id;
+                $("#edge-cost-function").text(json['cost']);
+                $("#selected-edge").text(json['from_node'] + " -> " + json['to_node']);
+            },
 
-        // handle a non-successful response
-        error : function(xhr,errmsg,err) {
-            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-        }
-    });
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+        });
+    }
 }
 
 

@@ -4,10 +4,9 @@
 {% block content %}
 <div class="jumbotron">
   <div class="container">
-    <a id="save-graph-btn" class="btn btn-default" href="#" role="button">Save graph</a>
-    <a id="load-graph-btn" class="btn btn-default" href="#" role="button">Load graph</a>
-    <a id="start-game-btn" class="btn btn-default" href="{% url 'logout' %}"
-       role="button">Logout</a>
+
+    {% block jumbotron %}
+    {% endblock %}
   </div>
 </div>
 

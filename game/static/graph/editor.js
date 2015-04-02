@@ -25,9 +25,9 @@ var nodes = [
 ],
     lastNodeId = null,
     links = [
-    ],
-    highlighted_links = []
-;
+    ];
+var highlighted_links = [];
+
 
 // var node_selected_callbacks = [];
 // var edge_click_callbacks = [];
