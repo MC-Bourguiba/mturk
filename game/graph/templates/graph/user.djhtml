@@ -27,11 +27,14 @@
 
 
 {% block center_content %}
-  <p> User: {{ username }} </p>
-  <p> Graph: {{ graph }} </p>
-  <p> Start: {{ start }} </p>
-  <p> Destination: {{ destination }} </p>
-  <p> Flow: {{ flow }} </p>
+  <div style="width:800px; margin:0 auto;">
+    <p> User: {{ username }} </p>
+    <p> Graph: {{ graph }} </p>
+    <p> Start: {{ start }} </p>
+    <p> Destination: {{ destination }} </p>
+    <p> Flow: {{ flow }} </p>
+  </div>
+
 {% endblock %}
 
 {% block scripts %}

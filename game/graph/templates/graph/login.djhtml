@@ -19,7 +19,6 @@
     <a class="btn btn-primary" href="{% url 'create_user' %}">Register</a>
 
   </div>
-
 </div>
 
 {% endblock %}

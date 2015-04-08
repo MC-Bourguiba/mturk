@@ -203,6 +203,64 @@ def add_model(request):
     return JsonResponse(response)
 
 
+def get_previous_cost(request, username):
+    user = User.objects.get(username=username)
+    game = user.player.game
+    current_turn = game.current_turn
+    player = Player.objects.get(user__username=username)
+    path_ids = list(Path.objects.filter(player_model=player.player_model).values_list('id', flat=True))
+    path_idxs = range(len(path_ids))
+    paths = dict()
+
+    flow = []
+    previous_cost = []
+    previous_turn = None
+    cumulative_costs = []
+    previous_costs = dict()
+
+    if current_turn.iteration > 0:
+        previous_turn = game.turns.get(iteration=current_turn.iteration - 1)
+
+    for idx, p_id in zip(path_idxs, path_ids):
+        path = Path.objects.get(id=p_id)
+        paths[idx] = list(path.edges.values_list('edge_id', flat=True))
+        if current_turn.flow_distributions.filter(username=username).exists():
+            fd = current_turn.flow_distributions.get(username=username)
+            flow.append(fd.path_assignments.get(path__id=p_id).flow)
+        else:
+            flow.append(0.5)
+
+        if current_turn.iteration > 0:
+            edge_costs = previous_turn.graph_cost.edge_costs
+            total_cost = 0
+            for e in path.edges.all():
+                total_cost += edge_costs.get(edge=e).cost
+            previous_cost.append(total_cost)
+
+            cumulative_cost = 0
+            for turn in game.turns.all():
+                e_costs = turn.graph_cost.edge_costs
+                t_cost = 0
+                for e in path.edges.all():
+                    t_cost += e_costs.get(edge=e).cost
+                if idx not in previous_costs:
+                    previous_costs[idx] = []
+                previous_costs[idx].append(t_cost)
+                cumulative_cost += total_cost
+
+            cumulative_costs.append(cumulative_cost)
+        else:
+            previous_cost.append(0)
+            cumulative_costs.append(0)
+
+    response = dict()
+
+    response['path_ids'] = path_ids
+    response['paths'] = paths
+    response['previous_costs'] = previous_costs
+    return JsonResponse(response)
+
+
 def get_paths(request, username):
     user = User.objects.get(username=username)
     game = user.player.game
@@ -406,7 +464,7 @@ def submit_distribution(request):
                                 id=path_id)
         assignment = PathFlowAssignment()
         assignment.path = path
-        assignment.flow = flow / total_flow
+        assignment.flow = (flow / total_flow) * user.player.player_model.flow
         assignment.save()
         current_flow_distribution.path_assignments.add(assignment)
         current_flow_distribution.username = user.username

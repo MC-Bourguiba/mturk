@@ -1,8 +1,8 @@
 <ul style="list-style-type:none" id="path-list">
   {% for i, id, flow, previous_cost, cumulative_cost in path_idxs %}
     <li>
-      Previous cost: {{previous_cost|floatformat:3}}
-      Cumulative cost: {{cumulative_cost|floatformat:3}}
+      <p> Previous cost: {{previous_cost|floatformat:3}}</p>
+      <p>Cumulative cost: {{cumulative_cost|floatformat:3}}</p>
       <a id="{{ id }}" href='#'>Path {{ i }} </a>
       <div style="float:left;">
         <input id="ex{{ i }}" type="range" name="points" min="0" max="1" step="0.01" onchange="printValue('ex{{ i }}', 'rangeValue{{ i }}')">

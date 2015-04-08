@@ -11,40 +11,6 @@ function on_edge_selected(selected_edge) {
 }
 
 
-// $("#start-game-btn").click(function() {
-//     $.ajax({
-//         url : "/graph/generate_paths/",
-//         type : "GET",
-//         data : {
-//             'graph': $("#graph-hidden")[0].value,
-//             'source': $("#source-hidden")[0].value,
-//             'destination': $("#destination-hidden")[0].value
-//         },
-
-//         success : function(json) {
-//             paths = json.paths;
-//             generated_paths = paths;
-//             $("#path-display-list").html(json.html);
-//             $("a[id*='path-list']").on('click', function(e) {
-//                 e.preventDefault();
-//                 var match = path_list_regex.exec(this.id);
-//                 var num = match[1];
-//                 editor_window.highlighted_links = generated_paths[num];
-//                 editor_window.restart();
-//             });
-
-//             $("#path-btns").removeClass("hidden");
-//             $("#path-display").show();
-//         },
-
-//         // handle a non-successful response
-//         error : function(xhr,errmsg,err) {
-//             console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-//         }
-//     });
-// });
-
-
 $("#submit-game-btn").click(function(e) {
     e.preventDefault();
 
@@ -106,6 +72,7 @@ function update_from_state(username) {
             }
 
             update_paths(username);
+            update_previous_cost(username);
             console.log(json);
         },
 
@@ -139,6 +106,53 @@ function update_paths(username) {
                 editor_window.highlighted_links = generated_paths[num];
                 // console.log(generated_paths[num]);
                 editor_window.restart();
+            });
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+}
+
+
+function update_previous_cost(username) {
+    $.ajax({
+        url : "/graph/get_previous_cost/" + username + "/",
+        type : "GET",
+
+        success : function(json) {
+            console.log(json);
+
+            var cumulative_cost = {};
+
+            for (var key in json['previous_costs']) {
+                var path = json['previous_costs'][key];
+                cumulative_cost[key] = [];
+                var cost = 0;
+                for (i=0; i < path.length; i += 1) {
+                    cost += path[i];
+                    cumulative_cost[key].push(cost);
+                }
+            }
+
+            console.log('cumulative cost:');
+            console.log(cumulative_cost);
+
+            var chart = c3.generate({
+                data: {
+                    json : json['previous_costs']
+                },
+                bindto: '#chart'
+            });
+
+            var cumulative_chart = c3.generate({
+                data: {
+                    json : cumulative_cost
+                },
+
+                bindto: '#cumulative_chart'
             });
         },
 
