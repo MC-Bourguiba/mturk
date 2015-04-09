@@ -8,8 +8,8 @@ function guid() {
 }
 
 // set up SVG for D3
-var width  = 960,
-    height = 560,
+var width  = 600,
+    height = 600,
     colors = d3.scale.category10();
 
 var svg = d3.select('body')

@@ -17,7 +17,7 @@ $("#submit-game-btn").click(function(e) {
     var paths = [];
     var allocation = [];
 
-    $("#path-list li").each(function(idx, li) {
+    $("#path-list tr").each(function(idx, li) {
         paths.push(parseInt($(li).find("a").attr('id')));
         allocation.push(parseFloat($(li).find("input")[1].value));
     });
@@ -97,7 +97,7 @@ function update_paths(username) {
 
             $("#path-display-list").html(json['html']);
 
-            $('#path-list li  a').click(function(e) {
+            $('#path-list tr  a').click(function(e) {
                 e.preventDefault();
                 // This is soooooooo bad
                 var num = parseInt($(this).html().substr('Path '.length));
@@ -141,6 +141,9 @@ function update_previous_cost(username) {
             console.log(cumulative_cost);
 
             var chart = c3.generate({
+                size: {
+                    height: 250,
+                },
                 data: {
                     json : json['previous_costs']
                 },
@@ -148,6 +151,9 @@ function update_previous_cost(username) {
             });
 
             var cumulative_chart = c3.generate({
+                size: {
+                    height: 250,
+                },
                 data: {
                     json : cumulative_cost
                 },

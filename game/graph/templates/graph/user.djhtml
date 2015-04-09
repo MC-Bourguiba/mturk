@@ -1,9 +1,25 @@
 {% extends "graph/index.djhtml" %}
 {% load staticfiles %}
 
+{% block navbar_extra_buttons %}
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Logged as: {{ username }} <span class="caret"></span></a>
+  <ul class="dropdown-menu" role="menu">
+    <li><a> Graph: {{ graph }}</a></li>
+    <li><a> Start Node: {{ start }} </a></li>
+    <li><a> Destination Node: {{ destination }} </a></li>
+    <li><a> Total Flow: {{ flow }} </a></li>
+  </ul>
+</li>
+<li>
+<p class="navbar-btn">
+  <a id="start-game-btn" class="btn btn-default " href="{% url 'logout' %}" role="button">Logout</a>
+</p>
+</li>
+{% endblock %}
+
 {% block jumbotron %}
   <!-- <a id="start-game-btn" class="btn btn-default" href="#" role="button">Start Game</a> -->
-  <a id="start-game-btn" class="btn btn-default" href="{% url 'logout' %}" role="button">Logout</a>
   <input id="graph-hidden" type="hidden" name="graph" value="{{ graph }}" />
   <input id="username-hidden" type="hidden" name="graph" value="{{ username }}" />
   <input id="source-hidden" type="hidden" name="graph" value="{{ start }}" />
@@ -11,15 +27,15 @@
 {% endblock %}
 
 
-{% block right_list %}
+{% block left_list %}
   <div>
     <div id="path-display-list">
     </div>
-    <div id="path-btns" style="display: none">
+    <div id="path-btns" style="display: none" align="right">
       <a id="submit-game-btn" class="btn btn-default" href="#" role="button">Submit</a>
       <!-- <a id="show-cost-btn" class="btn btn-default" href="#" role="button">Show cost</a> -->
     </div>
-    <div id="completed-turn" style="display: none">
+    <div id="completed-turn" style="display: none" align="right">
       <p> You finished your turn! </p>
     </div>
   </div>
@@ -27,15 +43,11 @@
 
 
 {% block center_content %}
-  <div style="width:800px; margin:0 auto;">
-    <p> User: {{ username }} </p>
-    <p> Graph: {{ graph }} </p>
-    <p> Start: {{ start }} </p>
-    <p> Destination: {{ destination }} </p>
-    <p> Flow: {{ flow }} </p>
-  </div>
-
 {% endblock %}
+
+{% block right_list %}
+{% endblock %}
+
 
 {% block scripts %}
   <script src="{% static 'graph/user.js' %}">
