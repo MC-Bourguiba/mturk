@@ -198,8 +198,8 @@ def get_user_costs(request, graph_name):
             cumulative_costs[player.user.username].append(cumulative_cost)
 
     response = dict()
-    response['current_cost'] = current_costs
-    response['cumulative_cost'] =  cumulative_costs
+    response['current_costs'] = current_costs
+    response['cumulative_costs'] =  cumulative_costs
     return JsonResponse(response)
 
 
