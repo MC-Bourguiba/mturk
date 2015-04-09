@@ -45,8 +45,6 @@
     {% endblock %}
   </body>
 
-  <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
-  <script src="{% static 'jquery/jquery.min.js' %}"></script>
   <script src="{% static 'jquery/jquery.min.js' %}"></script>
   <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
   <script src="{% static 'slider/bootstrap-slider.js' %}"></script>

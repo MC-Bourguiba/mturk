@@ -234,7 +234,6 @@ def updateEquilibriumFlows(graph):
     for (pm, mass) in massDict.items():
         masses[pmIndex[pm]] = mass
 
-    import pdb; pdb.set_trace();
     eqCosts = computeRoutingGameEquilibrium(costFunctions, adjMatrices, masses)
     for (pm, pmIdx) in pmIndex.items():
         pm.normalization_const = eqCosts[pmIdx]
