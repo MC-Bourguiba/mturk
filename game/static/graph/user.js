@@ -55,7 +55,7 @@ graph_window.onload = function() {
 
 function update_ui() {
     update_from_state($("#username-hidden")[0].value);
-    setTimeout(update_ui, 30000); // Update every 30 seconds
+    setTimeout(update_ui, 10000); // Update every 10 seconds
 }
 
 

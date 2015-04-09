@@ -27,6 +27,15 @@ $('#load-graph-btn').click(function(evt) {
 });
 
 
+$(document).ready(function() {
+    if (graph_name) {
+        update_user_cost(graph_name);
+    }
+
+    setTimeout(update_ui, 10000); // Update every 10 seconds
+});
+
+
 function update_user_cost(graph_name) {
     $.ajax({
         url : "/graph/get_user_costs/" + graph_name + "/",
