@@ -60,6 +60,7 @@ function update_ui() {
 
 
 $(document).ready(function() {
+    username = $("#username-hidden")[0].value;
     update_paths(username);
     update_previous_cost(username);
     update_ui();
