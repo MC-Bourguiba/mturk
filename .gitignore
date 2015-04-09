@@ -83,3 +83,4 @@ notes/routing_game.aux
 /game/game/local_settings.py
 
 *migrations*
+.idea/codeStyleSettings.xml

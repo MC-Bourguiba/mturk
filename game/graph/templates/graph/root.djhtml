@@ -1,29 +1,37 @@
 {% extends "graph/index.djhtml" %}
 {% load staticfiles %}
 
-{% block jumbotron %}
-  <a id="save-graph-btn" class="btn btn-default" href="#" role="button">Save graph</a>
-  <a id="load-graph-btn" class="btn btn-default" href="#" role="button">Load graph</a>
-  <a id="start-game-btn" class="btn btn-default" href="{% url 'logout' %}"
-     role="button">Logout</a>
+{% block navbar_extra_buttons %}
+<li><p class="navbar-btn">
+  <a id="start-game-btn" class="btn btn-default " href="{% url 'logout' %}" role="button">Logout</a>
+</p></li>
 {% endblock %}
 
 {% block left_list %}
-  <div class="btn-group btn-toggle" id="graph-user-btn">
-    <button class="btn btn-primary active" id="show-graphs-btn">Graphs</button>
-    <button class="btn btn-default" id="show-users-btn">Users</button>
-  </div>
+  <div class="row">
+      <div class="col-md-6">
+          <div class="btn-group btn-toggle" id="graph-user-btn">
+            <button class="btn btn-primary active" id="show-graphs-btn">Graphs</button>
+            <button class="btn btn-default" id="show-users-btn">Users</button>
+          </div>
 
-  <div class="list-group" id="graph-list-display">
-    {% for name in graph_names %}
-      <a href="#" class="list-group-item">{{ name }}</a>
-    {% endfor %}
-  </div>
+          <div class="list-group" id="graph-list-display">
+            {% for name in graph_names %}
+              <a href="#" class="list-group-item">{{ name }}</a>
+            {% endfor %}
+          </div>
 
-  <div class="list-group hidden" id="user-list-display">
-    {% for name in usernames %}
-      <a href="#" class="list-group-item">{{ name }}</a>
-    {% endfor %}
+          <div class="list-group hidden" id="user-list-display">
+            {% for name in usernames %}
+              <a href="#" class="list-group-item">{{ name }}</a>
+            {% endfor %}
+          </div>
+
+          <div class="btn-group" role="group">
+            <a id="save-graph-btn" class="btn btn-default" href="#" role="button">Save graph</a>
+            <a id="load-graph-btn" class="btn btn-default" href="#" role="button">Load graph</a>
+          </div>
+      </div>
   </div>
 
 {% endblock %}

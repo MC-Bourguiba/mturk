@@ -375,6 +375,9 @@ def save_model_node(request, model_name, graph_name, node_ui_id, is_start):
         # generate_paths(get_dict['graph'], int(get_dict['source']),
         #                    int(get_dict['destination']))
 
+        if player_model.flow:
+            updateEquilibriumFlows(graph_name)
+
 
     response = dict()
     response['node_ui_id'] = node_ui_id

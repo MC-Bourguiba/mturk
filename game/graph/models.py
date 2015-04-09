@@ -31,6 +31,7 @@ class PlayerModel(models.Model):
                                          null=True, blank=True)
     flow = models.FloatField(null=True, blank=True)
     in_use = models.BooleanField(default=False)
+    normalization_const = models.FloatField(null=True, blank=True)
 
     def get_player(self):
         if hasattr(self, 'player'):
