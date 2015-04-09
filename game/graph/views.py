@@ -555,8 +555,9 @@ def current_state(request, username):
         update_cost(game)
         iterate_next_turn(game)
         response['turn_completed'] = True
+    else:
+        response['turn_completed'] = False
 
-    response['turn_completed'] = False
     response['completed_task'] = user.player.completed_task
     return JsonResponse(response)
 

@@ -75,10 +75,10 @@ function update_from_state(username) {
                 $("#completed-turn").toggle(true);
             } else {
                 $("#path-btns").toggle(true);
+                update_paths(username);
+                update_previous_cost(username);
             }
 
-            update_paths(username);
-            update_previous_cost(username);
             console.log(json);
         },
 
