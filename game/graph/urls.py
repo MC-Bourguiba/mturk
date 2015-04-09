@@ -47,4 +47,6 @@ urlpatterns = patterns('',
                            views.get_paths, name='get_paths'),
                        url(r'^get_previous_cost/(?P<username>[a-zA-Z0-9_]+)/$',
                            views.get_previous_cost, name='get_previous_cost'),
+                       url(r'^get_user_costs/(?P<graph_name>[a-zA-Z0-9_]+)/$',
+                           views.get_user_costs, name='get_user_costs')
 )

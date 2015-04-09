@@ -96,6 +96,17 @@
 {% endblock %}
 
 
+{% block bottom_center %}
+  <div id="user_chart" >
+    <div class='chart'>
+      <h3> User costs </h3>
+      <div id='chart'>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+
 {% block scripts %}
   <script src="{% static 'graph/root.js' %}"></script>
 {% endblock %}

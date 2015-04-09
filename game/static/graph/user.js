@@ -53,8 +53,14 @@ graph_window.onload = function() {
 };
 
 
-$(document).ready(function() {
+function update_ui() {
     update_from_state($("#username-hidden")[0].value);
+    setTimeout(update_ui, 30000); // Update every 30 seconds
+}
+
+
+$(document).ready(function() {
+    update_ui();
 });
 
 

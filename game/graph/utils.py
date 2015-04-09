@@ -90,7 +90,7 @@ def update_cost(game):
         cost_f = parser.expr(e.cost_function).compile()
         cost = evalFunc(cost_f, edge_flow[e])
 
-        print cost
+        # print cost
 
         edge_cost = EdgeCost()
         edge_cost.edge = e

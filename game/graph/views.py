@@ -167,6 +167,43 @@ def get_model_info(request, modelname):
 
 
 @login_required
+def get_user_costs(request, graph_name):
+    game = Game.objects.get(graph__name=graph_name)
+    players = Player.objects.filter(game=game)
+
+    current_costs = dict()
+    cumulative_costs = dict()
+
+    for player in players:
+        username = player.user.username
+        paths = Path.objects.filter(player_model=player.player_model)
+        path_assignments = player.flow_distribution.path_assignments
+        cumulative_cost = 0
+        for turn in game.turns.all().order_by('iteration'):
+            e_costs = turn.graph_cost.edge_costs
+            current_cost = 0
+            if player.user.username not in current_costs:
+                current_costs[player.user.username] = []
+                cumulative_costs[player.user.username] = []
+
+            for path in paths:
+                flow = path_assignments.get(path=path).flow
+                current_path_cost = 0
+                for e in path.edges.all():
+                    current_path_cost += e_costs.get(edge=e).cost
+                current_path_cost *= flow
+                cumulative_cost += (current_path_cost) * flow
+                current_cost += (current_path_cost) * flow
+            current_costs[player.user.username].append(current_cost)
+            cumulative_costs[player.user.username].append(cumulative_cost)
+
+    response = dict()
+    response['current_cost'] = current_costs
+    response['cumulative_cost'] =  cumulative_costs
+    return JsonResponse(response)
+
+
+@login_required
 def assign_model_node(request):
     data = json.loads(request.body)
     return save_model_node(request, data['model_name'], data['graph_name'],
@@ -337,6 +374,7 @@ def save_model_node(request, model_name, graph_name, node_ui_id, is_start):
                        player_model.destination_node, player_model)
         # generate_paths(get_dict['graph'], int(get_dict['source']),
         #                    int(get_dict['destination']))
+
 
     response = dict()
     response['node_ui_id'] = node_ui_id

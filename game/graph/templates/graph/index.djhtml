@@ -26,18 +26,8 @@
       <iframe src="{% url 'graph_editor' %}" id="graph-editor">
       </iframe>
 
-      <div class='chart'>
-        <h3> Previous cost </h3>
-    <div id='chart'>
-    </div>
-  </div>
-
-  <div class='cumulative_chart'>
-    <h3> Cumulative cost </h3>
-    <div id='cumulative_chart'>
-    </div>
-  </div>
-
+      {% block bottom_center %}
+      {% endblock %}
     </div>
     <div class="col-md-2">
       <div class="well">

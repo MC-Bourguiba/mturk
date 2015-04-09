@@ -41,3 +41,18 @@
   <script src="{% static 'graph/user.js' %}">
   </script>
 {% endblock %}
+
+
+{% block bottom_center %}
+  <div class='chart'>
+    <h3> Previous cost </h3>
+    <div id='chart'>
+    </div>
+  </div>
+
+  <div class='cumulative_chart'>
+    <h3> Cumulative cost </h3>
+    <div id='cumulative_chart'>
+    </div>
+  </div>
+{% endblock %}

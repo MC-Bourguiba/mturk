@@ -21,8 +21,49 @@ $('#load-graph-btn').click(function(evt) {
 
     if (graph_name) {
         load_graph(graph_name);
+        update_user_cost(graph_name);
+        current_graph = graph_name;
     }
 });
+
+
+function update_user_cost(graph_name) {
+    $.ajax({
+        url : "/graph/get_user_costs/" + graph_name + "/",
+        type : "GET",
+
+        success : function(json) {
+            console.log(json);
+
+            var cumulative_cost = {};
+
+            for (var key in json['costs']) {
+                var user = json['costs'][key];
+                cumulative_cost[key] = [];
+                var cost = 0;
+                for (i=0; i < user.length; i += 1) {
+                    cost += user[i];
+                    cumulative_cost[key].push(cost);
+                }
+            }
+
+            console.log('cumulative cost:');
+            console.log(cumulative_cost);
+
+            var chart = c3.generate({
+                data: {
+                    json : cumulative_cost
+                },
+                bindto: '#chart'
+            });
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+}
 
 
 $('#model-display-list a').click(function(e) {
