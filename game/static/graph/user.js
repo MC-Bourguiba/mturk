@@ -54,12 +54,14 @@ graph_window.onload = function() {
 
 
 function update_ui() {
-    update_from_state($("#username-hidden")[0].value);
     setTimeout(update_ui, 10000); // Update every 10 seconds
+    update_from_state($("#username-hidden")[0].value);
 }
 
 
 $(document).ready(function() {
+    update_paths(username);
+    update_previous_cost(username);
     update_ui();
 });
 
@@ -70,13 +72,15 @@ function update_from_state(username) {
         type : "GET",
 
         success : function(json) {
-            if (json['completed_task'] && !json['turn_completed']) {
-                $("#path-btns").toggle(false);
-                $("#completed-turn").toggle(true);
-            } else {
-                $("#path-btns").toggle(true);
-                update_paths(username);
-                update_previous_cost(username);
+            if (json['completed_task']) {
+                if (!json['turn_completed']) {
+                    $("#path-btns").toggle(false);
+                    $("#completed-turn").toggle(true);
+                } else {
+                    $("#path-btns").toggle(true);
+                    update_paths(username);
+                    update_previous_cost(username);
+                }
             }
 
             console.log(json);
