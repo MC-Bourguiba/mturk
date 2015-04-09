@@ -21,3 +21,7 @@
 * Deployment / general stuff
 ** Use supervisord for process management
 ** Some way to display statistics (?)
+
+
+* Bugs
+** First turn has no flow distributions

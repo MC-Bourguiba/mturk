@@ -35,47 +35,16 @@ function update_user_cost(graph_name) {
         success : function(json) {
             console.log(json);
 
-            var current_costs = {};
-
-            for (var key in json['current_costs']) {
-                var user = json['current_costs'][key];
-                current_costs[key] = [];
-                var cost = 0;
-                for (i=0; i < user.length; i += 1) {
-                    cost += user[i];
-                    current_costs[key].push(cost);
-                }
-            }
-
-            console.log('current costs:');
-            console.log(current_costs);
-
             var chart = c3.generate({
                 data: {
-                    json : current_costs
+                    json : json['current_costs']
                 },
                 bindto: '#chart'
             });
 
-
-            var cumulative_costs = {};
-
-            for (var key in json['cumulative_costs']) {
-                var user = json['cumulative_costs'][key];
-                cumulative_costs[key] = [];
-                var cost = 0;
-                for (i=0; i < user.length; i += 1) {
-                    cost += user[i];
-                    cumulative_costs[key].push(cost);
-                }
-            }
-
-            console.log('cumulative costs:');
-            console.log(cumulative_costs);
-
             var chart = c3.generate({
                 data: {
-                    json : cumulative_costs
+                    json : json['cumulative_costs']
                 },
                 bindto: '#cumulative_chart'
             });

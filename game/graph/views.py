@@ -177,9 +177,14 @@ def get_user_costs(request, graph_name):
     for player in players:
         username = player.user.username
         paths = Path.objects.filter(player_model=player.player_model)
-        path_assignments = player.flow_distribution.path_assignments
+        # path_assignments = player.flow_distribution.path_assignments
         cumulative_cost = 0
         for turn in game.turns.all().order_by('iteration'):
+            # if turn.iteration == 0:
+            #     continue
+
+            path_assignments = FlowDistribution.objects.get(turn=turn, username=username).path_assignments
+            # path_assignments = turn.flow_distributions.get(username=username).path_assignments
             e_costs = turn.graph_cost.edge_costs
             current_cost = 0
             if player.user.username not in current_costs:
@@ -191,9 +196,10 @@ def get_user_costs(request, graph_name):
                 current_path_cost = 0
                 for e in path.edges.all():
                     current_path_cost += e_costs.get(edge=e).cost
-                current_path_cost *= flow
-                cumulative_cost += (current_path_cost) * flow
                 current_cost += (current_path_cost) * flow
+
+            cumulative_cost += current_cost
+
             current_costs[player.user.username].append(current_cost)
             cumulative_costs[player.user.username].append(cumulative_cost)
 
@@ -261,8 +267,10 @@ def get_previous_cost(request, username):
     for idx, p_id in zip(path_idxs, path_ids):
         path = Path.objects.get(id=p_id)
         paths[idx] = list(path.edges.values_list('edge_id', flat=True))
-        if current_turn.flow_distributions.filter(username=username).exists():
-            fd = current_turn.flow_distributions.get(username=username)
+        if FlowDistribution.objects.filter(username=username, turn=current_turn).exists():
+        # if current_turn.flow_distributions.filter(username=username).exists():
+            fd = FlowDistribution.objects.get(turn=current_turn, username=username)
+            # fd = current_turn.flow_distributions.get(username=username)
             flow.append(fd.path_assignments.get(path__id=p_id).flow)
         else:
             flow.append(0.5)
@@ -318,8 +326,10 @@ def get_paths(request, username):
     for idx, p_id in zip(path_idxs, path_ids):
         path = Path.objects.get(id=p_id)
         paths[idx] = list(path.edges.values_list('edge_id', flat=True))
-        if current_turn.flow_distributions.filter(username=username).exists():
-            fd = current_turn.flow_distributions.get(username=username)
+        if FlowDistribution.objects.filter(username=username, turn=current_turn).exists():
+        # if current_turn.flow_distributions.filter(username=username).exists():
+            fd = FlowDistribution.objects.get(turn=current_turn, username=username)
+            # fd = current_turn.flow_distributions.get(username=username)
             flow.append(fd.path_assignments.get(path__id=p_id).flow)
         else:
             flow.append(0.5)
@@ -491,12 +501,12 @@ def submit_distribution(request):
     game = user.player.game
     current_turn = game.current_turn
 
-    if hasattr(user.player, 'flow_distribution') and user.player.flow_distribution:
-        user.player.flow_distribution.delete()
-        user.player.save()
-
-    current_flow_distribution = FlowDistribution()
+    current_flow_distribution = FlowDistribution(turn=current_turn, username=user.username)
     current_flow_distribution.save()
+
+    if hasattr(user.player, 'flow_distribution') and user.player.flow_distribution:
+        user.player.flow_distribution = current_flow_distribution
+        user.player.save()
 
     total_flow = sum(data['allocation'])
 
@@ -511,7 +521,7 @@ def submit_distribution(request):
         current_flow_distribution.username = user.username
         current_flow_distribution.save()
 
-    current_turn.flow_distributions.add(current_flow_distribution)
+    # current_turn.flow_distributions.add(current_flow_distribution)
     user.player.flow_distribution = current_flow_distribution
     user.completed_task = True
     current_flow_distribution.save()
@@ -552,6 +562,10 @@ def current_state(request, username):
 
 
 def iterate_next_turn(game):
+    # turn_copy = GameTurn()
+    # turn_copy.iteration = game.current_turn.iteration
+    # turn_copy.flow_distributions = game.current_turn.flow_distributions
+    # turn_copy.save()
     game.turns.add(game.current_turn)
     next_turn = GameTurn()
     next_turn.iteration = game.current_turn.iteration + 1

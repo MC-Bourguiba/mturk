@@ -71,12 +71,12 @@ def evalFunc(func, xVal):
 def update_cost(game):
     edge_flow = dict()
     current_turn = game.current_turn
-    flow_distributions = current_turn.flow_distributions
+    # flow_distributions = current_turn.flow_distributions
 
     for e in Edge.objects.filter(graph=game.graph):
         edge_flow[e] = 0.0
 
-    for flow_distribution in flow_distributions.all():
+    for flow_distribution in FlowDistribution.objects.filter(turn=current_turn):
         for path_assignment in flow_distribution.path_assignments.all():
             for e in path_assignment.path.edges.all():
                 edge_flow[e] += path_assignment.flow

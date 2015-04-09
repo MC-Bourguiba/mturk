@@ -81,9 +81,16 @@ class PathFlowAssignment(models.Model):
     flow = models.FloatField(default=0.0)
 
 
+class GameTurn(models.Model):
+    iteration = models.IntegerField(default=0)
+    graph_cost = models.ForeignKey('GraphCost', blank=True, null=True)
+    # graph_cost = models.ManyToManyField('GraphCost', blank=True, null=True)
+
+
 class FlowDistribution(models.Model):
     path_assignments = models.ManyToManyField('PathFlowAssignment')
     username = models.TextField(blank=True, null=True)
+    turn = models.ForeignKey('GameTurn', blank=True, null=True)
 
 
 class EdgeCost(models.Model):
@@ -94,13 +101,6 @@ class EdgeCost(models.Model):
 class GraphCost(models.Model):
     graph = models.ForeignKey('Graph')
     edge_costs = models.ManyToManyField('EdgeCost')
-
-
-class GameTurn(models.Model):
-    iteration = models.IntegerField(default=0)
-    graph_cost = models.ForeignKey('GraphCost', blank=True, null=True)
-    # graph_cost = models.ManyToManyField('GraphCost', blank=True, null=True)
-    flow_distributions = models.ManyToManyField('FlowDistribution')
 
 
 class Game(models.Model):
