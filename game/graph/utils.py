@@ -174,7 +174,9 @@ def computeEquilibrium(dimensions, gradientFunctions, precision):
         t += 1
         print(t)
     # print("converged after {} iterations".format(t))
-    return [g[0] for g in gs]
+    costs = [np.dot(x.T, g) for (g, x) in zip(gs, xs)]
+    print(costs)
+    return costs
 
 
 def pathLossFunctions(costFunctions, adjMatrices, masses):
