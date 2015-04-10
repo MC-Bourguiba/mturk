@@ -1,6 +1,7 @@
 var graph_window = document.getElementById("graph-editor");
 var generated_paths = [];
 var path_ids = [];
+var current_iteration = -1;
 
 function on_node_selected(selected_node) {
 
@@ -73,16 +74,31 @@ function update_from_state(username) {
         type : "GET",
 
         success : function(json) {
-            if (json['completed_task']) {
-                if (!json['turn_completed']) {
+
+            if (current_iteration != json['iteration']) {
+                $("#path-btns").toggle(true);
+                update_paths(username);
+                update_previous_cost(username);
+            } else {
+                if (json['completed_task']) {
                     $("#path-btns").toggle(false);
                     $("#completed-turn").toggle(true);
-                } else {
-                    $("#path-btns").toggle(true);
-                    update_paths(username);
-                    update_previous_cost(username);
                 }
             }
+
+
+            // if (json['completed_task']) {
+            //     if (current_iteration != json['iteration']) {
+            //         $("#path-btns").toggle(true);
+            //         update_paths(username);
+            //         update_previous_cost(username);
+            //     } else {
+            //         $("#path-btns").toggle(false);
+            //         $("#completed-turn").toggle(true);
+            //     }
+            // }
+
+            current_iteration = json['iteration']
 
             console.log(json);
         },

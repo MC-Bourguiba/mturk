@@ -559,6 +559,7 @@ def current_state(request, username):
         response['turn_completed'] = False
 
     response['completed_task'] = user.player.completed_task
+    response['iteration'] = game.current_turn.iteration
     return JsonResponse(response)
 
 
