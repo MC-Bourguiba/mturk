@@ -79,7 +79,7 @@ function update_from_state(username) {
                 $("#path-btns").toggle(true);
                 update_paths(username);
                 update_previous_cost(username);
-                $("$completed-turn").toggle(false);
+                $("#completed-turn").toggle(false);
             } else {
                 if (json['completed_task']) {
                     $("#path-btns").toggle(false);
