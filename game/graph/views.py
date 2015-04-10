@@ -344,10 +344,10 @@ def get_paths(request, username):
             cumulative_cost = 0
             for turn in game.turns.all():
                 e_costs = turn.graph_cost.edge_costs
-                t_cost = 0
+                path_cost = 0
                 for e in path.edges.all():
-                    t_cost += e_costs.get(edge=e).cost
-                cumulative_cost += total_cost
+                    path_cost += e_costs.get(edge=e).cost
+                cumulative_cost += path_cost
 
             cumulative_costs.append(cumulative_cost)
         else:
