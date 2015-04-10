@@ -58,15 +58,21 @@ function update_user_cost(graph_name) {
     });
 }
 
+function update_ui() {
+    setTimeout(update_ui, 10000); // Update every 10 seconds
+    if (graph_name) {
+        update_user_cost(graph_name);
+    }
+}
+
 
 $(document).ready(function() {
     if (graph_name) {
         update_user_cost(graph_name);
     }
 
-    setTimeout(update_user_cost, 10000); // Update every 10 seconds
+    update_ui()
 });
-
 
 
 $('#model-display-list a').click(function(e) {
