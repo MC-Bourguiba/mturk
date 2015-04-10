@@ -179,6 +179,7 @@ def get_user_costs(request, graph_name):
         paths = Path.objects.filter(player_model=player.player_model)
         # path_assignments = player.flow_distribution.path_assignments
         cumulative_cost = 0
+        normalization_const = player.player_model.normalization_const
         for turn in game.turns.all().order_by('iteration'):
             # if turn.iteration == 0:
             #     continue
@@ -199,9 +200,8 @@ def get_user_costs(request, graph_name):
                 current_cost += (current_path_cost) * flow
 
             cumulative_cost += current_cost
-
-            current_costs[player.user.username].append(current_cost)
-            cumulative_costs[player.user.username].append(cumulative_cost)
+            current_costs[player.user.username].append(current_cost*normalization_const)
+            cumulative_costs[player.user.username].append(cumulative_cost*normalization_const)
 
     response = dict()
     response['current_costs'] = current_costs
