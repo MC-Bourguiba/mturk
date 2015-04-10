@@ -1,3 +1,5 @@
+var graph_name = "";
+
 $('#save-graph-btn').click(function(evt) {
     nodes = document.getElementById('graph-editor').contentWindow.nodes;
     links = document.getElementById('graph-editor').contentWindow.links;
@@ -11,7 +13,6 @@ $('#save-graph-btn').click(function(evt) {
 
 $('#load-graph-btn').click(function(evt) {
     evt.preventDefault();
-    graph_name = "";
 
     $("#graph-list-display").children().each(function(i) {
         if ($(this).hasClass("active")) {
