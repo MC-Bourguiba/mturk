@@ -172,6 +172,7 @@ def computeEquilibrium(dimensions, gradientFunctions, precision):
         xs = xs_plus
         gs = gs_plus
         t += 1
+        print(t)
     # print("converged after {} iterations".format(t))
     return [g[0] for g in gs]
 

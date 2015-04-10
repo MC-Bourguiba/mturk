@@ -200,8 +200,8 @@ def get_user_costs(request, graph_name):
                 current_cost += (current_path_cost) * flow
 
             cumulative_cost += current_cost
-            current_costs[player.user.username].append(current_cost*normalization_const)
-            cumulative_costs[player.user.username].append(cumulative_cost*normalization_const)
+            current_costs[player.user.username].append(current_cost/normalization_const)
+            cumulative_costs[player.user.username].append(cumulative_cost/normalization_const)
 
     response = dict()
     response['current_costs'] = current_costs

@@ -101,8 +101,10 @@ function load_graph(name) {
                 .nodes(graph_ui.nodes)
                 .links(graph_ui.links)
                 .size([editor_window.width, editor_window.height])
-                .linkDistance(150)
-                .charge(-500)
+                .linkDistance(100)
+                .linkStrength(0)
+                .charge(0)
+                .gravity(0)
                 .on('tick', editor_window.tick);
 
 

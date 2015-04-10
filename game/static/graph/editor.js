@@ -37,8 +37,10 @@ var force = d3.layout.force()
     .nodes(nodes)
     .links(links)
     .size([width, height])
-    .linkDistance(150)
-    .charge(-500)
+    .linkDistance(100)
+    .linkStrength(0)
+    .charge(0)
+    .gravity(0)
     .on('tick', tick)
 
 // define arrow markers for graph links
