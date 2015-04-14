@@ -172,17 +172,17 @@ def computeEquilibrium(dimensions, gradientFunctions, precision):
         xs = xs_plus
         gs = gs_plus
         t += 1
-        print(t)
+        if(t % 100 == 0):
+            print(t)
     # print("converged after {} iterations".format(t))
     costs = [np.dot(x.T, g) for (g, x) in zip(gs, xs)]
-    print(costs)
     return costs
 
 
 def pathLossFunctions(costFunctions, adjMatrices, masses):
     def lossFunctions(xs):
         edgeFlows = sum(mass*np.dot(adjMatrix, x) for (mass, adjMatrix, x) in zip (masses, adjMatrices, xs))
-        edgeCosts = [costFunc(edgeFlow) for (costFunc, edgeFlow) in zip(costFunctions, edgeFlows)]
+        edgeCosts = [evalFunc(costFunc, edgeFlow) for (costFunc, edgeFlow) in zip(costFunctions, edgeFlows)]
         return [np.dot(adjMatrix.T, edgeCosts) for adjMatrix in adjMatrices]
     return lossFunctions
 
@@ -215,8 +215,9 @@ def updateEquilibriumFlows(graph):
     for path in Path.objects.filter(graph__name=graph):
         pmPaths[path.player_model].append(path.edges.all())
 
+
     # once we have the dictionaries, we can create the vectors
-    costFunctions = [None]*len(edgeIndex)
+    compiledCosts = [None]*len(edgeIndex)
     adjMatrices = [None]*len(pmIndex)
     masses = [None]*len(pmIndex)
 
@@ -230,14 +231,13 @@ def updateEquilibriumFlows(graph):
         return adjMatrix
 
     for (edge, cost) in costFunctionDict.items():
-        costFunction = parser.expr(cost).compile()
-        costFunctions[edgeIndex[edge]] = lambda x: evalFunc(costFunction, x)
+        compiledCosts[edgeIndex[edge]] = parser.expr(cost).compile()
     for (pm, paths) in pmPaths.items():
         adjMatrices[pmIndex[pm]] = createAdjMatrix(paths)
     for (pm, mass) in massDict.items():
         masses[pmIndex[pm]] = mass
 
-    eqCosts = computeRoutingGameEquilibrium(costFunctions, adjMatrices, masses)
+    eqCosts = computeRoutingGameEquilibrium(compiledCosts, adjMatrices, masses)
     for (pm, pmIdx) in pmIndex.items():
         pm.normalization_const = eqCosts[pmIdx]
         pm.save()
