@@ -508,14 +508,19 @@ def submit_distribution(request):
         user.player.flow_distribution = current_flow_distribution
         user.player.save()
 
-    total_flow = sum(data['allocation'])
+    total_weight = float(sum(data['allocation']))
+    nb_paths = float(len(data['allocation']))
 
-    for flow, path_id in zip(data['allocation'], data['ids']):
+    for weight, path_id in zip(data['allocation'], data['ids']):
         path = Path.objects.get(graph=game.graph, player_model=user.player.player_model,
                                 id=path_id)
         assignment = PathFlowAssignment()
         assignment.path = path
-        assignment.flow = (flow / total_flow) * user.player.player_model.flow
+        if(total_weight > 0):
+            assignment.flow = (weight / total_weight) * user.player.player_model.flow
+        else:
+            # if all the weights are 0, assign the uniform distribution
+            assignment.flow = 1. / nb_paths * user.player.player_model.flow
         assignment.save()
         current_flow_distribution.path_assignments.add(assignment)
         current_flow_distribution.username = user.username
