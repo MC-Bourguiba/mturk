@@ -1,15 +1,19 @@
-{% extends "graph/base.djhtml" %}
+{% extends "graph/login-base.djhtml" %}
 {% load bootstrap %}
 
-{% block content %}
-  <div class="container">
-    <div class="starter-template">
-      <h1>Create an account</h1>
-      <form action="" method="post">
-        {{ form|bootstrap }} {% csrf_token %}
-        <input type="submit" class="btn btn-primary" value="Create account" />
-      </form>
-    </div>
-  </div>
+{% block tabcontent %}
+<div role="tabpanel" class="tab-pane active" id="login">
+  <form action="" method="post">
+    {{ form|bootstrap }} {% csrf_token %}
+    <input type="submit" class="btn btn-primary" value="Create account" />
+  </form>
+</div>
+{% endblock %}
 
+{% block scripts%}
+<script type="text/javascript">
+window.onload=function () {
+    $('#register-tab').addClass('active');
+};
+</script>
 {% endblock %}

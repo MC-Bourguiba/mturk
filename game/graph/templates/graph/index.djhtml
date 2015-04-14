@@ -24,8 +24,13 @@
       <ol style="visibility:hidden;"></ol>
     </div>
 
-    <!-- c3 charts -->
+
     <div class="col-md-6" >
+      <div>
+      {% block top-list%}
+      {% endblock %}
+      </div>
+      <!-- c3 charts -->
       <div class='chart panel panel-info'>
         <div class="panel-heading">Previous Cost</div>
         <div id='chart'>

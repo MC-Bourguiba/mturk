@@ -1,11 +1,8 @@
-{% extends "graph/base.djhtml" %}
+{% extends "graph/login-base.djhtml" %}
 {% load bootstrap %}
 
-{% block content %}
-<div class="container">
-  <div class="starter-template">
-
-    <h1>Login</h1>
+{% block tabcontent %}
+<div role="tabpanel" class="tab-pane active" id="login">
     {% if form.errors %}
     <p class="error">Sorry, that's not a valid username or password</p>
     {% endif %}
@@ -15,10 +12,12 @@
     <input type="submit" class="btn btn-primary" value="Login" />
     <input type="hidden" name="next" value="{{ next|escape }}" />
     </form>
-
-    <a class="btn btn-primary" href="{% url 'create_user' %}">Register</a>
-
-  </div>
 </div>
-
+{% endblock %}
+{% block scripts%}
+<script type="text/javascript">
+window.onload=function () {
+    $('#login-tab').addClass('active');
+};
+</script>
 {% endblock %}

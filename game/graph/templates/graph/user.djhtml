@@ -26,8 +26,7 @@
   <input id="destination-hidden" type="hidden" name="graph" value="{{ destination }}" />
 {% endblock %}
 
-
-{% block left_list %}
+{% block top-list%}
   <div>
     <div id="path-display-list">
     </div>
@@ -41,6 +40,9 @@
   </div>
 {% endblock %}
 
+{% block left_list %}
+{% endblock %}
+
 
 {% block center_content %}
 {% endblock %}
@@ -48,23 +50,7 @@
 {% block right_list %}
 {% endblock %}
 
-
 {% block scripts %}
   <script src="{% static 'graph/user.js' %}">
   </script>
-{% endblock %}
-
-
-{% block bottom_center %}
-  <div class='chart'>
-    <h3> Previous cost </h3>
-    <div id='chart'>
-    </div>
-  </div>
-
-  <div class='cumulative_chart'>
-    <h3> Cumulative cost </h3>
-    <div id='cumulative_chart'>
-    </div>
-  </div>
 {% endblock %}

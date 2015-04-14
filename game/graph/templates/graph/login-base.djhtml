@@ -1,0 +1,29 @@
+{% extends "graph/base.djhtml" %}
+{% load bootstrap %}
+
+{% block content %}
+<div class="container">
+    <div class="panel-body">
+        <div role="tabpanel">
+
+          <!-- Nav tabs -->
+          <ul class="nav nav-tabs nav-justified" role="tablist">
+            <li role="presentation" id="login-tab">
+                <a href="{% url 'login' %}" aria-controls="login" role="tab">Login</a>
+            </li>
+            <li role="presentation" id="register-tab">
+                <a href="{% url 'create_user' %}" aria-controls="register" role="tab">Register</a>
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            {% block tabcontent%}
+            {% endblock %}
+          </div>
+        </div>
+  </div>
+</div>
+
+{% endblock %}
+
+
