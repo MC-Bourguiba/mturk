@@ -51,6 +51,5 @@
 {% endblock %}
 
 {% block scripts %}
-  <script src="{% static 'graph/user.js' %}">
-  </script>
+  </script><script src="{% static 'graph/user.js' %}"></script>
 {% endblock %}

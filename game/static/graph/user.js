@@ -20,7 +20,7 @@ $("#submit-game-btn").click(function(e) {
 
     $("#path-list tr").each(function(idx, li) {
         paths.push(parseInt($(li).find("a").attr('id')));
-        allocation.push(parseFloat($(li).find("input")[1].value));
+        allocation.push(parseFloat($(li).find("input")[0].value/100));
     });
 
     console.log(paths);

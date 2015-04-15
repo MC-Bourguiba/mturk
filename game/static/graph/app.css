@@ -101,3 +101,12 @@ iframe {
 .nav-tabs {
     margin-bottom: 0;
 }
+
+/* For the sliders */
+.slider .slider-track-high {
+	background: #bbb;
+}
+
+.slider .slider-selection {
+	background: #f0ad4e;
+}

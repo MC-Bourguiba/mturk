@@ -17,13 +17,20 @@
               <td><p> {{cumulative_cost|floatformat:3}}</p></td>
               <td>
               <div style="float:left;">
-                <input id="ex{{ i }}" type="range" name="points" min="0" max="1" step="0.01" onchange="printValue('ex{{ i }}', 'rangeValue{{ i }}')">
-              </div>
-              <div style="display:inline-block;">
-                <input id="rangeValue{{i}}" type="text" size="5" value="{{ flow }}">
+                <input id="ex{{i}}" class="slider" type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="50"/>
               </div>
               </td>
             </tr>
+
+            <script type="text/javascript">
+                console.log(document.getElementById("exs{{i}}"));
+                var slider{{i}} = new Slider('#ex{{i}}', {
+                    tooltip: 'always',
+                    formatter: function(value) {
+                        return value/100;
+                    }
+                });
+            </script>
           {% endfor %}
        </tbody>
     </table>
