@@ -113,6 +113,9 @@ function update_from_state(username) {
 
 
 function update_paths(username) {
+    // editor_window = document.getElementById("graph-editor").contentWindow;
+    // editor_window.edit = false;
+
     $.ajax({
         url : "/graph/get_paths/" + username + "/",
         type : "GET",
@@ -125,12 +128,16 @@ function update_paths(username) {
 
             $("#path-display-list").html(json['html']);
 
+            editor_window = document.getElementById("graph-editor").contentWindow;
+            editor_window.edit = false;
+
             $('#path-list tr  a').click(function(e) {
                 e.preventDefault();
                 // This is soooooooo bad
                 var num = parseInt($(this).html().substr('Path '.length));
                 console.log(num);
                 editor_window = document.getElementById("graph-editor").contentWindow;
+                editor_window.edit = false;
                 editor_window.highlighted_links = generated_paths[num];
                 // console.log(generated_paths[num]);
                 editor_window.restart();

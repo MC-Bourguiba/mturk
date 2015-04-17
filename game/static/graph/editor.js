@@ -1,3 +1,5 @@
+var edit = true;
+
 function guid() {
     function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
@@ -113,6 +115,7 @@ function tick() {
 
 // update graph (called when needed)
 function restart() {
+
     // path (link) group
     path = path.data(links);
 
@@ -268,46 +271,52 @@ function restart() {
 }
 
 function mousedown() {
-    // prevent I-bar on drag
-    //d3.event.preventDefault();
+    if (edit) {
+        // prevent I-bar on drag
+        //d3.event.preventDefault();
 
-    // because :active only works in WebKit?
-    svg.classed('active', true);
+        // because :active only works in WebKit?
+        svg.classed('active', true);
 
-    if(d3.event.ctrlKey || mousedown_node || mousedown_link) return;
+        if(d3.event.ctrlKey || mousedown_node || mousedown_link) return;
 
-    // insert new node at point
-    var point = d3.mouse(this),
-        node = {id: ++lastNodeId, reflexive: false};
-    node.x = point[0];
-    node.y = point[1];
-    nodes.push(node);
+        // insert new node at point
+        var point = d3.mouse(this),
+            node = {id: ++lastNodeId, reflexive: false};
+        node.x = point[0];
+        node.y = point[1];
+        nodes.push(node);
 
-    restart();
+        restart();
+    }
 }
 
 function mousemove() {
-    if(!mousedown_node) return;
+    if (edit) {
+        if(!mousedown_node) return;
 
-    // update drag line
-    drag_line.attr('d', 'M' + mousedown_node.x + ',' + mousedown_node.y + 'L' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
+        // update drag line
+        drag_line.attr('d', 'M' + mousedown_node.x + ',' + mousedown_node.y + 'L' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
 
-    restart();
+        restart();
+    }
 }
 
 function mouseup() {
-    if(mousedown_node) {
-        // hide drag line
-        drag_line
-            .classed('hidden', true)
-            .style('marker-end', '');
+    if (edit) {
+        if(mousedown_node) {
+            // hide drag line
+            drag_line
+                .classed('hidden', true)
+                .style('marker-end', '');
+        }
+
+        // because :active only works in WebKit?
+        svg.classed('active', false);
+
+        // clear mouse event vars
+        resetMouseVars();
     }
-
-    // because :active only works in WebKit?
-    svg.classed('active', false);
-
-    // clear mouse event vars
-    resetMouseVars();
 }
 
 function spliceLinksForNode(node) {
