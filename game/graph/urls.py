@@ -48,5 +48,7 @@ urlpatterns = patterns('',
                        url(r'^get_previous_cost/(?P<username>[a-zA-Z0-9_]+)/$',
                            views.get_previous_cost, name='get_previous_cost'),
                        url(r'^get_user_costs/(?P<graph_name>[a-zA-Z0-9_]+)/$',
-                           views.get_user_costs, name='get_user_costs')
+                           views.get_user_costs, name='get_user_costs'),
+                       url(r'^start_game/$', views.start_game, name='start_game'),
+                       # url(r'^get_duration/$', view.get_duration, name='get_duration'),
 )

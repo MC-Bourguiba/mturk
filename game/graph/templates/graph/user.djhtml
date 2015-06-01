@@ -2,20 +2,20 @@
 {% load staticfiles %}
 
 {% block navbar_extra_buttons %}
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Logged as: {{ username }} <span class="caret"></span></a>
-  <ul class="dropdown-menu" role="menu">
-    <li><a> Graph: {{ graph }}</a></li>
-    <li><a> Start Node: {{ start }} </a></li>
-    <li><a> Destination Node: {{ destination }} </a></li>
-    <li><a> Total Flow: {{ flow }} </a></li>
-  </ul>
-</li>
-<li>
-<p class="navbar-btn">
-  <a id="start-game-btn" class="btn btn-default " href="{% url 'logout' %}" role="button">Logout</a>
-</p>
-</li>
+  <li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Logged as: {{ username }} <span class="caret"></span></a>
+    <ul class="dropdown-menu" role="menu">
+      <li><a> Graph: {{ graph }}</a></li>
+      <li><a> Start Node: {{ start }} </a></li>
+      <li><a> Destination Node: {{ destination }} </a></li>
+      <li><a> Total Flow: {{ flow }} </a></li>
+    </ul>
+  </li>
+  <li>
+    <p class="navbar-btn">
+      <a id="start-game-btn" class="btn btn-default " href="{% url 'logout' %}" role="button">Logout</a>
+    </p>
+  </li>
 {% endblock %}
 
 {% block jumbotron %}
@@ -24,6 +24,7 @@
   <input id="username-hidden" type="hidden" name="graph" value="{{ username }}" />
   <input id="source-hidden" type="hidden" name="graph" value="{{ start }}" />
   <input id="destination-hidden" type="hidden" name="graph" value="{{ destination }}" />
+  <div> <b> Time remaining: </b> <span id="time_countdown"></span></div>
 {% endblock %}
 
 {% block top-list%}

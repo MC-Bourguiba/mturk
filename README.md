@@ -1,5 +1,27 @@
 # bayen
 
+Feature:
+* Display weighted cost
+
+
+UI:
+* Countdown
+* Highlight paths in list and graph
+* Normalize weights automatically (show box)
+* Slide graph
+* Display previous weights
+* Show total score
+* Username, allow special characters
+* Path colors match graph and list
+* Thickness of flow on graph
+* Maybe show edge costs
+* Everything fit in smaller space (so no scroll)
+
+
+Bugs:
+* Allow integer values (0)
+* Don't let
+
 
 Access the server at http://104.131.132.100
 

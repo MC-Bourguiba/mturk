@@ -1,5 +1,9 @@
 from models import *
 
+import os
+
+from celery import Celery
+
 import json
 import re
 import copy
@@ -8,6 +12,7 @@ import parser
 import networkx as nx
 import uuid
 import numpy as np
+from datetime import timedelta
 
 
 root_username = 'root'
@@ -243,3 +248,106 @@ def updateEquilibriumFlows(graph):
         pm.save()
 
     return True
+
+
+def iterate_next_turn(game):
+    # turn_copy = GameTurn()
+    # turn_copy.iteration = game.current_turn.iteration
+    # turn_copy.flow_distributions = game.current_turn.flow_distributions
+    # turn_copy.save()
+    game.turns.add(game.current_turn)
+    next_turn = GameTurn()
+    next_turn.iteration = game.current_turn.iteration + 1
+    next_turn.save()
+
+    for player in Player.objects.filter(game=game):
+        player.completed_task = False
+        player.save()
+
+    game.current_turn = next_turn
+    game.save()
+
+
+def update_game(user, allocation, path_ids, is_temporary):
+    game = user.player.game
+    current_turn = game.current_turn
+
+    current_flow_distribution = FlowDistribution(turn=current_turn, username=user.username)
+    current_flow_distribution.save()
+
+    if hasattr(user.player, 'flow_distribution') and user.player.flow_distribution:
+        user.player.flow_distribution = current_flow_distribution
+        user.player.save()
+
+    total_weight = float(sum(allocation))
+    nb_paths = float(len(allocation))
+
+    for weight, path_id in zip(allocation, path_ids):
+        path = Path.objects.get(graph=game.graph, player_model=user.player.player_model,
+                                id=path_id)
+        assignment = PathFlowAssignment()
+        assignment.path = path
+        if(total_weight > 0):
+            assignment.flow = (weight / total_weight) * user.player.player_model.flow
+        else:
+            # if all the weights are 0, assign the uniform distribution
+            assignment.flow = 1. / nb_paths * user.player.player_model.flow
+        assignment.save()
+        current_flow_distribution.path_assignments.add(assignment)
+        current_flow_distribution.username = user.username
+        current_flow_distribution.save()
+
+    # current_turn.flow_distributions.add(current_flow_distribution)
+    user.player.flow_distribution = current_flow_distribution
+    # user.completed_task = True # Not needed?
+    current_flow_distribution.save()
+
+    # current_turn.save()
+
+    if not is_temporary:
+        user.player.completed_task = True
+        print 'Completed task!!!'
+
+    user.save()
+    user.player.save()
+    game.save()
+    user.save()
+
+
+# @app.periodic_tasks.add(run_every=timedelta(seconds=30))
+# def update_game(game):
+#     if not game.started:
+#         return
+
+#     if game.current_turn.iteration > game.thread_iteration:
+#         game.thread_iteration = game.current_turn.iteration
+#         game.save()
+#         return
+
+#     for player in Player.objects.filter(game=game).all():
+#         player.completed_task = True
+#         player.save()
+#         update_game(player.user)
+
+#     if is_turn_complete(game):
+#         update_cost(game)
+#         iterate_next_turn(game)
+
+
+def create_default_distribution(player_model, game, username):
+    path_ids = list(Path.objects.filter(player_model=player_model).values_list('id', flat=True))
+    fd = FlowDistribution(turn=game.current_turn, username=username)
+    fd.save()
+
+    for path_id in path_ids:
+        path = Path.objects.get(graph=game.graph, player_model=player_model,
+                                id=path_id)
+        assignment = PathFlowAssignment()
+        assignment.path = path
+        assignment.flow = player_model.flow / float(len(path_ids))
+        assignment.save()
+        fd.path_assignments.add(assignment)
+        fd.username = username
+
+    fd.save()
+    return fd

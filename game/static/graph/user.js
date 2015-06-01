@@ -2,10 +2,15 @@ var graph_window = document.getElementById("graph-editor");
 var generated_paths = [];
 var path_ids = [];
 var current_iteration = -1;
+var duration = 30;
+var previous_allocation = [];
+// var has_displayed_paths = false;
+
 
 function on_node_selected(selected_node) {
 
 }
+
 
 function on_edge_selected(selected_edge) {
 
@@ -14,6 +19,12 @@ function on_edge_selected(selected_edge) {
 
 $("#submit-game-btn").click(function(e) {
     e.preventDefault();
+    submit_distribution(false);
+});
+
+
+// temporary: true if user does not want to finish turn
+function submit_distribution(temporary) {
 
     var paths = [];
     var allocation = [];
@@ -32,11 +43,15 @@ $("#submit-game-btn").click(function(e) {
         data : JSON.stringify({
             "username" : $("#username-hidden")[0].value,
             "allocation" : allocation,
-            "ids" : paths
+            "ids" : paths,
+            "temporary": temporary
         }),
 
         success : function(json) {
             console.log(json);
+            if (!temporary) {
+                previous_allocation = allocation;
+            }
             update_from_state($("#username-hidden")[0].value);
         },
 
@@ -45,7 +60,7 @@ $("#submit-game-btn").click(function(e) {
             console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
         }
     });
-});
+}
 
 
 graph_window.onload = function() {
@@ -54,9 +69,14 @@ graph_window.onload = function() {
 };
 
 
-function update_ui() {
-    setTimeout(update_ui, 10000); // Update every 10 seconds
+function update_loop() {
+    setTimeout(update_loop, 10000); // Update every 10 seconds
     update_from_state($("#username-hidden")[0].value);
+}
+
+function post_temporary_distribution_loop() {
+    setTimeout(post_temporary_distribution_loop, 1000); // Update every second
+    submit_distribution(true);
 }
 
 
@@ -64,7 +84,10 @@ $(document).ready(function() {
     username = $("#username-hidden")[0].value;
     update_paths(username);
     update_previous_cost(username);
-    update_ui();
+    update_loop();
+    setTimeout(post_temporary_distribution_loop, 5000); // Some timing bug here! Should not have to wait 5s to post distribution!
+    display = $('#time_countdown');
+    // startTimer(duration, display);
 });
 
 
@@ -75,18 +98,44 @@ function update_from_state(username) {
 
         success : function(json) {
 
+            display = $('#time_countdown');
+
+            if (json.hasOwnProperty('secs')) {
+                if (json['secs'] >= 0) {
+                    display.text(json['secs']);
+                } else {
+                    display.text('0');
+                }
+            } else {
+                display.text('');
+            }
+
+
+            // TODO: Fix this so that the previous allocation "sticks"
+            // if (previous_allocation.length > 0) {
+            //     $("#path-list tr").each(function(idx, li) {
+            //         path_id = parseInt($(li).find("a").attr('id'));
+            //         index = path_ids.indexOf(path_id);
+            //         allocation = previous_allocation[index];
+            //         $('#slider').slider('setValue', allocation);
+
+            //         // paths.push(parseInt($(li).find("a").attr('id')));
+            //         // allocation.push(parseFloat($(li).find("input")[0].value/100));
+            //     });
+            // }
+
             if (current_iteration != json['iteration']) {
                 $("#path-btns").toggle(true);
                 update_paths(username);
                 update_previous_cost(username);
                 $("#completed-turn").toggle(false);
+                // startTimer(duration, display);
             } else {
                 if (json['completed_task']) {
                     $("#path-btns").toggle(false);
                     $("#completed-turn").toggle(true);
                 }
             }
-
 
             // if (json['completed_task']) {
             //     if (current_iteration != json['iteration']) {
@@ -126,7 +175,10 @@ function update_paths(username) {
             console.log(generated_paths);
             path_ids = json['path_ids'];
 
+            // if (!has_displayed_paths) {
             $("#path-display-list").html(json['html']);
+            has_displayed_paths = true;
+            // }
 
             editor_window = document.getElementById("graph-editor").contentWindow;
             editor_window.edit = false;
@@ -202,4 +254,24 @@ function update_previous_cost(username) {
             console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
         }
     });
+}
+
+
+function startTimer(duration, display) {
+    var timer = duration, minutes, seconds;
+    var inter = setInterval(function () {
+        minutes = parseInt(timer / 60, 10)
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.text(seconds);
+
+        if (--timer < 0) {
+            timer = duration;
+            clearInterval(inter);
+            submit_distribution(false);
+        }
+    }, 1000);
 }

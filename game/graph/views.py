@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template import RequestContext, loader
@@ -13,6 +15,7 @@ from django.core.files import File
 
 from utils import *
 from models import *
+from tasks import *
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm
@@ -22,6 +25,8 @@ from django.contrib.auth.models import User
 
 import simplejson as json
 
+
+# duration = 15
 
 current_game = 'game'
 
@@ -43,13 +48,19 @@ def create_account(request):
             try:
                 pm = PlayerModel.objects.filter(in_use=False, graph__isnull=False)[:1].get()
                 pm.in_use = True
+
+                flow_distribution = create_default_distribution(pm, game, new_user.username)
                 player = Player()
                 player.user = new_user
+                # new_user.player = player
                 player.player_model = pm
                 player.game = game
+                player.flow_distribution = flow_distribution
+                flow_distribution.save()
                 pm.save()
                 player.save()
-            except:
+            except Exception as e:
+                print e
                 pass
 
             return HttpResponseRedirect("/graph/index")
@@ -497,51 +508,27 @@ def get_user_info(request, username):
 def submit_distribution(request):
     data = json.loads(request.body)
     user = User.objects.get(username=data['username'])
+    allocation = data['allocation']
+    path_ids = data['ids']
+    temporary = data['temporary']
 
     game = user.player.game
-    current_turn = game.current_turn
 
-    current_flow_distribution = FlowDistribution(turn=current_turn, username=user.username)
-    current_flow_distribution.save()
+    if not game.started:
+        return JsonResponse(dict())
 
-    if hasattr(user.player, 'flow_distribution') and user.player.flow_distribution:
-        user.player.flow_distribution = current_flow_distribution
-        user.player.save()
-
-    total_weight = float(sum(data['allocation']))
-    nb_paths = float(len(data['allocation']))
-
-    for weight, path_id in zip(data['allocation'], data['ids']):
-        path = Path.objects.get(graph=game.graph, player_model=user.player.player_model,
-                                id=path_id)
-        assignment = PathFlowAssignment()
-        assignment.path = path
-        if(total_weight > 0):
-            assignment.flow = (weight / total_weight) * user.player.player_model.flow
-        else:
-            # if all the weights are 0, assign the uniform distribution
-            assignment.flow = 1. / nb_paths * user.player.player_model.flow
-        assignment.save()
-        current_flow_distribution.path_assignments.add(assignment)
-        current_flow_distribution.username = user.username
-        current_flow_distribution.save()
-
-    # current_turn.flow_distributions.add(current_flow_distribution)
-    user.player.flow_distribution = current_flow_distribution
-    user.completed_task = True
-    current_flow_distribution.save()
-    current_turn.save()
-    user.player.completed_task = True
-    user.player.save()
-    game.save()
-    user.save()
+    update_game(user, allocation, path_ids, temporary)
 
     response = dict()
     response['success'] = True
 
-    if is_turn_complete(game):
+    if is_turn_complete(game) and not temporary:
         update_cost(game)
         iterate_next_turn(game)
+        if async_res:
+            async_res.revoke()
+        game.game_loop_started = datetime.now()
+        game.save()
         response['turn_completed'] = True
 
     response['turn_completed'] = False
@@ -556,6 +543,16 @@ def current_state(request, username):
 
     response = dict()
 
+    if game.game_loop_started:
+        print 'Calculating time left'
+    # if True:
+        datetime_started = game.game_loop_started
+        print 'datetime_started', datetime_started
+        es_started = int(datetime_started.strftime("%s"))
+        secs_now = int(datetime.now().strftime("%s"))
+        print 'datetime_now', datetime.now()
+        response['secs'] = (es_started + duration) - secs_now
+
     if is_turn_complete(game):
         update_cost(game)
         iterate_next_turn(game)
@@ -565,22 +562,21 @@ def current_state(request, username):
 
     response['completed_task'] = user.player.completed_task
     response['iteration'] = game.current_turn.iteration
+
+    print response
+
     return JsonResponse(response)
 
 
-def iterate_next_turn(game):
-    # turn_copy = GameTurn()
-    # turn_copy.iteration = game.current_turn.iteration
-    # turn_copy.flow_distributions = game.current_turn.flow_distributions
-    # turn_copy.save()
-    game.turns.add(game.current_turn)
-    next_turn = GameTurn()
-    next_turn.iteration = game.current_turn.iteration + 1
-    next_turn.save()
+def start_game(request):
+    # TODO: Fix this, let game be addressable in root UI
+    game = Game.objects.get(name=current_game)
+    # game = Game.objects.all()[0]
+    game.started = True
+    game.game_loop_started = datetime.now()
 
-    for player in Player.objects.filter(game=game):
-        player.completed_task = False
-        player.save()
-
-    game.current_turn = next_turn
     game.save()
+
+    async_res = game_force_next.apply_async((game.name,), countdown=duration)
+
+    return JsonResponse(dict())

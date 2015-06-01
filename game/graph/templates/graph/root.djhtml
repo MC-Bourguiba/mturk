@@ -94,6 +94,7 @@
         <a id="assign-start-node" class="btn btn-default" href="#" role="button">Assign start node</a>
         <a id="assign-destination-node" class="btn btn-default" href="#" role="button">Assign destination node</a>
         <a id="assign-graph" class="btn btn-default" href="#" role="button">Assign graph</a>
+        <a id="start-game" class="btn btn-default" href="#" role="button">Start game</a>
         <p> Selected node:  <span id="selected-node"></span>  </p>
         <p> Selected edge: <span id="selected-edge"></span> </p>
         <p> Edge cost function: <span id="edge-cost-function"></span> </p>

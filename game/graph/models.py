@@ -51,7 +51,6 @@ class Player(models.Model):
     completed_task = models.BooleanField(default=False)
     game = models.ForeignKey('Game', null=True, blank=True)
     flow_distribution = models.ForeignKey('FlowDistribution', null=True, blank=True)
-    completed_task = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.user.username
@@ -108,3 +107,6 @@ class Game(models.Model):
     turns = models.ManyToManyField('GameTurn')
     current_turn = models.ForeignKey('GameTurn', related_name='current_turn', blank=True, null=True)
     graph = models.OneToOneField('Graph', blank=True, null=True)
+    started = models.BooleanField(default=False)
+    game_loop_started = models.DateTimeField(blank=True, null=True)
+    # thread_iteration = models.IntegerField(blank=True, null=True)
