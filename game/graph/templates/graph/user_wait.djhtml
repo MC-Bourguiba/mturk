@@ -1,0 +1,8 @@
+{% extends "graph/index.djhtml" %}
+{% load staticfiles %}
+
+{% block jumbotron %}
+
+  <p> Please wait for a few minutes and refresh </p>
+
+{% endblock %}

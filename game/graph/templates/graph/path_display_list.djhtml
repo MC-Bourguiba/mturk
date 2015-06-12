@@ -17,7 +17,7 @@
               <td><p> {{cumulative_cost|floatformat:3}}</p></td>
               <td>
               <div style="float:left;">
-                <input id="ex{{i}}" class="slider" type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="50"/>
+                <input id="ex{{i}}" class="slider" type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="{{ flow }}"/>
               </div>
               </td>
             </tr>

@@ -15,6 +15,11 @@ import numpy as np
 from datetime import timedelta
 
 
+import md5
+
+
+duration = 30
+
 root_username = 'root'
 
 
@@ -59,7 +64,7 @@ def generate_and_save_graph(graph_dict):
 
 
 def is_turn_complete(game):
-    players = Player.objects.filter(game=game)
+    players = Player.objects.filter(game=game).exclude(user__username=root_username)
 
     for player in players:
         if not player.completed_task:
@@ -76,7 +81,6 @@ def evalFunc(func, xVal):
 def update_cost(game):
     edge_flow = dict()
     current_turn = game.current_turn
-    # flow_distributions = current_turn.flow_distributions
 
     for e in Edge.objects.filter(graph=game.graph):
         edge_flow[e] = 0.0
@@ -92,8 +96,6 @@ def update_cost(game):
     for e in Edge.objects.filter(graph=game.graph):
         cost_f = parser.expr(e.cost_function).compile()
         cost = evalFunc(cost_f, edge_flow[e])
-
-        # print cost
 
         edge_cost = EdgeCost()
         edge_cost.edge = e
@@ -251,10 +253,8 @@ def updateEquilibriumFlows(graph):
 
 
 def iterate_next_turn(game):
-    # turn_copy = GameTurn()
-    # turn_copy.iteration = game.current_turn.iteration
-    # turn_copy.flow_distributions = game.current_turn.flow_distributions
-    # turn_copy.save()
+    update_cost(game)
+
     game.turns.add(game.current_turn)
     next_turn = GameTurn()
     next_turn.iteration = game.current_turn.iteration + 1
@@ -271,6 +271,8 @@ def iterate_next_turn(game):
 def update_game(user, allocation, path_ids, is_temporary):
     game = user.player.game
     current_turn = game.current_turn
+
+    FlowDistribution.objects.filter(username=user.username, turn=game.current_turn).delete()
 
     current_flow_distribution = FlowDistribution(turn=current_turn, username=user.username)
     current_flow_distribution.save()
@@ -292,12 +294,12 @@ def update_game(user, allocation, path_ids, is_temporary):
         else:
             # if all the weights are 0, assign the uniform distribution
             assignment.flow = 1. / nb_paths * user.player.player_model.flow
+
         assignment.save()
         current_flow_distribution.path_assignments.add(assignment)
         current_flow_distribution.username = user.username
         current_flow_distribution.save()
 
-    # current_turn.flow_distributions.add(current_flow_distribution)
     user.player.flow_distribution = current_flow_distribution
     # user.completed_task = True # Not needed?
     current_flow_distribution.save()
@@ -306,32 +308,11 @@ def update_game(user, allocation, path_ids, is_temporary):
 
     if not is_temporary:
         user.player.completed_task = True
-        print 'Completed task!!!'
 
     user.save()
     user.player.save()
     game.save()
     user.save()
-
-
-# @app.periodic_tasks.add(run_every=timedelta(seconds=30))
-# def update_game(game):
-#     if not game.started:
-#         return
-
-#     if game.current_turn.iteration > game.thread_iteration:
-#         game.thread_iteration = game.current_turn.iteration
-#         game.save()
-#         return
-
-#     for player in Player.objects.filter(game=game).all():
-#         player.completed_task = True
-#         player.save()
-#         update_game(player.user)
-
-#     if is_turn_complete(game):
-#         update_cost(game)
-#         iterate_next_turn(game)
 
 
 def create_default_distribution(player_model, game, username):
@@ -351,3 +332,10 @@ def create_default_distribution(player_model, game, username):
 
     fd.save()
     return fd
+
+
+def get_hash(s):
+    md_hash = md5.new()
+    md_hash.update(s)
+
+    return str(md_hash.hexdigest())

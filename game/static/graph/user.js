@@ -75,7 +75,7 @@ function update_loop() {
 }
 
 function post_temporary_distribution_loop() {
-    setTimeout(post_temporary_distribution_loop, 1000); // Update every second
+    setTimeout(post_temporary_distribution_loop, 2000); // Update every two second
     submit_distribution(true);
 }
 
@@ -93,7 +93,7 @@ $(document).ready(function() {
 
 function update_from_state(username) {
     $.ajax({
-        url : "/graph/current_state/" + username + "/",
+        url : "/graph/current_state/",
         type : "GET",
 
         success : function(json) {

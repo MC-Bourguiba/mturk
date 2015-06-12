@@ -7,6 +7,7 @@ from django.template.loader import render_to_string
 
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models.fields.files import FieldFile
+from django.db.models import Q
 from django.views.generic import FormView
 from django.views.generic.base import TemplateView
 from django.contrib import messages
@@ -16,6 +17,7 @@ from django.core.files import File
 from utils import *
 from models import *
 from tasks import *
+from game_functions import *
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm
@@ -23,13 +25,12 @@ from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.models import User
 
+from django.core.cache import cache
+
 import simplejson as json
 
 
-# duration = 15
-
 current_game = 'game'
-
 
 def create_account(request):
 
@@ -42,30 +43,16 @@ def create_account(request):
         if form.is_valid():
             new_user = form.save()
             game = Game.objects.get(name=current_game)
-            new_user.game = game
-            new_user.save()
 
-            try:
-                pm = PlayerModel.objects.filter(in_use=False, graph__isnull=False)[:1].get()
-                pm.in_use = True
-
-                flow_distribution = create_default_distribution(pm, game, new_user.username)
-                player = Player()
-                player.user = new_user
-                # new_user.player = player
-                player.player_model = pm
-                player.game = game
-                player.flow_distribution = flow_distribution
-                flow_distribution.save()
-                pm.save()
-                player.save()
-            except Exception as e:
-                print e
+            if create_new_player(new_user, game):
+                return HttpResponseRedirect('/graph/index')
+            else:
                 pass
-
-            return HttpResponseRedirect("/graph/index")
+                # TODO: Return empty page here
+                # template = 'graph/user_wait.djhtml'
     else:
         form = UserCreationForm()
+
     return render(request, "graph/register.djhtml", {
         'form': form,
     })
@@ -87,12 +74,16 @@ def show_graph(request):
     if request.user.username != root_username:
         template = 'graph/user.djhtml'
         user = User.objects.get(username=request.user.username)
-        player_model = user.player.player_model
-        context['graph'] = player_model.graph.name
-        context['username'] = user.username
-        context['start'] = player_model.start_node.ui_id
-        context['destination'] = player_model.destination_node.ui_id
-        context['flow'] = player_model.flow
+
+        try:
+            player_model = user.player.player_model
+            context['graph'] = player_model.graph.name
+            context['username'] = user.username
+            context['start'] = player_model.start_node.ui_id
+            context['destination'] = player_model.destination_node.ui_id
+            context['flow'] = player_model.flow
+        except:
+            template = 'graph/user_wait.djhtml'
     else:
         # if not Game.objects.filter(name=current_game).exists():
        #     game = Game(name=current_game)
@@ -102,6 +93,19 @@ def show_graph(request):
         context['usernames'] = User.objects.values_list('username', flat=True)
         context['model_names'] = PlayerModel.objects.values_list('name', flat=True)
         context['graph_names'] = graphs
+
+    context['hidden'] = 'hidden'
+
+    g = Game.objects.all()[0]
+
+    # if not g.started:
+    #     template = 'graph/user_wait.djhtml'
+
+    try:
+        if len(PlayerModel.objects.filter(in_use=False, graph__isnull=False).all()) == 0:
+            context['hidden'] = ''
+    except:
+        pass
 
     return render(request, template, context)
 
@@ -186,6 +190,9 @@ def get_user_costs(request, graph_name):
     cumulative_costs = dict()
 
     for player in players:
+        if player.user.username == root_username:
+            continue
+
         username = player.user.username
         paths = Path.objects.filter(player_model=player.player_model)
         # path_assignments = player.flow_distribution.path_assignments
@@ -215,6 +222,7 @@ def get_user_costs(request, graph_name):
             cumulative_costs[player.user.username].append(cumulative_cost/normalization_const)
 
     response = dict()
+    response['started'] = game.started
     response['current_costs'] = current_costs
     response['cumulative_costs'] =  cumulative_costs
     return JsonResponse(response)
@@ -326,23 +334,38 @@ def get_paths(request, username):
     path_idxs = range(len(path_ids))
     paths = dict()
 
-    flow = []
     previous_cost = []
     previous_turn = None
     cumulative_costs = []
+    flow = []
+
+    prev_alloc, prev_path_ids = None, None
 
     if current_turn.iteration > 0:
         previous_turn = game.turns.get(iteration=current_turn.iteration - 1)
 
+    # TODO: Fix the cache key scheme
+    if cache.get(get_hash(user.username) + 'path_ids'):
+        prev_alloc = cache.get(get_hash(user.username) + 'alloc')
+        prev_path_ids = cache.get(get_hash(user.username) + 'path_ids')
+
+
     for idx, p_id in zip(path_idxs, path_ids):
         path = Path.objects.get(id=p_id)
         paths[idx] = list(path.edges.values_list('edge_id', flat=True))
-        if FlowDistribution.objects.filter(username=username, turn=current_turn).exists():
-        # if current_turn.flow_distributions.filter(username=username).exists():
-            fd = FlowDistribution.objects.get(turn=current_turn, username=username)
-            # fd = current_turn.flow_distributions.get(username=username)
-            flow.append(fd.path_assignments.get(path__id=p_id).flow)
+
+        # if FlowDistribution.objects.filter(username=username, turn=current_turn).exists():
+        # # if current_turn.flow_distributions.filter(username=username).exists():
+        #     fd = FlowDistribution.objects.get(turn=current_turn, username=username)
+        #     # fd = current_turn.flow_distributions.get(username=username)
+        #     flow.append(fd.path_assignments.get(path__id=p_id).flow)
+        # else:
+        #     flow.append(0.5)
+
+        if prev_alloc:
+            flow.append(prev_alloc[prev_path_ids.index(p_id)])
         else:
+            print 'failing!!!!!!!'
             flow.append(0.5)
 
         if current_turn.iteration > 0:
@@ -365,6 +388,8 @@ def get_paths(request, username):
             previous_cost.append(0)
             cumulative_costs.append(0)
 
+
+    flow = map(lambda x: x * 100, flow)
 
     html_dict = {'path_idxs': zip(path_idxs, path_ids, flow, previous_cost,
                                   cumulative_costs)}
@@ -411,8 +436,12 @@ def user_model_info(request, username):
 
     user_dict = dict()
     user_dict['player_username'] = username
-    if hasattr(user, 'player'):
-        user_dict['player_modelname'] = user.player.player_model.name
+
+    try:
+        if hasattr(user, 'player') and hasattr(user.player, 'player_model'):
+            user_dict['player_modelname'] = user.player.player_model.name
+    except:
+        pass
 
     html = render_to_string('graph/player_assigned_model_info.djhtml', user_dict)
     response = dict()
@@ -426,13 +455,15 @@ def assign_user_model(request):
     user = User.objects.get(username=data['username'])
     model = PlayerModel.objects.get(name=data['modelname'])
 
-    if hasattr(user, 'player'):
-        user.player.player_model.in_use = False
-        user.player.player_model.save()
-        user.player.delete()
+    try:
+        if hasattr(user, 'player'):
+            user.player.player_model.in_use = False
+            user.player.player_model.save()
+            user.player.delete()
+    except:
+        pass
 
-    player = Player()
-    player.user = user
+    player = user.player
     player.player_model = model
 
     model.in_use = True
@@ -508,62 +539,46 @@ def get_user_info(request, username):
 def submit_distribution(request):
     data = json.loads(request.body)
     user = User.objects.get(username=data['username'])
+    player = Player.objects.get(user__username=data['username'])
     allocation = data['allocation']
     path_ids = data['ids']
     temporary = data['temporary']
 
-    game = user.player.game
+    response = dict()
+    game = player.game
 
     if not game.started:
-        return JsonResponse(dict())
+        return JsonResponse(response)
 
     update_game(user, allocation, path_ids, temporary)
 
-    response = dict()
-    response['success'] = True
+    cache.set(get_hash(user.username) + 'alloc', allocation)
+    cache.set(get_hash(user.username) + 'path_ids', path_ids)
 
     if is_turn_complete(game) and not temporary:
-        update_cost(game)
         iterate_next_turn(game)
         if async_res:
             async_res.revoke()
-        game.game_loop_started = datetime.now()
-        game.save()
-        response['turn_completed'] = True
 
-    response['turn_completed'] = False
+        game.game_loop_time = datetime.now()
+        game.save()
+
     return JsonResponse(response)
 
 
 @login_required
-def current_state(request, username):
-    user = User.objects.get(username=username)
+def current_state(request):
+    game = Game.objects.all()[0]
 
-    game = user.player.game
+    update_game_state(game)
 
     response = dict()
-
-    if game.game_loop_started:
-        print 'Calculating time left'
-    # if True:
-        datetime_started = game.game_loop_started
-        print 'datetime_started', datetime_started
-        es_started = int(datetime_started.strftime("%s"))
-        secs_now = int(datetime.now().strftime("%s"))
-        print 'datetime_now', datetime.now()
-        response['secs'] = (es_started + duration) - secs_now
-
-    if is_turn_complete(game):
-        update_cost(game)
-        iterate_next_turn(game)
-        response['turn_completed'] = True
-    else:
-        response['turn_completed'] = False
-
-    response['completed_task'] = user.player.completed_task
     response['iteration'] = game.current_turn.iteration
 
-    print response
+    response['secs'] = duration
+
+    if cache.get('time_left'):
+        response['secs'] = cache.get('time_left')
 
     return JsonResponse(response)
 
@@ -573,10 +588,26 @@ def start_game(request):
     game = Game.objects.get(name=current_game)
     # game = Game.objects.all()[0]
     game.started = True
-    game.game_loop_started = datetime.now()
+    game.game_loop_time = datetime.now()
+    game.stopped = False
 
     game.save()
 
     async_res = game_force_next.apply_async((game.name,), countdown=duration)
 
     return JsonResponse(dict())
+
+
+def stop_game(request):
+    game = Game.objects.all()[0]
+    game.stopped = True
+    game.save()
+
+    response = dict()
+
+    if async_res:
+        async_res.revoke()
+
+    response['success'] = True
+
+    return JsonResponse(response)

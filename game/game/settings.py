@@ -156,6 +156,23 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 
+CACHES = {
+    'default': {
+        'BACKEND': 'redis_cache.RedisCache',
+        'LOCATION': 'localhost:6379',
+        # 'OPTIONS': {
+        #     'DB': 1,
+        #     'PASSWORD': 'yadayada',
+        #     'PARSER_CLASS': 'redis.connection.HiredisParser',
+        #     'CONNECTION_POOL_CLASS': 'redis.BlockingConnectionPool',
+        #     'CONNECTION_POOL_CLASS_KWARGS': {
+        #         'max_connections': 50,
+        #         'timeout': 20,
+        #     }
+        # },
+    },
+}
+
 try:
     from local_settings import *
 except:

@@ -1,13 +1,14 @@
 from __future__ import absolute_import
 
-from graph.models import *
-from graph.utils import *
 from datetime import datetime
+
+from .models import *
+from .utils import *
+from .game_functions import *
 
 from celery import shared_task
 
 
-duration = 30
 async_res = None
 
 
@@ -17,19 +18,13 @@ def game_force_next(game_name):
 
     game = Game.objects.get(name=game_name)
 
-    # Force turn completion
-    if not is_turn_complete(game):
-        players = Player.objects.filter(game=game)
-        for player in players:
-            player.completed_task = True
-            # if not player.completed_task:
-            #     return False
+    if game.stopped:
+        return
 
-    print 'Forced next turn!!!'
-    update_cost(game)
+    force_complete_turn(game)
     iterate_next_turn(game)
 
-    game.game_loop_started = datetime.now()
+    game.game_loop_time = datetime.now()
     game.save()
     async_res = game_force_next.apply_async((game_name,), countdown=duration)
 

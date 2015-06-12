@@ -36,19 +36,21 @@ function update_user_cost(graph_name) {
         success : function(json) {
             console.log(json);
 
-            var chart = c3.generate({
-                data: {
-                    json : json['current_costs']
-                },
-                bindto: '#chart'
-            });
+            if (json['started']) {
+                var chart = c3.generate({
+                    data: {
+                        json : json['current_costs']
+                    },
+                    bindto: '#chart'
+                });
 
-            var chart = c3.generate({
-                data: {
-                    json : json['cumulative_costs']
-                },
-                bindto: '#cumulative_chart'
-            });
+                var chart = c3.generate({
+                    data: {
+                        json : json['cumulative_costs']
+                    },
+                    bindto: '#cumulative_chart'
+                });
+            }
         },
 
         // handle a non-successful response
@@ -154,6 +156,35 @@ $("#start-game").click(function(e) {
     e.preventDefault();
     $.ajax({
         url : '/graph/start_game/',
+        type : "POST", // http method
+        dataType: "json",
+        contentType: 'application/json', // JSON encoding
+
+        data : JSON.stringify({
+            'graph' : current_graph
+        }),
+
+        // handle a successful response
+        success : function(json) {
+            // $('#post-text').val(''); // remove the value from the input
+            // console.log(json); // log the returned json to the console
+            console.log(json); // another sanity check
+
+            // $("#model-info-graph").text(json['graph_name']);
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+});
+
+
+$("#stop-game").click(function(e) {
+    e.preventDefault();
+    $.ajax({
+        url : '/graph/stop_game/',
         type : "POST", // http method
         dataType: "json",
         contentType: 'application/json', // JSON encoding

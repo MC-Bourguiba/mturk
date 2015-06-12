@@ -32,7 +32,7 @@
     <div id="path-display-list">
     </div>
     <div id="path-btns" style="display: none" align="right">
-      <a id="submit-game-btn" class="btn btn-default" href="#" role="button">Submit</a>
+      <a id="submit-game-btn" class="btn btn-default hidden" href="#" role="button">Submit</a>
       <!-- <a id="show-cost-btn" class="btn btn-default" href="#" role="button">Show cost</a> -->
     </div>
     <div id="completed-turn" style="display: none" align="right">

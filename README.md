@@ -3,6 +3,9 @@
 Feature:
 * Display weighted cost
 
+redis: Run redis anywhere
+celery: celery -A game worker -l info
+
 
 UI:
 * Countdown

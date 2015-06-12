@@ -2,7 +2,7 @@ from django.db import models
 
 from django.contrib.auth.models import User
 
-from uuidfield import UUIDField
+# from uuidfield import UUIDField
 
 
 class Graph(models.Model):
@@ -77,7 +77,7 @@ class Path(models.Model):
 
 class PathFlowAssignment(models.Model):
     path = models.ForeignKey('Path')
-    flow = models.FloatField(default=0.0)
+    flow = models.FloatField(default=0.2)
 
 
 class GameTurn(models.Model):
@@ -87,7 +87,8 @@ class GameTurn(models.Model):
 
 
 class FlowDistribution(models.Model):
-    path_assignments = models.ManyToManyField('PathFlowAssignment')
+    path_assignments = models.ManyToManyField('PathFlowAssignment',
+                                              related_name='flow_distribution')
     username = models.TextField(blank=True, null=True)
     turn = models.ForeignKey('GameTurn', blank=True, null=True)
 
@@ -108,5 +109,6 @@ class Game(models.Model):
     current_turn = models.ForeignKey('GameTurn', related_name='current_turn', blank=True, null=True)
     graph = models.OneToOneField('Graph', blank=True, null=True)
     started = models.BooleanField(default=False)
-    game_loop_started = models.DateTimeField(blank=True, null=True)
+    game_loop_time = models.DateTimeField(blank=True, null=True)
+    stopped = models.BooleanField(default=False)
     # thread_iteration = models.IntegerField(blank=True, null=True)
