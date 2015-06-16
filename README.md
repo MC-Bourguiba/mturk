@@ -4,7 +4,17 @@ Feature:
 * Display weighted cost
 
 redis: Run redis anywhere
-celery: celery -A game worker -l info
+
+```bash
+redis-server
+```
+
+
+celery: Need to run at the root of the project
+
+```bash
+celery -A game worker -l info
+```
 
 
 UI:
