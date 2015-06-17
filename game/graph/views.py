@@ -202,7 +202,8 @@ def get_user_costs(request, graph_name):
             # if turn.iteration == 0:
             #     continue
 
-            path_assignments = FlowDistribution.objects.get(turn=turn, username=username).path_assignments
+            path_assignments = FlowDistribution.objects.get(turn=turn,
+                                                            username=username).path_assignments
             # path_assignments = turn.flow_distributions.get(username=username).path_assignments
             e_costs = turn.graph_cost.edge_costs
             current_cost = 0
@@ -580,6 +581,16 @@ def current_state(request):
     if cache.get('time_left'):
         response['secs'] = cache.get('time_left')
 
+
+    edge_costs = dict()
+
+    if game.current_turn.iteration > 1 and game.edge_highlight:
+        gc = GameTurn.objects.get(iteration=game.current_turn.iteration - 1).graph_cost
+        for ec in gc.edge_costs.all():
+            edge_costs[ec.edge_id] = ec.cost
+
+    response['edge_cost'] = edge_costs
+
     return JsonResponse(response)
 
 
@@ -610,4 +621,50 @@ def stop_game(request):
 
     response['success'] = True
 
+    return JsonResponse(response)
+
+
+def restart_game(game):
+    game.stopped = True
+    game.save()
+    if async_res:
+        async_res.revoke()
+
+    EdgeCost.objects.all().clear()
+    GameTurn.objects.all().clear()
+    FlowDistribution.objects.all().clear()
+    GraphCost.objects.all().clear()
+    PathFlowAssignment.object.all().clear()
+
+    initial_turn = GameTurn()
+    initial_turn.iteration = 0
+    initial_turn.save()
+    game.current_turn = initial_turn
+    game.save()
+
+
+def start_edge_highlight(request):
+    game = Game.objects.all()[0]
+
+    # TODO: Flush data somewhere
+
+    if not game.edge_highlight:
+        restart_game(game)
+
+
+    response = dict()
+    response['success'] = True
+    return JsonResponse(response)
+
+
+def stop_edge_highlight(request):
+    game = Game.objects.all()[0]
+
+    # TODO: Flush data somewhere
+
+    if game.edge_highlight:
+        restart_game(game)
+
+    response = dict()
+    response['success'] = True
     return JsonResponse(response)

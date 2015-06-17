@@ -1,5 +1,14 @@
 var edit = true;
 
+function componentToHex(c) {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(r, g, b) {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
 function guid() {
     function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
@@ -29,6 +38,9 @@ var nodes = [
     links = [
     ];
 var highlighted_links = [];
+var edge_cost = {};
+var show_edge_cost = false;
+var show_highlighted_paths = false;
 
 
 // var node_selected_callbacks = [];
@@ -142,7 +154,25 @@ function restart() {
             restart();
         });
 
-    path.style('stroke', function(d) {return highlighted_links.indexOf(d.id) > -1 ? 'red' :  'black'});
+    path.style('stroke', function(d) {
+        if (show_highlighted_paths && (highlighted_links.indexOf(d.id) > -1)) {
+            return '#7a9bde';
+            // return '#2C6EFF';
+            // return 'red';
+        }
+
+        // console.info(edge_cost);
+
+        if (show_edge_cost && edge_cost.hasOwnProperty(d.id)) {
+            cost = edge_cost[d.id];
+            red_val = Math.round(255 * cost);
+            green_val = Math.round(255 * (1 - cost));
+            blue_val = 0;
+            return rgbToHex(red_val, green_val, blue_val);
+        }
+
+        return 'black';
+    });
 
     // remove old links
     path.exit().remove();

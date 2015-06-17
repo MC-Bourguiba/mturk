@@ -4,6 +4,8 @@ var path_ids = [];
 var current_iteration = -1;
 var duration = 30;
 var previous_allocation = [];
+var editor_window = null;
+
 // var has_displayed_paths = false;
 
 
@@ -20,6 +22,27 @@ function on_edge_selected(selected_edge) {
 $("#submit-game-btn").click(function(e) {
     e.preventDefault();
     submit_distribution(false);
+});
+
+
+$("#show-edge-btn").click(function(e) {
+    e.preventDefault();
+    if (editor_window == null) {
+        editor_window = document.getElementById("graph-editor").contentWindow;
+    }
+    editor_window.show_edge_cost = true;
+    editor_window.restart();
+});
+
+
+$("#clear-edge-btn").click(function(e) {
+    e.preventDefault();
+    if (editor_window == null) {
+        editor_window = document.getElementById("graph-editor").contentWindow;
+    }
+    editor_window.show_edge_cost = false;
+    editor_window.show_highlighted_paths = false;
+    editor_window.restart();
 });
 
 
@@ -74,6 +97,7 @@ function update_loop() {
     update_from_state($("#username-hidden")[0].value);
 }
 
+
 function post_temporary_distribution_loop() {
     setTimeout(post_temporary_distribution_loop, 2000); // Update every two second
     submit_distribution(true);
@@ -82,6 +106,11 @@ function post_temporary_distribution_loop() {
 
 $(document).ready(function() {
     username = $("#username-hidden")[0].value;
+
+    if (editor_window == null) {
+        editor_window = document.getElementById("graph-editor").contentWindow;
+    }
+
     update_paths(username);
     update_previous_cost(username);
     update_loop();
@@ -108,6 +137,16 @@ function update_from_state(username) {
                 }
             } else {
                 display.text('');
+            }
+
+            if (json.hasOwnProperty('edge_cost')) {
+                if (editor_window != null) {
+                    editor_window = document.getElementById("graph-editor").contentWindow;
+                }
+                // console.info("Setting edge_cost!!!");
+                editor_window.edge_cost = json['edge_cost'];
+                editor_window.restart();
+                // console.info(edge_cost);
             }
 
 
@@ -180,7 +219,9 @@ function update_paths(username) {
             has_displayed_paths = true;
             // }
 
-            editor_window = document.getElementById("graph-editor").contentWindow;
+            if (editor_window == null) {
+                editor_window = document.getElementById("graph-editor").contentWindow;
+            }
             editor_window.edit = false;
 
             $('#path-list tr  a').click(function(e) {
@@ -188,8 +229,12 @@ function update_paths(username) {
                 // This is soooooooo bad
                 var num = parseInt($(this).html().substr('Path '.length));
                 console.log(num);
-                editor_window = document.getElementById("graph-editor").contentWindow;
+
+                if (editor_window == null) {
+                    editor_window = document.getElementById("graph-editor").contentWindow;
+                }
                 editor_window.edit = false;
+                editor_window.show_highlighted_paths = true;
                 editor_window.highlighted_links = generated_paths[num];
                 // console.log(generated_paths[num]);
                 editor_window.restart();

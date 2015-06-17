@@ -335,6 +335,7 @@
         "current_turn": 1,
         "game_loop_time": null,
         "stopped": false,
+        "edge_highlight": true,
         "turns": []
     },
     "model": "graph.game",

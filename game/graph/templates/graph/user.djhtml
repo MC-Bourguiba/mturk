@@ -25,6 +25,9 @@
   <input id="source-hidden" type="hidden" name="graph" value="{{ start }}" />
   <input id="destination-hidden" type="hidden" name="graph" value="{{ destination }}" />
   <div> <b> Time remaining: </b> <span id="time_countdown"></span></div>
+
+  <a id="show-edge-btn" class="btn btn-default " href="#" role="button">Highlight edge cost</a>
+  <a id="clear-edge-btn" class="btn btn-default " href="#" role="button">Clear edge highlight</a>
 {% endblock %}
 
 {% block top-list%}

@@ -111,4 +111,5 @@ class Game(models.Model):
     started = models.BooleanField(default=False)
     game_loop_time = models.DateTimeField(blank=True, null=True)
     stopped = models.BooleanField(default=False)
+    edge_highlight = models.BooleanField(default=True)
     # thread_iteration = models.IntegerField(blank=True, null=True)
