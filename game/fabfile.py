@@ -27,6 +27,7 @@ def deploy(reboot=True):
     # Reboots gunicorn
     if reboot:
         restart('gunicorn')
+        restart('celery')
 
 
 def supervisor(command, *args):
