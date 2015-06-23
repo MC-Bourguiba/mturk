@@ -306,6 +306,18 @@ function update_previous_cost(username) {
                 data: {
                     json : json['previous_costs']
                 },
+                axis: {
+                    y: {
+                        tick: {
+                            format: d3.format(".3f")
+                        }
+                    },
+                    // x: {
+                    //     tick: {
+                    //         format: d3.format(".3f")
+                    //     }
+                    // }
+                },
                 bindto: '#chart'
             });
 
@@ -317,6 +329,19 @@ function update_previous_cost(username) {
                     json : cumulative_cost
                 },
 
+                axis: {
+                    y: {
+                        tick: {
+                            format: d3.format(".3f")
+                        }
+                    },
+                    // x: {
+                    //     tick: {
+                    //         format: d3.format(".3f")
+                    //     }
+                    // }
+                },
+
                 bindto: '#cumulative_chart'
             });
 
@@ -326,6 +351,19 @@ function update_previous_cost(username) {
                 },
                 data: {
                     json : json['previous_flows']
+                },
+
+                axis: {
+                    y: {
+                        tick: {
+                            format: d3.format(".3f")
+                        }
+                    },
+                    // x: {
+                    //     tick: {
+                    //         format: d3.format(".3f")
+                    //     }
+                    // }
                 },
 
                 bindto: '#flows_chart'
