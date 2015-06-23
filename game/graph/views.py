@@ -190,7 +190,6 @@ def get_user_costs(request, graph_name):
         # path_assignments = player.flow_distribution.path_assignments
         cumulative_cost = 0
         normalization_const = player.player_model.normalization_const
-        normalization_const = 1.0
         for turn in game.turns.all().order_by('iteration'):
             # if turn.iteration == 0:
             #     continue
@@ -394,8 +393,6 @@ def save_model_node(request, model_name, graph_name, node_ui_id, is_start):
         # generate_paths(get_dict['graph'], int(get_dict['source']),
         #                    int(get_dict['destination']))
 
-        if player_model.flow:
-            updateEquilibriumFlows(graph_name)
 
 
     response = dict()
@@ -571,16 +568,18 @@ def current_state(request):
 def start_game(request):
     # TODO: Fix this, let game be addressable in root UI
     game = Game.objects.get(name=current_game)
-    # game = Game.objects.all()[0]
-    game.started = True
-    game.game_loop_time = datetime.now()
-    game.stopped = False
+    if(game.started):
+        return JsonResponse(dict())
+    else:
+        updateEquilibriumFlows(game.graph.name)
+        game.started = True
+        game.game_loop_time = datetime.now()
+        game.stopped = False
 
-    game.save()
+        game.save()
 
-    game_force_next.apply_async((game.name,), countdown=duration)
-
-    return JsonResponse(dict())
+        game_force_next.apply_async((game.name,), countdown=duration)
+        return JsonResponse(dict())
 
 
 def stop_game(request):

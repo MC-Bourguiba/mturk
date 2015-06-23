@@ -141,6 +141,9 @@ def computeEquilibrium(dimensions, gradientFunctions, precision):
     costs = [np.dot(x.T, g) for (g, x) in zip(gs, xs)]
     return costs
 
+def evalFunc(func, xVal):
+    x = xVal
+    return eval(func)
 
 def pathLossFunctions(costFunctions, adjMatrices, masses):
     def lossFunctions(xs):
@@ -155,7 +158,7 @@ def computeRoutingGameEquilibrium(costFunctions, adjMatrices, masses, precision 
     gradientFunction = pathLossFunctions(costFunctions, adjMatrices, masses)
     return computeEquilibrium(dimensions, gradientFunction, precision)
 
-def updateEquilibriumFlows(graph):
+def updateEquilibriumFlows(graph_name):
     costFunctionDict = {}
     massDict = {}
     pmPaths = {}
@@ -165,16 +168,16 @@ def updateEquilibriumFlows(graph):
     pmIndex = {}
     pmIdx = 0
 
-    for edge in Edge.objects.filter(graph__name=graph):
+    for edge in Edge.objects.filter(graph__name=graph_name):
         costFunctionDict[edge] = edge.cost_function
         edgeIndex[edge] = edgeIdx
         edgeIdx += 1
-    for pm in PlayerModel.objects.filter(graph__name=graph):
+    for pm in PlayerModel.objects.filter(graph__name=graph_name):
         massDict[pm] = pm.flow
         pmPaths[pm] = []
         pmIndex[pm] = pmIdx
         pmIdx += 1
-    for path in Path.objects.filter(graph__name=graph):
+    for path in Path.objects.filter(graph__name=graph_name):
         pmPaths[path.player_model].append(path.edges.all())
 
 
