@@ -30,20 +30,9 @@
       {% block top-list%}
       {% endblock %}
       </div>
-      <!-- c3 charts -->
-      <div class='chart panel panel-info'>
-        <div class="panel-heading">Previous Cost</div>
-        <div id='chart'>
-        </div>
-      </div>
-
-      <div class='cumulative_chart panel panel-info'>
-        <div class="panel-heading">Cumulative Cost</div>
-        <div id='cumulative_chart'>
-        </div>
-      </div>
+      {% block c3-charts %}
+      {% endblock %}
     </div>
-    <!-- end c3 charts -->
   </div>
 
   <div class="row">

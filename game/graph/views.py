@@ -267,6 +267,7 @@ def get_previous_cost(request, username):
     path_idxs = range(len(path_ids))
     paths = dict()
 
+    previous_flows = dict()
     previous_costs = dict()
 
     for idx, p_id in zip(path_idxs, path_ids):
@@ -274,19 +275,27 @@ def get_previous_cost(request, username):
         paths[idx] = list(path.edges.values_list('edge_id', flat=True))
 
         for turn in game.turns.all():
+
             e_costs = turn.graph_cost.edge_costs
             t_cost = 0
+            flow_distribution = FlowDistribution.objects.get(turn=turn, username=username)
+            flow = flow_distribution.path_assignments.get(path=path).flow
             for e in path.edges.all():
                 t_cost += e_costs.get(edge=e).cost
             if idx not in previous_costs:
                 previous_costs[idx] = []
             previous_costs[idx].append(t_cost)
+            if idx not in previous_flows:
+                previous_flows[idx] = []
+            previous_flows[idx].append(flow)
+
 
     response = dict()
 
     response['path_ids'] = path_ids
     response['paths'] = paths
     response['previous_costs'] = previous_costs
+    response['previous_flows'] = previous_flows
     return JsonResponse(response)
 
 
