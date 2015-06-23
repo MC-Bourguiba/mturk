@@ -314,6 +314,17 @@ function update_previous_cost(username) {
 
                 bindto: '#cumulative_chart'
             });
+
+            var flows_chart = c3.generate({
+                size: {
+                    height: 250,
+                },
+                data: {
+                    json : json['previous_flows']
+                },
+
+                bindto: '#flows_chart'
+            });
         },
 
         // handle a non-successful response

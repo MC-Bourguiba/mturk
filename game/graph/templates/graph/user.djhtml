@@ -44,6 +44,28 @@
   </div>
 {% endblock %}
 
+{% block c3-charts%}
+  <!-- c3 charts -->
+  <div class='chart panel panel-info'>
+    <div class="panel-heading">Previous Cost</div>
+    <div id='chart'>
+    </div>
+  </div>
+
+  <div class='cumulative_chart panel panel-info'>
+    <div class="panel-heading">Cumulative Cost</div>
+    <div id='cumulative_chart'>
+    </div>
+  </div>
+
+  <div class='flows_chart panel panel-info'>
+    <div class="panel-heading">Previous Flows</div>
+    <div id='flows_chart'>
+    </div>
+  </div>
+  <!-- end c3 charts -->
+{% endblock %}
+
 {% block left_list %}
 {% endblock %}
 
