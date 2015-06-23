@@ -1,0 +1,276 @@
+[
+{
+    "fields": {
+        "graph_ui": "{\"graph\": \"g1\", \"nodes\": [{\"index\": 0, \"reflexive\": false, \"weight\": 2, \"px\": 136, \"py\": 91, \"y\": 91, \"x\": 136, \"id\": 1}, {\"index\": 1, \"reflexive\": false, \"weight\": 2, \"px\": 396, \"py\": 72, \"y\": 72, \"x\": 396, \"id\": 2}, {\"index\": 2, \"reflexive\": false, \"weight\": 2, \"px\": 202, \"py\": 174, \"y\": 174, \"x\": 202, \"id\": 3}, {\"index\": 3, \"reflexive\": false, \"weight\": 2, \"px\": 339, \"py\": 190, \"y\": 190, \"x\": 339, \"id\": 4}, {\"index\": 4, \"reflexive\": false, \"weight\": 4, \"px\": 389, \"py\": 150, \"y\": 150, \"x\": 389, \"id\": 5}], \"links\": [{\"id\": \"580bdb02bf14ced82561ce96d2bc2d9d\", \"source\": {\"index\": 0, \"reflexive\": false, \"weight\": 2, \"px\": 136, \"py\": 91, \"y\": 91, \"x\": 136, \"id\": 1}, \"right\": true, \"target\": {\"index\": 1, \"reflexive\": false, \"weight\": 2, \"px\": 396, \"py\": 72, \"y\": 72, \"x\": 396, \"id\": 2}, \"left\": false}, {\"id\": \"c170caac531f6914b576599c5af4e57f\", \"source\": {\"index\": 1, \"reflexive\": false, \"weight\": 2, \"px\": 396, \"py\": 72, \"y\": 72, \"x\": 396, \"id\": 2}, \"right\": true, \"target\": {\"index\": 4, \"reflexive\": false, \"weight\": 4, \"px\": 389, \"py\": 150, \"y\": 150, \"x\": 389, \"id\": 5}, \"left\": false}, {\"id\": \"6f977c05c6d9e95ca43c39fbb90907d1\", \"source\": {\"index\": 2, \"reflexive\": false, \"weight\": 2, \"px\": 202, \"py\": 174, \"y\": 174, \"x\": 202, \"id\": 3}, \"right\": true, \"target\": {\"index\": 3, \"reflexive\": false, \"weight\": 2, \"px\": 339, \"py\": 190, \"y\": 190, \"x\": 339, \"id\": 4}, \"left\": false}, {\"id\": \"b4b66c5a5c63e259b1a88475192656c5\", \"source\": {\"index\": 2, \"reflexive\": false, \"weight\": 2, \"px\": 202, \"py\": 174, \"y\": 174, \"x\": 202, \"id\": 3}, \"right\": true, \"target\": {\"index\": 4, \"reflexive\": false, \"weight\": 4, \"px\": 389, \"py\": 150, \"y\": 150, \"x\": 389, \"id\": 5}, \"left\": false}, {\"id\": \"2d91522da9df0e6d2f9260b4d26e99de\", \"source\": {\"index\": 3, \"reflexive\": false, \"weight\": 2, \"px\": 339, \"py\": 190, \"y\": 190, \"x\": 339, \"id\": 4}, \"right\": true, \"target\": {\"index\": 4, \"reflexive\": false, \"weight\": 4, \"px\": 389, \"py\": 150, \"y\": 150, \"x\": 389, \"id\": 5}, \"left\": false}, {\"id\": \"0b48b345e8c0b3d1a9d6af6c17212671\", \"source\": {\"index\": 0, \"reflexive\": false, \"weight\": 2, \"px\": 136, \"py\": 91, \"y\": 91, \"x\": 136, \"id\": 1}, \"right\": true, \"target\": {\"index\": 4, \"reflexive\": false, \"weight\": 4, \"px\": 389, \"py\": 150, \"y\": 150, \"x\": 389, \"id\": 5}, \"left\": false}]}"
+    },
+    "model": "graph.graph",
+    "pk": "g1"
+},
+{
+    "fields": {
+        "graph": "g1",
+        "ui_id": 2
+    },
+    "model": "graph.node",
+    "pk": "4d573001-c0cb-424a-9852-61c097351792"
+},
+{
+    "fields": {
+        "graph": "g1",
+        "ui_id": 4
+    },
+    "model": "graph.node",
+    "pk": "6f9f8b84-be26-4db8-ab75-7a2dda04025d"
+},
+{
+    "fields": {
+        "graph": "g1",
+        "ui_id": 3
+    },
+    "model": "graph.node",
+    "pk": "bfd0ff3f-92de-4c2b-a821-5b7757d7ddf6"
+},
+{
+    "fields": {
+        "graph": "g1",
+        "ui_id": 1
+    },
+    "model": "graph.node",
+    "pk": "dd52b53c-48d2-484c-83fe-eafaf0408175"
+},
+{
+    "fields": {
+        "graph": "g1",
+        "ui_id": 5
+    },
+    "model": "graph.node",
+    "pk": "de67e47b-c131-4155-81db-db5d50aa6c5b"
+},
+{
+    "fields": {
+        "destination_node": "de67e47b-c131-4155-81db-db5d50aa6c5b",
+        "graph": "g1",
+        "in_use": true,
+        "flow": 1.0,
+        "normalization_const": null,
+        "start_node": "dd52b53c-48d2-484c-83fe-eafaf0408175"
+    },
+    "model": "graph.playermodel",
+    "pk": "m1"
+},
+{
+    "fields": {
+        "destination_node": "de67e47b-c131-4155-81db-db5d50aa6c5b",
+        "graph": "g1",
+        "in_use": true,
+        "flow": 1.0,
+        "normalization_const": null,
+        "start_node": "bfd0ff3f-92de-4c2b-a821-5b7757d7ddf6"
+    },
+    "model": "graph.playermodel",
+    "pk": "m2"
+},
+{
+    "fields": {
+        "flow_distribution": 1,
+        "game": "game",
+        "user": 2,
+        "player_model": "m1"
+    },
+    "model": "graph.player",
+    "pk": 1
+},
+{
+    "fields": {
+        "flow_distribution": 2,
+        "game": "game",
+        "user": 3,
+        "player_model": "m2"
+    },
+    "model": "graph.player",
+    "pk": 2
+},
+{
+    "fields": {
+        "graph": "g1",
+        "cost_function": "x",
+        "to_node": "de67e47b-c131-4155-81db-db5d50aa6c5b",
+        "from_node": "dd52b53c-48d2-484c-83fe-eafaf0408175"
+    },
+    "model": "graph.edge",
+    "pk": "0b48b345e8c0b3d1a9d6af6c17212671"
+},
+{
+    "fields": {
+        "graph": "g1",
+        "cost_function": "x",
+        "to_node": "de67e47b-c131-4155-81db-db5d50aa6c5b",
+        "from_node": "6f9f8b84-be26-4db8-ab75-7a2dda04025d"
+    },
+    "model": "graph.edge",
+    "pk": "2d91522da9df0e6d2f9260b4d26e99de"
+},
+{
+    "fields": {
+        "graph": "g1",
+        "cost_function": "x",
+        "to_node": "4d573001-c0cb-424a-9852-61c097351792",
+        "from_node": "dd52b53c-48d2-484c-83fe-eafaf0408175"
+    },
+    "model": "graph.edge",
+    "pk": "580bdb02bf14ced82561ce96d2bc2d9d"
+},
+{
+    "fields": {
+        "graph": "g1",
+        "cost_function": "x",
+        "to_node": "6f9f8b84-be26-4db8-ab75-7a2dda04025d",
+        "from_node": "bfd0ff3f-92de-4c2b-a821-5b7757d7ddf6"
+    },
+    "model": "graph.edge",
+    "pk": "6f977c05c6d9e95ca43c39fbb90907d1"
+},
+{
+    "fields": {
+        "graph": "g1",
+        "cost_function": "x",
+        "to_node": "de67e47b-c131-4155-81db-db5d50aa6c5b",
+        "from_node": "bfd0ff3f-92de-4c2b-a821-5b7757d7ddf6"
+    },
+    "model": "graph.edge",
+    "pk": "b4b66c5a5c63e259b1a88475192656c5"
+},
+{
+    "fields": {
+        "graph": "g1",
+        "cost_function": "x",
+        "to_node": "de67e47b-c131-4155-81db-db5d50aa6c5b",
+        "from_node": "4d573001-c0cb-424a-9852-61c097351792"
+    },
+    "model": "graph.edge",
+    "pk": "c170caac531f6914b576599c5af4e57f"
+},
+{
+    "fields": {
+        "graph": "g1",
+        "edges": [
+            "580bdb02bf14ced82561ce96d2bc2d9d",
+            "c170caac531f6914b576599c5af4e57f"
+        ],
+        "player_model": "m1"
+    },
+    "model": "graph.path",
+    "pk": 1
+},
+{
+    "fields": {
+        "graph": "g1",
+        "edges": [
+            "0b48b345e8c0b3d1a9d6af6c17212671"
+        ],
+        "player_model": "m1"
+    },
+    "model": "graph.path",
+    "pk": 2
+},
+{
+    "fields": {
+        "graph": "g1",
+        "edges": [
+            "6f977c05c6d9e95ca43c39fbb90907d1",
+            "2d91522da9df0e6d2f9260b4d26e99de"
+        ],
+        "player_model": "m2"
+    },
+    "model": "graph.path",
+    "pk": 3
+},
+{
+    "fields": {
+        "graph": "g1",
+        "edges": [
+            "b4b66c5a5c63e259b1a88475192656c5"
+        ],
+        "player_model": "m2"
+    },
+    "model": "graph.path",
+    "pk": 4
+},
+{
+    "fields": {
+        "path": 1,
+        "flow": 0.5
+    },
+    "model": "graph.pathflowassignment",
+    "pk": 1
+},
+{
+    "fields": {
+        "path": 2,
+        "flow": 0.5
+    },
+    "model": "graph.pathflowassignment",
+    "pk": 2
+},
+{
+    "fields": {
+        "path": 3,
+        "flow": 0.5
+    },
+    "model": "graph.pathflowassignment",
+    "pk": 3
+},
+{
+    "fields": {
+        "path": 4,
+        "flow": 0.5
+    },
+    "model": "graph.pathflowassignment",
+    "pk": 4
+},
+{
+    "fields": {
+        "iteration": 0,
+        "graph_cost": null
+    },
+    "model": "graph.gameturn",
+    "pk": 1
+},
+{
+    "fields": {
+        "username": "u1",
+        "turn": 1,
+        "path_assignments": [
+            1,
+            2
+        ]
+    },
+    "model": "graph.flowdistribution",
+    "pk": 1
+},
+{
+    "fields": {
+        "username": "u2",
+        "turn": 1,
+        "path_assignments": [
+            3,
+            4
+        ]
+    },
+    "model": "graph.flowdistribution",
+    "pk": 2
+},
+{
+    "fields": {
+        "current_turn": 1,
+        "started": false,
+        "graph": "g1",
+        "game_loop_time": null,
+        "edge_highlight": true,
+        "stopped": false,
+        "turns": []
+    },
+    "model": "graph.game",
+    "pk": "game"
+}
+]

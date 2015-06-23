@@ -14,6 +14,7 @@ import uuid
 import numpy as np
 from datetime import timedelta
 
+from django.core.cache import cache
 
 import md5
 
@@ -61,51 +62,6 @@ def generate_and_save_graph(graph_dict):
         edge.save()
 
     return graph
-
-
-def is_turn_complete(game):
-    players = Player.objects.filter(game=game).exclude(user__username=root_username)
-
-    for player in players:
-        if not player.completed_task:
-            return False
-
-    return True
-
-
-def evalFunc(func, xVal):
-    x = xVal
-    return eval(func)
-
-
-def update_cost(game):
-    edge_flow = dict()
-    current_turn = game.current_turn
-
-    for e in Edge.objects.filter(graph=game.graph):
-        edge_flow[e] = 0.0
-
-    for flow_distribution in FlowDistribution.objects.filter(turn=current_turn):
-        for path_assignment in flow_distribution.path_assignments.all():
-            for e in path_assignment.path.edges.all():
-                edge_flow[e] += path_assignment.flow
-
-    graph_cost = GraphCost(graph=game.graph)
-    graph_cost.save()
-
-    for e in Edge.objects.filter(graph=game.graph):
-        cost_f = parser.expr(e.cost_function).compile()
-        cost = evalFunc(cost_f, edge_flow[e])
-
-        edge_cost = EdgeCost()
-        edge_cost.edge = e
-        edge_cost.cost = cost
-        edge_cost.save()
-        graph_cost.edge_costs.add(edge_cost)
-
-    graph_cost.save()
-    current_turn.graph_cost = graph_cost
-    current_turn.save()
 
 
 def sanitize_graph_json(graph_dict):
@@ -194,7 +150,6 @@ def pathLossFunctions(costFunctions, adjMatrices, masses):
     return lossFunctions
 
 
-
 def computeRoutingGameEquilibrium(costFunctions, adjMatrices, masses, precision = .000000001):
     dimensions = [np.size(adjMatrix, 1) for adjMatrix in adjMatrices]
     gradientFunction = pathLossFunctions(costFunctions, adjMatrices, masses)
@@ -250,88 +205,6 @@ def updateEquilibriumFlows(graph):
         pm.save()
 
     return True
-
-
-def iterate_next_turn(game):
-    update_cost(game)
-
-    game.turns.add(game.current_turn)
-    next_turn = GameTurn()
-    next_turn.iteration = game.current_turn.iteration + 1
-    next_turn.save()
-
-    for player in Player.objects.filter(game=game):
-        player.completed_task = False
-        player.save()
-
-    game.current_turn = next_turn
-    game.save()
-
-
-def update_game(user, allocation, path_ids, is_temporary):
-    game = user.player.game
-    current_turn = game.current_turn
-
-    FlowDistribution.objects.filter(username=user.username, turn=game.current_turn).delete()
-
-    current_flow_distribution = FlowDistribution(turn=current_turn, username=user.username)
-    current_flow_distribution.save()
-
-    if hasattr(user.player, 'flow_distribution') and user.player.flow_distribution:
-        user.player.flow_distribution = current_flow_distribution
-        user.player.save()
-
-    total_weight = float(sum(allocation))
-    nb_paths = float(len(allocation))
-
-    for weight, path_id in zip(allocation, path_ids):
-        path = Path.objects.get(graph=game.graph, player_model=user.player.player_model,
-                                id=path_id)
-        assignment = PathFlowAssignment()
-        assignment.path = path
-        if(total_weight > 0):
-            assignment.flow = (weight / total_weight) * user.player.player_model.flow
-        else:
-            # if all the weights are 0, assign the uniform distribution
-            assignment.flow = 1. / nb_paths * user.player.player_model.flow
-
-        assignment.save()
-        current_flow_distribution.path_assignments.add(assignment)
-        current_flow_distribution.username = user.username
-        current_flow_distribution.save()
-
-    user.player.flow_distribution = current_flow_distribution
-    # user.completed_task = True # Not needed?
-    current_flow_distribution.save()
-
-    # current_turn.save()
-
-    if not is_temporary:
-        user.player.completed_task = True
-
-    user.save()
-    user.player.save()
-    game.save()
-    user.save()
-
-
-def create_default_distribution(player_model, game, username):
-    path_ids = list(Path.objects.filter(player_model=player_model).values_list('id', flat=True))
-    fd = FlowDistribution(turn=game.current_turn, username=username)
-    fd.save()
-
-    for path_id in path_ids:
-        path = Path.objects.get(graph=game.graph, player_model=player_model,
-                                id=path_id)
-        assignment = PathFlowAssignment()
-        assignment.path = path
-        assignment.flow = player_model.flow / float(len(path_ids))
-        assignment.save()
-        fd.path_assignments.add(assignment)
-        fd.username = username
-
-    fd.save()
-    return fd
 
 
 def get_hash(s):

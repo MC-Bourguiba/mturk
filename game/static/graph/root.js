@@ -1,5 +1,60 @@
 var graph_name = "";
 
+
+
+$('#turn-on-edge').click(function(evt) {
+    $.ajax({
+        url : "/graph/start_edge_highlight/",
+        type : "GET",
+
+        success : function(json) {
+            console.log(json);
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+});
+
+
+
+$('#turn-off-edge').click(function(evt) {
+    $.ajax({
+        url : "/graph/stop_edge_highlight/",
+        type : "GET",
+
+        success : function(json) {
+            console.log(json);
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+});
+
+
+
+$('#save-data-btn').click(function(evt) {
+    $.ajax({
+        url : "/graph/save_data/",
+        type : "GET",
+
+        success : function(json) {
+            console.log(json);
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+});
+
+
 $('#save-graph-btn').click(function(evt) {
     nodes = document.getElementById('graph-editor').contentWindow.nodes;
     links = document.getElementById('graph-editor').contentWindow.links;

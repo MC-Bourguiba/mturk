@@ -72,20 +72,8 @@
 },
 {
     "fields": {
-        "flow_distribution": null,
-        "game": "game",
-        "completed_task": false,
-        "user": 1,
-        "player_model": null
-    },
-    "model": "graph.player",
-    "pk": 1
-},
-{
-    "fields": {
         "flow_distribution": 1,
         "game": "game",
-        "completed_task": false,
         "user": 2,
         "player_model": "m1"
     },
@@ -96,7 +84,6 @@
     "fields": {
         "flow_distribution": 2,
         "game": "game",
-        "completed_task": false,
         "user": 3,
         "player_model": "m2"
     },

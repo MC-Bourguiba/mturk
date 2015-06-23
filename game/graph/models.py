@@ -46,9 +46,9 @@ class PlayerModel(models.Model):
 
 
 class Player(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, null=True, blank=True)
     player_model = models.ForeignKey(PlayerModel, blank=True, null=True)
-    completed_task = models.BooleanField(default=False)
+    # completed_task = models.BooleanField(default=False)
     game = models.ForeignKey('Game', null=True, blank=True)
     flow_distribution = models.ForeignKey('FlowDistribution', null=True, blank=True)
 
@@ -74,6 +74,9 @@ class Path(models.Model):
     edges = models.ManyToManyField('Edge')
     player_model = models.ForeignKey('PlayerModel')
 
+    def __unicode__(self):
+        return str(self.id) + str(map(str, self.edges.all()))
+
 
 class PathFlowAssignment(models.Model):
     path = models.ForeignKey('Path')
@@ -86,11 +89,16 @@ class GameTurn(models.Model):
     # graph_cost = models.ManyToManyField('GraphCost', blank=True, null=True)
 
 
+# NOTE: DO NOT do something like FlowDistribution.objects.
+# Use the player model!!!
 class FlowDistribution(models.Model):
     path_assignments = models.ManyToManyField('PathFlowAssignment',
                                               related_name='flow_distribution')
     username = models.TextField(blank=True, null=True)
     turn = models.ForeignKey('GameTurn', blank=True, null=True)
+
+    class Meta:
+        unique_together = ['username', 'turn']
 
 
 class EdgeCost(models.Model):
@@ -105,7 +113,7 @@ class GraphCost(models.Model):
 
 class Game(models.Model):
     name = models.TextField(primary_key=True)
-    turns = models.ManyToManyField('GameTurn')
+    turns = models.ManyToManyField('GameTurn') # Previous turns
     current_turn = models.ForeignKey('GameTurn', related_name='current_turn', blank=True, null=True)
     graph = models.OneToOneField('Graph', blank=True, null=True)
     started = models.BooleanField(default=False)

@@ -98,6 +98,7 @@
         <a id="stop-game" class="btn btn-default {{ hidden }}" href="#" role="button">Stop game</a>
         <a id="turn-off-edge" class="btn btn-default {{ hidden }}" href="#" role="button">Turn off edge</a>
         <a id="turn-on-edge" class="btn btn-default {{ hidden }}" href="#" role="button">Turn on edge</a>
+        <a id="save-data-btn" class="btn btn-default" href="#" role="button">Save data</a>
         <p> Selected node:  <span id="selected-node"></span>  </p>
         <p> Selected edge: <span id="selected-edge"></span> </p>
         <p> Edge cost function: <span id="edge-cost-function"></span> </p>

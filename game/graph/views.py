@@ -30,6 +30,20 @@ from django.core.cache import cache
 import simplejson as json
 
 
+from django.core import management
+from cStringIO import StringIO
+
+import random
+
+
+def dump_data_fixture(filename):
+    buf = StringIO()
+    management.call_command('dumpdata', stdout=buf)
+    buf.seek(0)
+    with open(filename, 'w') as f:
+        f.write(buf.read())
+
+
 current_game = 'game'
 
 def create_account(request):
@@ -85,10 +99,6 @@ def show_graph(request):
         except:
             template = 'graph/user_wait.djhtml'
     else:
-        # if not Game.objects.filter(name=current_game).exists():
-       #     game = Game(name=current_game)
-        #     game.save()
-
         graphs = map(lambda g: g.name, Graph.objects.all())
         context['usernames'] = User.objects.values_list('username', flat=True)
         context['model_names'] = PlayerModel.objects.values_list('name', flat=True)
@@ -190,14 +200,12 @@ def get_user_costs(request, graph_name):
     cumulative_costs = dict()
 
     for player in players:
-        if player.user.username == root_username:
-            continue
-
         username = player.user.username
         paths = Path.objects.filter(player_model=player.player_model)
         # path_assignments = player.flow_distribution.path_assignments
         cumulative_cost = 0
         normalization_const = player.player_model.normalization_const
+        normalization_const = 1.0
         for turn in game.turns.all().order_by('iteration'):
             # if turn.iteration == 0:
             #     continue
@@ -318,7 +326,7 @@ def get_paths(request, username):
 
     # TODO: Fix the cache key scheme
     if cache.get(get_hash(user.username) + 'path_ids'):
-        prev_alloc = cache.get(get_hash(user.username) + 'alloc')
+        prev_alloc = cache.get(get_hash(user.username) + 'allocation')
         prev_path_ids = cache.get(get_hash(user.username) + 'path_ids')
 
 
@@ -337,7 +345,6 @@ def get_paths(request, username):
         if prev_alloc:
             flow.append(prev_alloc[prev_path_ids.index(p_id)])
         else:
-            print 'failing!!!!!!!'
             flow.append(0.5)
 
         if current_turn.iteration > 0:
@@ -514,7 +521,6 @@ def submit_distribution(request):
     player = Player.objects.get(user__username=data['username'])
     allocation = data['allocation']
     path_ids = data['ids']
-    temporary = data['temporary']
 
     response = dict()
     game = player.game
@@ -522,18 +528,8 @@ def submit_distribution(request):
     if not game.started:
         return JsonResponse(response)
 
-    update_game(user, allocation, path_ids, temporary)
-
-    cache.set(get_hash(user.username) + 'alloc', allocation)
+    cache.set(get_hash(user.username) + 'allocation', allocation)
     cache.set(get_hash(user.username) + 'path_ids', path_ids)
-
-    # if is_turn_complete(game) and not temporary:
-    #     iterate_next_turn(game)
-    #     if async_res:
-    #         async_res.revoke()
-    #
-    #     game.game_loop_time = datetime.now()
-    #     game.save()
 
     return JsonResponse(response)
 
@@ -542,25 +538,32 @@ def submit_distribution(request):
 def current_state(request):
     game = Game.objects.all()[0]
 
-    update_game_state(game)
+    secs_left = duration
+
+    if game.game_loop_time:
+        datetime_started = game.game_loop_time
+        es_started = int(datetime_started.strftime("%s"))
+        secs_now = int(datetime.now().strftime("%s"))
+        secs_left = (es_started + duration) - secs_now
+
+
+    cache.set('time_left', secs_left)
 
     response = dict()
     response['iteration'] = game.current_turn.iteration
-
-    response['secs'] = duration
-
-    if cache.get('time_left'):
-        response['secs'] = cache.get('time_left')
-
+    response['secs'] = secs_left
 
     edge_costs = dict()
 
-    if game.current_turn.iteration > 1 and game.edge_highlight:
-        gc = GameTurn.objects.get(iteration=game.current_turn.iteration - 1).graph_cost
-        for ec in gc.edge_costs.all():
-            edge_costs[ec.edge_id] = ec.cost
+    costs_cache_key = 'iteration %d' % game.current_turn.iteration
+
+    if cache.get(costs_cache_key):
+        edge_costs = cache.get(costs_cache_key)
+    else:
+        cache.set(costs_cache_key, get_current_edge_costs(game))
 
     response['edge_cost'] = edge_costs
+    response['duration'] = duration
 
     return JsonResponse(response)
 
@@ -575,7 +578,7 @@ def start_game(request):
 
     game.save()
 
-    async_res = game_force_next.apply_async((game.name,), countdown=duration)
+    game_force_next.apply_async((game.name,), countdown=duration)
 
     return JsonResponse(dict())
 
@@ -586,26 +589,24 @@ def stop_game(request):
     game.save()
 
     response = dict()
-
-    if async_res:
-        async_res.revoke()
-
     response['success'] = True
 
     return JsonResponse(response)
 
 
-def restart_game(game):
-    game.stopped = True
-    game.save()
-    if async_res:
-        async_res.revoke()
+def reset_game(game):
 
-    EdgeCost.objects.all().clear()
-    GameTurn.objects.all().clear()
-    FlowDistribution.objects.all().clear()
-    GraphCost.objects.all().clear()
-    PathFlowAssignment.object.all().clear()
+    users, pms = [], []
+
+    for player in Player.objects.all():
+        users.append(player.user)
+        pms.append(player.player_model)
+
+    EdgeCost.objects.all().delete()
+    GameTurn.objects.all().delete()
+    FlowDistribution.objects.all().delete()
+    GraphCost.objects.all().delete()
+    PathFlowAssignment.objects.all().delete()
 
     initial_turn = GameTurn()
     initial_turn.iteration = 0
@@ -613,15 +614,31 @@ def restart_game(game):
     game.current_turn = initial_turn
     game.save()
 
+    # Randomize here
+    random.shuffle(pms)
+
+    for user, pm in zip(users, pms):
+        player = Player(user=user)
+        player.game = game
+        player.player_model = pm
+        flow_distribution = create_default_distribution(player.player_model, game,
+                                                        player.user.username, player)
+        player.flow_distribution = flow_distribution
+        flow_distribution.save()
+        player.save()
+
+    game.stopped = True
+    game.started = False
+    game.save()
+
 
 def start_edge_highlight(request):
     game = Game.objects.all()[0]
 
-    # TODO: Flush data somewhere
-
     if not game.edge_highlight:
-        restart_game(game)
-
+        game.edge_highlight = True
+        game.save()
+        reset_game(game)
 
     response = dict()
     response['success'] = True
@@ -631,11 +648,16 @@ def start_edge_highlight(request):
 def stop_edge_highlight(request):
     game = Game.objects.all()[0]
 
-    # TODO: Flush data somewhere
-
     if game.edge_highlight:
-        restart_game(game)
+        game.edge_highlight = False
+        game.save()
+        reset_game(game)
 
     response = dict()
     response['success'] = True
     return JsonResponse(response)
+
+
+def save_data(request):
+    dump_data_fixture('graph-' + str(datetime.now()) + '.json')
+    return JsonResponse(dict())

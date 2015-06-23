@@ -709,12 +709,12 @@
         "is_active": true,
         "is_superuser": false,
         "is_staff": false,
-        "last_login": "2015-06-09T20:29:29.636Z",
+        "last_login": "2015-06-23T05:50:48.574Z",
         "groups": [],
         "user_permissions": [],
-        "password": "pbkdf2_sha256$15000$egFJpud6q0lt$o7BrOkfuNjaWc6yjG0eOfq7V3fBNNVsTtSVST5dojhs=",
+        "password": "pbkdf2_sha256$15000$dctOM1scYWGZ$JBddRlJkHLvvhklMAgsgYjaqFURqg5aiwwyWpzMxhUs=",
         "email": "",
-        "date_joined": "2015-06-09T20:13:59.405Z"
+        "date_joined": "2015-06-23T05:47:29.145Z"
     },
     "model": "auth.user",
     "pk": 1
@@ -727,12 +727,12 @@
         "is_active": true,
         "is_superuser": false,
         "is_staff": false,
-        "last_login": "2015-06-09T20:29:23.622Z",
+        "last_login": "2015-06-23T05:50:35.983Z",
         "groups": [],
         "user_permissions": [],
-        "password": "pbkdf2_sha256$15000$1s91bsYuGqqW$PgnWlqokwjMcCzBotwlfzTRm5dgqpZS/jpd9bDM14Hc=",
+        "password": "pbkdf2_sha256$15000$OaNAw2uLtVfI$CLEoGzUoJTA8jKhfILEY3QR/1whmyCH6WNI4bB02Di8=",
         "email": "",
-        "date_joined": "2015-06-09T20:29:23.622Z"
+        "date_joined": "2015-06-23T05:50:35.984Z"
     },
     "model": "auth.user",
     "pk": 2
@@ -745,47 +745,14 @@
         "is_active": true,
         "is_superuser": false,
         "is_staff": false,
-        "last_login": "2015-06-09T20:29:26.960Z",
+        "last_login": "2015-06-23T05:50:40.198Z",
         "groups": [],
         "user_permissions": [],
-        "password": "pbkdf2_sha256$15000$LPaFl7MLmeVF$x6agidcUJ/4ch1v70Z3UGHhaPqzOKdkQJ9cvGKzeNmk=",
+        "password": "pbkdf2_sha256$15000$zoV7tHHuqMic$yDYEcqlr82SlpnBVcyaGiTK2moBKcoK7LA0XOeE26kw=",
         "email": "",
-        "date_joined": "2015-06-09T20:29:26.960Z"
+        "date_joined": "2015-06-23T05:50:40.198Z"
     },
     "model": "auth.user",
-    "pk": 3
-},
-{
-    "fields": {
-        "flow_distribution": null,
-        "game": "game",
-        "completed_task": false,
-        "user": 1,
-        "player_model": null
-    },
-    "model": "graph.player",
-    "pk": 1
-},
-{
-    "fields": {
-        "flow_distribution": 1,
-        "game": "game",
-        "completed_task": false,
-        "user": 2,
-        "player_model": "m1"
-    },
-    "model": "graph.player",
-    "pk": 2
-},
-{
-    "fields": {
-        "flow_distribution": 2,
-        "game": "game",
-        "completed_task": false,
-        "user": 3,
-        "player_model": "m2"
-    },
-    "model": "graph.player",
     "pk": 3
 }
 ]

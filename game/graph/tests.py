@@ -4,12 +4,15 @@ from django.contrib.auth.models import User
 from .models import *
 from .game_functions import *
 
+from django.core.cache import cache
+
 
 class EmptyGameTemplate(TestCase):
 
-    fixtures = ['fixtures/create_account/graph_pm.json']
+    fixtures = ['fixtures/tests/create_account/graph_pm.json']
 
     def setUp(self):
+        cache.clear()
         self.u1 = User.objects.create(username='u1')
         self.u1.save()
         self.g1 = Game.objects.all()[0]
@@ -26,17 +29,10 @@ class CreateAccountTest(EmptyGameTemplate):
         self.assertIsNotNone(p1)
 
 
-    def test_default_distribution(self):
-        fd = create_default_distribution(self.pm1, self.g1, self.u1.username)
-        pas = fd.path_assignments.all()
-        for pa in pas:
-            self.assertEquals(pa.flow, 1.0 / len(pas))
-
-
 class GameTemplate(TestCase):
 
-    fixtures = ['fixtures/game_template/graph.json',
-                'fixtures/game_template/player.json']
+    fixtures = ['fixtures/tests/game_template/graph.json',
+                'fixtures/tests/game_template/player.json']
 
     def setUp(self):
         self.path1_allocation = [0.1, 0.5, 0.3, 0.5]
@@ -48,71 +44,54 @@ class GameTemplate(TestCase):
         self.p1 = Player.objects.get(user__username='u1')
         self.p2 = Player.objects.get(user__username='u2')
         self.g1 = Game.objects.all()[0]
+        self.pm1 = PlayerModel.objects.all()[0]
 
 
-class GameFlowTest(GameTemplate):
+class GameFunctionsTest(GameTemplate):
 
     def setUp(self):
-        super(GameFlowTest, self).setUp()
+        super(GameFunctionsTest, self).setUp()
         self.g1.started = True
         self.g1.save()
 
 
-class SubmitDistributionTest(GameFlowTest):
+    def test_default_distribution(self):
+        player = Player(user=self.u1)
+        fd = create_default_distribution(self.pm1, self.g1, self.u1.username, player)
+        pas = fd.path_assignments.all()
+        for pa in pas:
+            self.assertEquals(pa.flow, 1.0 / len(pas))
 
 
-    def test_submission_turn_completed(self):
-        self.assertTrue(self.g1.started)
+    # Make sure that the normalization doesn't screw up if we "clone" a flow distribution
+    def test_create_flow_distribution_normalization(self):
+        fd1 = create_flow_distribution(self.g1, self.u1.username, self.p1,
+                                       self.path1_allocation, self.path1_ids,
+                                       self.g1.current_turn)
 
-        update_game(self.u1, self.path1_allocation,
-                    self.path1_ids, False)
+        allocation = []
+        path_ids = []
 
-        update_game(self.u2, self.path2_allocation,
-                    self.path2_ids, False)
+        for pfa in fd1.path_assignments.all():
+            path_ids.append(pfa.path.id)
+            allocation.append(pfa.flow)
 
-        self.assertTrue(is_turn_complete(self.g1))
+        new_turn = GameTurn(iteration=self.g1.current_turn.iteration+1)
 
+        fd2 = create_flow_distribution(self.g1, self.u1.username, self.p1, allocation,
+                                       path_ids, new_turn)
 
-    def test_submission_turn_partial_temporary(self):
-        self.assertTrue(self.g1.started)
-
-        update_game(self.u1, self.path1_allocation,
-                    self.path1_ids, True)
-
-        update_game(self.u2, self.path2_allocation,
-                    self.path2_ids, False)
-
-        self.assertFalse(is_turn_complete(self.g1))
-
-
-    def test_multiple_temporary_submission(self):
-        # Test that the flow distribution is discarded after another update
-
-        self.assertTrue(self.g1.started)
-
-        update_game(self.u1, self.path1_allocation,
-                    self.path1_ids, True)
-
-        update_game(self.u2, self.path2_allocation,
-                    self.path2_ids, False)
-
-        num = len(FlowDistribution.objects.all())
-
-        self.path1_allocation[0] = 0.93
-
-        update_game(self.u1, self.path1_allocation,
-                    self.path1_ids, False)
-
-        self.assertEquals(num, len(FlowDistribution.objects.all()))
-
-        update_game(self.u1, self.path1_allocation,
-                    self.path1_ids, True)
-
-        self.assertEquals(num, len(FlowDistribution.objects.all()))
+        for pfa in fd1.path_assignments.all():
+            index_of = path_ids.index(pfa.path.id)
+            self.assertEquals(pfa.flow, allocation[index_of])
 
 
+    def test_calculate_edge_flow(self):
+        # TODO: TEST THIS!!! calculate_edge_flow in utils.py
+        pass
 
-class IterateTurnTest(GameFlowTest):
+
+class IterateTurnTest(GameFunctionsTest):
 
     def test_iterate_next_turn_count(self):
         self.assertEquals(self.g1.current_turn.iteration, 0)
@@ -125,49 +104,18 @@ class IterateTurnTest(GameFlowTest):
         self.assertEquals(self.g1.current_turn.iteration, 3)
 
 
-class GameStateTest(GameFlowTest):
-
-
-    def test_turn_not_iterated(self):
-
+    def test_next_turn_flow_distribution(self):
         self.assertEquals(self.g1.current_turn.iteration, 0)
 
-        update_game(self.u1, self.path1_allocation,
-                    self.path1_ids, True)
+        prev_iteration = self.g1.current_turn.iteration
 
-        update_game(self.u2, self.path2_allocation,
-                    self.path2_ids, False)
+        prev_fds = []
+        for player in Player.objects.all():
+            fd1 = FlowDistribution.objects.get(turn=self.g1.current_turn,
+                                               player=player)
 
-        update_game_state(self.g1)
-
-        self.assertEquals(self.g1.current_turn.iteration, 0)
-
-
-
-    def test_turn_iterated(self):
-
-        self.assertEquals(self.g1.current_turn.iteration, 0)
-
-        update_game(self.u1, self.path1_allocation,
-                    self.path1_ids, False)
-
-        update_game(self.u2, self.path2_allocation,
-                    self.path2_ids, False)
-
-        update_game_state(self.g1)
+        iterate_next_turn(self.g1)
 
         self.assertEquals(self.g1.current_turn.iteration, 1)
 
-
-    def test_force_complete_turn(self):
-        players = Player.objects.filter(game=self.g1).exclude(user__username=root_username)
-        for player in players:
-            self.assertFalse(player.completed_task)
-
-        self.assertFalse(is_turn_complete(self.g1))
-
-        force_complete_turn(self.g1)
-
-        players = Player.objects.filter(game=self.g1).exclude(user__username=root_username)
-        for player in players:
-            self.assertTrue(player.completed_task)
+        iterate_next_turn(self.g1)

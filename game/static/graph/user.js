@@ -2,9 +2,11 @@ var graph_window = document.getElementById("graph-editor");
 var generated_paths = [];
 var path_ids = [];
 var current_iteration = -1;
-var duration = 30;
+// var duration = 30;
 var previous_allocation = [];
 var editor_window = null;
+var duration = -1;
+var inter = null;
 
 // var has_displayed_paths = false;
 
@@ -19,10 +21,10 @@ function on_edge_selected(selected_edge) {
 }
 
 
-$("#submit-game-btn").click(function(e) {
-    e.preventDefault();
-    submit_distribution(false);
-});
+// $("#submit-game-btn").click(function(e) {
+//     e.preventDefault();
+//     submit_distribution();
+// });
 
 
 $("#show-edge-btn").click(function(e) {
@@ -47,7 +49,7 @@ $("#clear-edge-btn").click(function(e) {
 
 
 // temporary: true if user does not want to finish turn
-function submit_distribution(temporary) {
+function submit_distribution(update_state) {
 
     var paths = [];
     var allocation = [];
@@ -67,15 +69,15 @@ function submit_distribution(temporary) {
             "username" : $("#username-hidden")[0].value,
             "allocation" : allocation,
             "ids" : paths,
-            "temporary": temporary
         }),
 
         success : function(json) {
-            console.log(json);
-            if (!temporary) {
-                previous_allocation = allocation;
+
+            if (update_state) {
+                update_from_state($("#username-hidden")[0].value);
             }
-            update_from_state($("#username-hidden")[0].value);
+
+            console.log(json);
         },
 
         // handle a non-successful response
@@ -93,13 +95,25 @@ graph_window.onload = function() {
 
 
 function update_loop() {
-    setTimeout(update_loop, 10000); // Update every 10 seconds
     update_from_state($("#username-hidden")[0].value);
+
+    // TODO: Use duration to do the timer in client-side.
+
+    // if (duration == -1) {
+    //     setTimeout(update_loop, 5); // Update every 5 seconds
+    // } else {
+    //     display = $('#time_countdown');
+    //     setTimeout(update_loop, 1000 * duration); // or duration seconds
+    //     if (inter != null) {
+    //         clearInterval(inter);
+    //     }
+    //     startTimer(duration, display);
+    // }
 }
 
 
 function post_temporary_distribution_loop() {
-    setTimeout(post_temporary_distribution_loop, 2000); // Update every two second
+    setTimeout(post_temporary_distribution_loop, 1000); // Update every second.
     submit_distribution(true);
 }
 
@@ -129,9 +143,17 @@ function update_from_state(username) {
 
             display = $('#time_countdown');
 
+            duration = json['duration'];
+
             if (json.hasOwnProperty('secs')) {
                 if (json['secs'] >= 0) {
                     display.text(json['secs']);
+
+                    if (inter != null) {
+                        clearInterval(inter);
+                    }
+
+                    startTimer(json['secs'], display);
                 } else {
                     display.text('0');
                 }
@@ -304,7 +326,7 @@ function update_previous_cost(username) {
 
 function startTimer(duration, display) {
     var timer = duration, minutes, seconds;
-    var inter = setInterval(function () {
+    inter = setInterval(function () {
         minutes = parseInt(timer / 60, 10)
         seconds = parseInt(timer % 60, 10);
 
@@ -316,7 +338,8 @@ function startTimer(duration, display) {
         if (--timer < 0) {
             timer = duration;
             clearInterval(inter);
-            submit_distribution(false);
+            submit_distribution(true);
+            inter = null;
         }
     }, 1000);
 }
