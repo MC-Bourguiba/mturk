@@ -176,21 +176,6 @@ def get_model_info(request, modelname):
     return JsonResponse(response)
 
 
-# Need source and destination to generate possible paths.
-# @login_required
-# def generate_all_paths(request):
-#     get_dict = request.GET.dict()
-#     paths = generate_paths(get_dict['graph'], int(get_dict['source']),
-#                            int(get_dict['destination']))
-#     path_idxs = range(len(paths))
-#     html_dict = {'path_idxs': path_idxs}
-#     html = render_to_string('graph/path_display_list.djhtml', html_dict)
-#     response = dict()
-#     response['html'] = html
-#     response['paths'] = paths
-#     return JsonResponse(response)
-
-
 @login_required
 def get_user_costs(request, graph_name):
     game = Game.objects.get(graph__name=graph_name)
@@ -562,6 +547,12 @@ def current_state(request):
     else:
         cache.set(costs_cache_key, get_current_edge_costs(game))
 
+    max_flow_cache_key = 'edge_max_flow'
+    if not cache.get(max_flow_cache_key):
+        edge_max_flow = calculate_maximum_flow(game)
+        cache.set(max_flow_cache_key, edge_max_flow)
+
+    response['edge_max_flow'] = cache.get(max_flow_cache_key)
     response['edge_cost'] = edge_costs
     response['duration'] = duration
 
@@ -607,6 +598,7 @@ def reset_game(game):
     FlowDistribution.objects.all().delete()
     GraphCost.objects.all().delete()
     PathFlowAssignment.objects.all().delete()
+    cache.clear()
 
     initial_turn = GameTurn()
     initial_turn.iteration = 0

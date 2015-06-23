@@ -145,6 +145,14 @@ function update_from_state(username) {
 
             duration = json['duration'];
 
+            if (editor_window != null) {
+                editor_window = document.getElementById("graph-editor").contentWindow;
+            }
+
+            if (json.hasOwnProperty('edge_max_flow')) {
+                editor_window.edge_max_flow = json['edge_max_flow'];
+            }
+
             if (json.hasOwnProperty('secs')) {
                 if (json['secs'] >= 0) {
                     display.text(json['secs']);
@@ -162,9 +170,6 @@ function update_from_state(username) {
             }
 
             if (json.hasOwnProperty('edge_cost')) {
-                if (editor_window != null) {
-                    editor_window = document.getElementById("graph-editor").contentWindow;
-                }
                 // console.info("Setting edge_cost!!!");
                 editor_window.edge_cost = json['edge_cost'];
                 editor_window.restart();

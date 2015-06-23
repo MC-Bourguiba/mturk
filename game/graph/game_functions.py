@@ -90,6 +90,24 @@ def create_flow_distribution(game, username, player, allocation, path_ids, turn)
     return None
 
 
+def calculate_maximum_flow(game):
+    """
+    Calculate the maximum flow on the edges for all users
+    """
+
+    edge_flow = dict()
+    for pm in PlayerModel.objects.filter(graph=game.graph):
+        for path in Path.objects.filter(player_model=pm, graph=game.graph):
+        # path = Path.objects.get(player_model=pm, graph=game.graph)
+            for edge in path.edges.all():
+                if edge.edge_id not in edge_flow:
+                    edge_flow[edge.edge_id] = pm.flow
+                else:
+                    edge_flow[edge.edge_id] += pm.flow
+
+    return edge_flow
+
+
 def create_default_distribution(player_model, game, username, player):
     path_ids = list(Path.objects.filter(player_model=player_model).values_list('id', flat=True))
     return create_flow_distribution(game, username, player, [], path_ids, game.current_turn)

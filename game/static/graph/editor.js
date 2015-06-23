@@ -41,6 +41,7 @@ var highlighted_links = [];
 var edge_cost = {};
 var show_edge_cost = false;
 var show_highlighted_paths = false;
+var edge_max_flow = null;
 
 
 // var node_selected_callbacks = [];
@@ -164,7 +165,7 @@ function restart() {
         // console.info(edge_cost);
 
         if (show_edge_cost && edge_cost.hasOwnProperty(d.id)) {
-            cost = edge_cost[d.id];
+            cost = edge_cost[d.id] / edge_max_flow[d.id];
             red_val = Math.round(255 * cost);
             green_val = Math.round(255 * (1 - cost));
             blue_val = 0;
