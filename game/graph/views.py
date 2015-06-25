@@ -163,10 +163,13 @@ def get_model_info(request, modelname):
     player_model = PlayerModel.objects.get(name=modelname)
     model_dict = dict()
     model_dict['name'] = modelname
-    if player_model.start_node and player_model.destination_node and player_model.graph:
+    if player_model.start_node:
         model_dict['start'] = player_model.start_node.ui_id
+    if player_model.destination_node:
         model_dict['destination'] = player_model.destination_node.ui_id
+    if player_model.graph:
         model_dict['graph_name'] = player_model.graph.name
+    if player_model.flow:
         model_dict['flow'] = player_model.flow
 
     html = render_to_string('graph/model_info.djhtml', model_dict)
@@ -449,7 +452,9 @@ def assign_user_model(request):
 @login_required
 def assign_model_flow(request):
     data = json.loads(request.body)
+    print data
     model = PlayerModel.objects.get(name=data['modelname'])
+    print model.flow
     flow = float(data['flow'])
 
     model.flow = flow
