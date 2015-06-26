@@ -27,10 +27,6 @@
 
   <!-- <a id="start-game-btn" class="btn btn-default" href="#" role="button">Start Game</a> -->
 
-
-  <a id="show-edge-btn" class="btn btn-default " href="#" role="button">Highlight edge cost</a>
-  <a id="clear-edge-btn" class="btn btn-default " href="#" role="button">Clear edge highlight</a>
-
 {% block top_right%}
   <div>
     <div id="path-display-list">
@@ -42,6 +38,9 @@
     <div id="completed-turn" style="display: none" align="right">
       <p> You finished your turn! </p>
     </div>
+    <a id="show-edge-btn" class="btn btn-default " href="#" role="button">Show edge costs</a>
+    <a id="clear-edge-btn" class="btn btn-default " href="#" role="button">Clear edge costs</a>
+
   </div>
 {% endblock %}
 
