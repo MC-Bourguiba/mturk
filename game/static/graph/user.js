@@ -335,11 +335,6 @@ function update_previous_cost(username) {
                             format: d3.format(".3f")
                         }
                     },
-                    // x: {
-                    //     tick: {
-                    //         format: d3.format(".3f")
-                    //     }
-                    // }
                 },
 
                 bindto: '#cumulative_chart'
@@ -359,11 +354,6 @@ function update_previous_cost(username) {
                             format: d3.format(".3f")
                         }
                     },
-                    // x: {
-                    //     tick: {
-                    //         format: d3.format(".3f")
-                    //     }
-                    // }
                 },
 
                 bindto: '#flows_chart'

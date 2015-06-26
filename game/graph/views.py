@@ -313,7 +313,7 @@ def get_paths(request, username):
     previous_cost = []
     previous_turn = None
     cumulative_costs = []
-    flow = []
+    weights = []
 
     prev_alloc, prev_path_ids = None, None
 
@@ -339,9 +339,9 @@ def get_paths(request, username):
         #     flow.append(0.5)
 
         if prev_alloc:
-            flow.append(prev_alloc[prev_path_ids.index(p_id)])
+            weights.append(prev_alloc[prev_path_ids.index(p_id)])
         else:
-            flow.append(0.5)
+            weights.append(0.5)
 
         if current_turn.iteration > 0:
             edge_costs = previous_turn.graph_cost.edge_costs
@@ -364,10 +364,11 @@ def get_paths(request, username):
             cumulative_costs.append(0)
 
 
-    flow = map(lambda x: x * 100, flow)
+    weights = map(lambda x: x * 100, weights)
+    total_weight = sum(weights)
+    flows = map(lambda x: x/total_weight, weights)
 
-    html_dict = {'path_idxs': zip(path_idxs, path_ids, flow, previous_cost,
-                                  cumulative_costs)}
+    html_dict = {'path_idxs': zip(path_idxs, path_ids, weights, previous_cost, cumulative_costs, flows)}
     html = render_to_string('graph/path_display_list.djhtml', html_dict)
 
     response = dict()
