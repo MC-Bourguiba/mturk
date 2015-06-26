@@ -2,6 +2,9 @@
 {% load staticfiles %}
 
 {% block navbar_extra_buttons %}
+  <li class="navbar-text">
+      <div> <b> Time remaining: </b> <span id="time_countdown"></span></div>
+  </li>
   <li class="dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Logged as: {{ username }} <span class="caret"></span></a>
     <ul class="dropdown-menu" role="menu">
@@ -9,6 +12,10 @@
       <li><a> Start Node: {{ start }} </a></li>
       <li><a> Destination Node: {{ destination }} </a></li>
       <li><a> Total Flow: {{ flow }} </a></li>
+        <input id="graph-hidden" type="hidden" name="graph" value="{{ graph }}" />
+        <input id="username-hidden" type="hidden" name="graph" value="{{ username }}" />
+        <input id="source-hidden" type="hidden" name="graph" value="{{ start }}" />
+        <input id="destination-hidden" type="hidden" name="graph" value="{{ destination }}" />
     </ul>
   </li>
   <li>
@@ -18,19 +25,13 @@
   </li>
 {% endblock %}
 
-{% block jumbotron %}
   <!-- <a id="start-game-btn" class="btn btn-default" href="#" role="button">Start Game</a> -->
-  <input id="graph-hidden" type="hidden" name="graph" value="{{ graph }}" />
-  <input id="username-hidden" type="hidden" name="graph" value="{{ username }}" />
-  <input id="source-hidden" type="hidden" name="graph" value="{{ start }}" />
-  <input id="destination-hidden" type="hidden" name="graph" value="{{ destination }}" />
-  <div> <b> Time remaining: </b> <span id="time_countdown"></span></div>
+
 
   <a id="show-edge-btn" class="btn btn-default " href="#" role="button">Highlight edge cost</a>
   <a id="clear-edge-btn" class="btn btn-default " href="#" role="button">Clear edge highlight</a>
-{% endblock %}
 
-{% block top-list%}
+{% block top_right%}
   <div>
     <div id="path-display-list">
     </div>
@@ -44,36 +45,37 @@
   </div>
 {% endblock %}
 
-{% block c3-charts%}
-  <!-- c3 charts -->
-  <div class='chart panel panel-info'>
-    <div class="panel-heading">Previous Cost</div>
-    <div id='chart'>
-    </div>
-  </div>
+{% block top_left %}
+{% endblock %}
 
-  <div class='cumulative_chart panel panel-info'>
-    <div class="panel-heading">Cumulative Cost</div>
-    <div id='cumulative_chart'>
-    </div>
-  </div>
+{% block left_right %}
+{% endblock %}
 
-  <div class='flows_chart panel panel-info'>
-    <div class="panel-heading">Previous Flows</div>
-    <div id='flows_chart'>
+{% block bottom %}
+<!-- c3 charts -->
+  <div class="container-fluid">
+    <div class="row">
+    <div class="col-md-4">
+      <div class='chart panel panel-info'>
+        <div class="panel-heading">Previous Cost</div>
+        <div id='chart'></div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class='cumulative_chart panel panel-info'>
+        <div class="panel-heading">Cumulative Cost</div>
+        <div id='cumulative_chart'></div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class='flows_chart panel panel-info'>
+        <div class="panel-heading">Previous Flows</div>
+        <div id='flows_chart'></div>
+      </div>
+    </div>
     </div>
   </div>
   <!-- end c3 charts -->
-{% endblock %}
-
-{% block left_list %}
-{% endblock %}
-
-
-{% block center_content %}
-{% endblock %}
-
-{% block right_list %}
 {% endblock %}
 
 {% block scripts %}

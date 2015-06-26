@@ -2,53 +2,55 @@
 {% load staticfiles %}
 
 {% block content %}
-<div class="jumbotron">
-  <div class="container">
+<!--<div class="jumbotron">-->
+  <!--<div class="container">-->
 
-    {% block jumbotron %}
-    {% endblock %}
-  </div>
-</div>
+    <!--{% block jumbotron %}-->
+    <!--{% endblock %}-->
+  <!--</div>-->
+<!--</div>-->
 
 <div class="container-fluid">
-  <div class="row-fluid">
-    {% block center_content %}
-    {% endblock %}
-  </div>
 
   <div class="row">
 
-    <div class="col-md-6" id="middlecolumn">
+    <div class="col-md-5" id="middlecolumn">
       <iframe scrolling="no" src="{% url 'graph_editor' %}" id="graph-editor" width="100%" height="400" style="border:1">
       </iframe>
       <ol style="visibility:hidden;"></ol>
+      <div>
+      {% block top_left %}
+      {% endblock %}
+    </div>
     </div>
 
-
-    <div class="col-md-6" >
+    <div class="col-md-7" >
       <div>
-      {% block top-list%}
-      {% endblock %}
-      </div>
-      {% block c3-charts %}
+      {% block top_right %}
       {% endblock %}
     </div>
   </div>
 
   <div class="row">
     <div class="col-md-6">
-    {% block left_list %}
+    {% block mid_left %}
     {% endblock %}
     </div>
     <div class="col-md-6">
-      <div>
-        {% block right_list %}
+        {% block mid_right %}
         {% endblock %}
-      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+    {% block bottom %}
+    {% endblock %}
     </div>
   </div>
 </div>
 {% endblock %}
+
 
 {% block scripts %}
 {% endblock %}

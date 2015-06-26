@@ -46,7 +46,11 @@
         window.setInterval(function(){
             total_current_weight = weights.reduce(function(pv, cv) { return pv + cv; }, 0);
             for (i = 0; i < weights.length; i++) {
-                flow = weights[i] / total_current_weight;
+                if(total_current_weight > 0) {
+                    flow = weights[i] / total_current_weight;
+                } else {
+                    flow = 1./weights.length;
+                }
                 document.getElementById('current_flow'+i).innerHTML = flow.toFixed(3);
             }
         }, 100);

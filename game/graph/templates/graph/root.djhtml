@@ -2,13 +2,16 @@
 {% load staticfiles %}
 
 {% block navbar_extra_buttons %}
+<li class="navbar-text">
+    <div> <b> Time remaining: </b> <span id="time_countdown"></span></div>
+</li>
 <li><p class="navbar-btn">
   <a id="start-game-btn" class="btn btn-default " href="{% url 'logout' %}" role="button">Logout</a>
 </p></li>
 {% endblock %}
 
-{% block left_list %}
-  <div class="row">
+{% block top_left %}
+<div class="row">
       <div class="col-md-6">
           <div class="btn-group btn-toggle" id="graph-user-btn">
             <button class="btn btn-primary active" id="show-graphs-btn">Graphs</button>
@@ -32,36 +35,36 @@
             <a id="load-graph-btn" class="btn btn-default" href="#" role="button">Load graph</a>
           </div>
       </div>
-  </div>
-
-{% endblock %}
-
-{% block right_list %}
-  <div>
-    <span class="label label-default" >Player Model</span>
-    <div class="control-group" id="fields">
-      <div class="controls" id="profs">
-        <form class="input-append">
-          <div id="field">
-            <input autocomplete="off" class="input" id="model-name" name="model_name" type="text" placeholder="Model name"/>
-            <button id="add-model" class="btn add-more" type="button">+</button>
+      <div class="col-md-6">
+        <span class="label label-default" >Player Model</span>
+        <div class="control-group" id="fields">
+          <div class="controls" id="profs">
+            <form class="input-append">
+              <div id="field">
+                <input autocomplete="off" class="input" id="model-name" name="model_name" type="text" placeholder="Model name"/>
+                <button id="add-model" class="btn add-more" type="button">+</button>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
+        <div id="model-display-list">
+          {% for name in model_names %}
+            <a href="#" class="list-group-item">
+              {{ name }}
+            </a>
+          {% endfor %}
+        </div>
       </div>
-    </div>
-    <div id="model-display-list">
-      {% for name in model_names %}
-        <a href="#" class="list-group-item">
-          {{ name }}
-        </a>
-      {% endfor %}
-    </div>
-  </div>
-  </div>
-
+</div>
 {% endblock %}
 
-{% block center_content %}
+{% block mid_left %}
+{% endblock %}
+
+{% block mid_right %}
+{% endblock %}
+
+{% block bottom %}
   <div class="container-fluid" id="user-operation-pane" class="hidden">
     <div class="row-fluid">
       <div class="col-md-3">
@@ -109,16 +112,7 @@
 {% endblock %}
 
 
-{% block bottom_center %}
-  <div id="user_chart" >
-    <div class='chart'>
-      <h3> User costs </h3>
-      <div id='chart'>
-      </div>
-    </div>
-  </div>
-{% endblock %}
-{% block c3-charts%}
+{% block top_right %}
   <!-- c3 charts -->
   <div class='chart panel panel-info'>
     <div class="panel-heading">Previous Cost</div>

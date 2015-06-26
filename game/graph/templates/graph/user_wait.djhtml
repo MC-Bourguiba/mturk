@@ -1,8 +1,22 @@
 {% extends "graph/index.djhtml" %}
 {% load staticfiles %}
 
-{% block jumbotron %}
-
-  <p> Please wait for a few minutes and refresh </p>
-
+{% block navbar_extra_buttons %}
+  <li class="navbar-text">
+      <p> No game is currently available. </p>
+  </li>
+  <li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Logged as: {{ username }} <span class="caret"></span></a>
+    <ul class="dropdown-menu" role="menu">
+      <li><a> Graph: {{ graph }}</a></li>
+      <li><a> Start Node: {{ start }} </a></li>
+      <li><a> Destination Node: {{ destination }} </a></li>
+      <li><a> Total Flow: {{ flow }} </a></li>
+    </ul>
+  </li>
+  <li>
+    <p class="navbar-btn">
+      <a id="start-game-btn" class="btn btn-default " href="{% url 'logout' %}" role="button">Logout</a>
+    </p>
+  </li>
 {% endblock %}
