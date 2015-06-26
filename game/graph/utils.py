@@ -116,7 +116,7 @@ def computeEquilibrium(dimensions, gradientFunctions, precision):
     # gs = gradientFunctions(xs) returns a list of path costs, where xs is a list of path flows
     # precision is a scalar, specifies the desired precision.
     def entropicDescentUpdate(x, g, t):
-        w = [xi*np.exp(-gi/(1+np.sqrt(t))) for (xi,gi) in zip(x, g)]
+        w = [xi*np.exp(-gi/(1+np.sqrt(t))/20) for (xi,gi) in zip(x, g)]
         return w / (sum(w))
     # initialize
     xs = [np.ones((di, 1))/di for di in dimensions]
