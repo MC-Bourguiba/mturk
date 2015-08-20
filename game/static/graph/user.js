@@ -1,12 +1,14 @@
 var graph_window = document.getElementById("graph-editor");
 var generated_paths = [];
 var path_ids = [];
-var current_iteration = -1;
+var current_iteration = 0;
 // var duration = 30;
 var previous_allocation = [];
 var editor_window = null;
 var duration = -1;
 var inter = null;
+var previous_costs_dict = {};
+var previous_flows_dict = {};
 
 // var has_displayed_paths = false;
 
@@ -59,8 +61,8 @@ function submit_distribution(update_state) {
         allocation.push(parseFloat($(li).find("input")[0].value/100));
     });
 
-    console.log(paths);
-    console.log(allocation);
+    // console.log(paths);
+    // console.log(allocation);
 
     $.ajax({
         url : "/graph/submit_distribution/",
@@ -77,7 +79,7 @@ function submit_distribution(update_state) {
                 update_from_state($("#username-hidden")[0].value);
             }
 
-            console.log(json);
+            // console.log(json);
         },
 
         // handle a non-successful response
@@ -89,7 +91,7 @@ function submit_distribution(update_state) {
 
 
 graph_window.onload = function() {
-    console.log($("#graph-hidden")[0].value);
+    // console.log($("#graph-hidden")[0].value);
     load_graph($("#graph-hidden")[0].value);
 };
 
@@ -125,8 +127,8 @@ $(document).ready(function() {
         editor_window = document.getElementById("graph-editor").contentWindow;
     }
 
-    update_paths(username);
-    update_previous_cost(username);
+    get_paths(username, current_iteration);
+    update_previous_cost(username, current_iteration);
     update_loop();
     setTimeout(post_temporary_distribution_loop, 5000); // Some timing bug here! Should not have to wait 5s to post distribution!
     display = $('#time_countdown');
@@ -172,7 +174,7 @@ function update_from_state(username) {
             if (json.hasOwnProperty('edge_cost')) {
                 // console.info("Setting edge_cost!!!");
                 editor_window.edge_cost = json['edge_cost'];
-                editor_window.restart();
+                // editor_window.restart();
                 // console.info(edge_cost);
             }
 
@@ -192,8 +194,8 @@ function update_from_state(username) {
 
             if (current_iteration != json['iteration']) {
                 $("#path-btns").toggle(true);
-                update_paths(username);
-                update_previous_cost(username);
+                // update_paths(username, json['iteration']);
+                update_previous_cost(username, json['iteration']);
                 $("#completed-turn").toggle(false);
                 // startTimer(duration, display);
             } else {
@@ -203,20 +205,8 @@ function update_from_state(username) {
                 }
             }
 
-            // if (json['completed_task']) {
-            //     if (current_iteration != json['iteration']) {
-            //         $("#path-btns").toggle(true);
-            //         update_paths(username);
-            //         update_previous_cost(username);
-            //     } else {
-            //         $("#path-btns").toggle(false);
-            //         $("#completed-turn").toggle(true);
-            //     }
-            // }
-
-            current_iteration = json['iteration']
-
-            console.log(json);
+            current_iteration = json['iteration'];
+            // console.log(json);
         },
 
         // handle a non-successful response
@@ -227,18 +217,19 @@ function update_from_state(username) {
 }
 
 
-function update_paths(username) {
+function get_paths(username, iteration) {
     // editor_window = document.getElementById("graph-editor").contentWindow;
     // editor_window.edit = false;
 
     $.ajax({
         url : "/graph/get_paths/" + username + "/",
         type : "GET",
+        data : {"iteration": iteration},
 
         success : function(json) {
-            console.log(json);
+            // console.log(json);
             generated_paths = json['paths'];
-            console.log(generated_paths);
+            // console.log(generated_paths);
             path_ids = json['path_ids'];
 
             // if (!has_displayed_paths) {
@@ -255,7 +246,6 @@ function update_paths(username) {
                 e.preventDefault();
                 // This is soooooooo bad
                 var num = parseInt($(this).html().substr('Path '.length));
-                console.log(num);
 
                 if (editor_window == null) {
                     editor_window = document.getElementById("graph-editor").contentWindow;
@@ -276,35 +266,64 @@ function update_paths(username) {
 }
 
 
-function update_previous_cost(username) {
+function update_previous_cost(username, iteration) {
+    iteration = parseInt(iteration);
+
     $.ajax({
         url : "/graph/get_previous_cost/" + username + "/",
         type : "GET",
+        data : {"iteration": iteration},
 
         success : function(json) {
             console.log(json);
 
             var cumulative_cost = {};
+            var previous_cost = {};
+            var previous_flow = {};
+
+            // previous_costs_dict[iter_key] = {};
+
+            k1 = Object.keys(json['previous_costs'])[0];
 
             for (var key in json['previous_costs']) {
-                var path = json['previous_costs'][key];
-                cumulative_cost[key] = [];
-                var cost = 0;
-                for (i=0; i < path.length; i += 1) {
-                    cost += path[i];
-                    cumulative_cost[key].push(cost);
+                for (i = 0; i < json['previous_costs'][key].length; i += 1) {
+                    if (!((iteration+i) in previous_costs_dict)) {
+                        previous_costs_dict[iteration+i] = {};
+                    }
+                    previous_costs_dict[iteration+i][key] = json['previous_costs'][key][i];
                 }
             }
 
-            console.log('cumulative cost:');
-            console.log(cumulative_cost);
+            for (var key in json['previous_costs']) {
+                cumulative_cost[key] = [];
+                previous_cost[key] = [];
+                // previous_flows[key] = [];
+                var cost = 0;
+
+                for (var iter in previous_costs_dict) {
+                    val = previous_costs_dict[iter][key];
+                    if (val == undefined) {
+                        continue;
+                    }
+
+                    val = parseFloat(val);
+                    cost += val;
+                    cumulative_cost[key].push(cost);
+                    previous_cost[key].push(val);
+                }
+                // previous_flows[key] = json['previous_flows'][key];
+            }
+
+            console.log('previous cost:');
+            console.log(previous_cost);
 
             var chart = c3.generate({
                 size: {
                     height: 250,
                 },
                 data: {
-                    json : json['previous_costs']
+                    json : previous_cost
+                    // json : json['previous_costs']
                 },
                 axis: {
                     y: {
@@ -340,24 +359,24 @@ function update_previous_cost(username) {
                 bindto: '#cumulative_chart'
             });
 
-            var flows_chart = c3.generate({
-                size: {
-                    height: 250,
-                },
-                data: {
-                    json : json['previous_flows']
-                },
+            // var flows_chart = c3.generate({
+            //     size: {
+            //         height: 250,
+            //     },
+            //     data: {
+            //         json : previous_flow
+            //         // json : json['previous_flows']
+            //     },
+            //     axis: {
+            //         y: {
+            //             tick: {
+            //                 format: d3.format(".3f")
+            //             }
+            //         },
+            //     },
 
-                axis: {
-                    y: {
-                        tick: {
-                            format: d3.format(".3f")
-                        }
-                    },
-                },
-
-                bindto: '#flows_chart'
-            });
+            //     bindto: '#flows_chart'
+            // });
         },
 
         // handle a non-successful response

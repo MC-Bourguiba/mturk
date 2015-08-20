@@ -50,7 +50,7 @@ class Player(models.Model):
     player_model = models.ForeignKey(PlayerModel, blank=True, null=True)
     # completed_task = models.BooleanField(default=False)
     game = models.ForeignKey('Game', null=True, blank=True)
-    flow_distribution = models.ForeignKey('FlowDistribution', null=True, blank=True)
+    # flow_distribution = models.ForeignKey('FlowDistribution', null=True, blank=True)
 
     def __unicode__(self):
         return self.user.username
@@ -82,10 +82,16 @@ class PathFlowAssignment(models.Model):
     path = models.ForeignKey('Path')
     flow = models.FloatField(default=0.2)
 
+    def __unicode__(self):
+        return unicode(self.path) + ' flow: ' + str(self.flow)
+
 
 class GameTurn(models.Model):
     iteration = models.IntegerField(default=0)
     graph_cost = models.ForeignKey('GraphCost', blank=True, null=True)
+
+    def __unicode__(self):
+        return str(self.iteration)
     # graph_cost = models.ManyToManyField('GraphCost', blank=True, null=True)
 
 
@@ -94,16 +100,22 @@ class GameTurn(models.Model):
 class FlowDistribution(models.Model):
     path_assignments = models.ManyToManyField('PathFlowAssignment',
                                               related_name='flow_distribution')
-    username = models.TextField(blank=True, null=True)
+    player = models.ForeignKey('Player')
     turn = models.ForeignKey('GameTurn', blank=True, null=True)
 
+    def __unicode__(self):
+        return 'user: ' + str(self.player) + ' turn: ' + str(self.turn.iteration)
+
     class Meta:
-        unique_together = ['username', 'turn']
+        unique_together = ['player', 'turn']
 
 
 class EdgeCost(models.Model):
     edge = models.ForeignKey('Edge')
     cost = models.FloatField(default=0.0)
+
+    def __unicode__(self):
+        return str(self.cost)
 
 
 class GraphCost(models.Model):

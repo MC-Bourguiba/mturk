@@ -18,13 +18,14 @@ def create_new_player(user, game):
 
         pms = PlayerModel.objects.filter(in_use=False, graph__isnull=False)
         player = Player(user=user)
+        player.save()
         # player.user = user
         player.game = game
 
         if pms:
             pm = PlayerModel.objects.filter(in_use=False, graph__isnull=False)[:1].get()
             pm.in_use = True
-            flow_distribution = create_default_distribution(pm, game, user.username, player)
+            flow_distribution = create_default_distribution(pm, game, player)
             player.flow_distribution = flow_distribution
             player.player_model = pm
             flow_distribution.save()
@@ -49,40 +50,39 @@ def iterate_next_turn(game):
 
 # Lock to protect against race condition using Redis.
 # TODO: Make this cleaner?
-def create_flow_distribution(game, username, player, allocation, path_ids, turn):
+def create_flow_distribution(game, player, allocation, path_ids, turn):
     conn = StrictRedis()
 
-    with redis_lock.Lock(conn, get_hash(username) + get_hash(str(turn.iteration))
-                         + 'create_flow_distribution'):
+    # with redis_lock.Lock(conn, get_hash(username) + get_hash(str(turn.iteration))
+    #                      + 'create_flow_distribution'):
         # Do we really need this?
-        FlowDistribution.objects.filter(username=username, turn=turn).delete()
+    # FlowDistribution.objects.filter(username=username, turn=turn).delete()
 
-        flow_distribution = FlowDistribution(turn=turn, username=username)
-        flow_distribution.save()
+    flow_distribution, created = FlowDistribution.objects.get_or_create(turn=turn, player=player)
+    flow_distribution.path_assignments.clear()
 
-        total_weight = float(sum(allocation))
-        nb_paths = float(len(allocation))
+    total_weight = float(sum(allocation))
+    nb_paths = float(len(allocation))
 
-        for weight, path_id in zip(allocation, path_ids):
-            path = Path.objects.get(graph=game.graph, player_model=player.player_model,
-                                    pk=path_id)
-            assignment = PathFlowAssignment()
-            assignment.path = path
-            if(total_weight > 0):
-                assignment.flow = (weight / total_weight) * player.player_model.flow
-            else:
-                # if all the weights are non-positive, assign the uniform distribution
-                assignment.flow = 1. / nb_paths * player.player_model.flow
+    for weight, path_id in zip(allocation, path_ids):
+        path = Path.objects.get(graph=game.graph, player_model=player.player_model,
+                                pk=path_id)
+        assignment = PathFlowAssignment()
+        assignment.path = path
+        if(total_weight > 0):
+            assignment.flow = (weight / total_weight) * player.player_model.flow
+        else:
+            # if all the weights are non-positive, assign the uniform distribution
+            assignment.flow = 1. / nb_paths * player.player_model.flow
 
-            assignment.save()
-            flow_distribution.path_assignments.add(assignment)
-            flow_distribution.username = username
+        assignment.save()
+        flow_distribution.path_assignments.add(assignment)
 
-        flow_distribution.save()
-        player.flow_distribution = flow_distribution
-        player.save()
+    flow_distribution.save()
+    player.flow_distribution = flow_distribution
+    player.save()
 
-        return flow_distribution
+    return flow_distribution
 
     return None
 
@@ -105,9 +105,9 @@ def calculate_maximum_flow(game):
     return edge_flow
 
 
-def create_default_distribution(player_model, game, username, player):
+def create_default_distribution(player_model, game, player):
     path_ids = list(Path.objects.filter(player_model=player_model).values_list('id', flat=True))
-    return create_flow_distribution(game, username, player, [], path_ids, game.current_turn)
+    return create_flow_distribution(game, player, [], path_ids, game.current_turn)
 
 
 def evalFunc(func, xVal):
@@ -115,13 +115,13 @@ def evalFunc(func, xVal):
     return eval(func)
 
 
-def calculate_edge_flow(game):
+def calculate_edge_flow(current_turn, game):
     """
     Returns dictionary, keys are the edge id's and
     the values are the flow on the edge.
     """
     edge_flow = dict()
-    current_turn = game.current_turn
+    # current_turn = game.current_turn
 
     for e in Edge.objects.filter(graph=game.graph):
         edge_flow[e] = 0.0
@@ -134,6 +134,8 @@ def calculate_edge_flow(game):
         if cache.get(get_hash(player.user.username) + 'allocation'):
             allocation = cache.get(get_hash(player.user.username) + 'allocation')
             path_ids = cache.get(get_hash(player.user.username) + 'path_ids')
+            if player.user.username == 'u1':
+                print 'Getting allocation from cache:', allocation
         else:
             flow_distribution = None
 
@@ -155,10 +157,7 @@ def calculate_edge_flow(game):
                 allocation.append(pfa.flow)
 
 
-        # print allocation
-        # print path_ids
-        flow_distribution = create_flow_distribution(game, player.user.username,
-                                                     player, allocation,
+        flow_distribution = create_flow_distribution(game, player, allocation,
                                                      path_ids, current_turn)
 
         for path_assignment in flow_distribution.path_assignments.all():
@@ -177,12 +176,11 @@ def get_current_edge_costs(game):
     return edge_costs
 
 
-def update_cost(game):
-    edge_flow = calculate_edge_flow(game)
-    graph_cost = GraphCost(graph=game.graph)
+def calculate_graph_cost(edge_flow, graph):
+    graph_cost = GraphCost(graph=graph)
     graph_cost.save()
 
-    for e in Edge.objects.filter(graph=game.graph):
+    for e in Edge.objects.filter(graph=graph):
         cost_f = parser.expr(e.cost_function).compile()
         cost = evalFunc(cost_f, edge_flow[e])
 
@@ -193,6 +191,15 @@ def update_cost(game):
         graph_cost.edge_costs.add(edge_cost)
 
     graph_cost.save()
+    return graph_cost
+
+
+def update_cost(game):
+    edge_flow = calculate_edge_flow(game.current_turn, game)
+    graph_cost = calculate_graph_cost(edge_flow, game.graph)
+    # graph_cost = GraphCost(graph=game.graph)
+    # graph_cost.save()
+
     game.current_turn.graph_cost = graph_cost
     game.current_turn.save()
 

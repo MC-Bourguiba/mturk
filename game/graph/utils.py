@@ -7,7 +7,6 @@ from celery import Celery
 import json
 import re
 import copy
-from graph_tools import *
 import parser
 import networkx as nx
 import uuid
@@ -19,7 +18,7 @@ from django.core.cache import cache
 import md5
 
 
-duration = 30
+duration = 10
 
 root_username = 'root'
 
@@ -135,8 +134,9 @@ def computeEquilibrium(dimensions, gradientFunctions, precision):
         xs = xs_plus
         gs = gs_plus
         t += 1
-        if(t % 100 == 0):
-            print(t)
+        # if(t % 100 == 0):
+        #     print(t)
+
     # print("converged after {} iterations".format(t))
     costs = [np.dot(x.T, g) for (g, x) in zip(gs, xs)]
     return costs

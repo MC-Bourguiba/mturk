@@ -20,4 +20,6 @@ urlpatterns = patterns('',
     # url(r'^admin/', include(admin.site.urls)),
 )
 
+urlpatterns += patterns('', url(r'^silk/', include('silk.urls', namespace='silk')))
+
 urlpatterns += staticfiles_urlpatterns()

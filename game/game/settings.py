@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'id_counter',
     'bootstrapform',
     'graph',
+    'silk',
     # 'bootstrap3',
 )
 
@@ -53,6 +54,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'silk.middleware.SilkyMiddleware',
 )
 
 DATABASES = {
@@ -172,6 +174,10 @@ CACHES = {
         # },
     },
 }
+
+
+SILKY_PYTHON_PROFILER = True
+
 
 try:
     from local_settings import *

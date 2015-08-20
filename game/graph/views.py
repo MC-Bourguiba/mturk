@@ -198,7 +198,7 @@ def get_user_costs(request, graph_name):
             #     continue
 
             path_assignments = FlowDistribution.objects.get(turn=turn,
-                                                            username=username).path_assignments
+                                                            player=player).path_assignments
             # path_assignments = turn.flow_distributions.get(username=username).path_assignments
             e_costs = turn.graph_cost.edge_costs
             current_cost = 0
@@ -264,6 +264,7 @@ def add_model(request):
 def get_previous_cost(request, username):
     user = User.objects.get(username=username)
     game = user.player.game
+    iteration = int(request.GET.dict()['iteration'])
     player = Player.objects.get(user__username=username)
     path_ids = list(Path.objects.filter(player_model=player.player_model).values_list('id', flat=True))
     path_idxs = range(len(path_ids))
@@ -276,11 +277,11 @@ def get_previous_cost(request, username):
         path = Path.objects.get(id=p_id)
         paths[idx] = list(path.edges.values_list('edge_id', flat=True))
 
-        for turn in game.turns.all():
-
+        # for turn in game.turns.all():
+        for turn in game.turns.filter(iteration__gte=iteration-1):
             e_costs = turn.graph_cost.edge_costs
             t_cost = 0
-            flow_distribution = FlowDistribution.objects.get(turn=turn, username=username)
+            flow_distribution = FlowDistribution.objects.get(turn=turn, player=player)
             flow = flow_distribution.path_assignments.get(path=path).flow
             for e in path.edges.all():
                 t_cost += e_costs.get(edge=e).cost
@@ -303,6 +304,7 @@ def get_previous_cost(request, username):
 
 def get_paths(request, username):
     user = User.objects.get(username=username)
+    # iteration = request.GET.dict()['iteration']
     game = user.player.game
     current_turn = game.current_turn
     player = Player.objects.get(user__username=username)
@@ -397,8 +399,6 @@ def save_model_node(request, model_name, graph_name, node_ui_id, is_start):
         # generate_paths(get_dict['graph'], int(get_dict['source']),
         #                    int(get_dict['destination']))
 
-
-
     response = dict()
     response['node_ui_id'] = node_ui_id
     return JsonResponse(response)
@@ -453,9 +453,9 @@ def assign_user_model(request):
 @login_required
 def assign_model_flow(request):
     data = json.loads(request.body)
-    print data
+    # print data
     model = PlayerModel.objects.get(name=data['modelname'])
-    print model.flow
+    # print model.flow
     flow = float(data['flow'])
 
     model.flow = flow
@@ -515,7 +515,7 @@ def get_user_info(request, username):
 def submit_distribution(request):
     data = json.loads(request.body)
     user = User.objects.get(username=data['username'])
-    player = Player.objects.get(user__username=data['username'])
+    player = Player.objects.get(user=user)
     allocation = data['allocation']
     path_ids = data['ids']
 
@@ -533,6 +533,7 @@ def submit_distribution(request):
 
 @login_required
 def current_state(request):
+    # print 'CACHE FAILLEDDD'
     game = Game.objects.all()[0]
 
     secs_left = duration
@@ -557,10 +558,12 @@ def current_state(request):
     if cache.get(costs_cache_key):
         edge_costs = cache.get(costs_cache_key)
     else:
+        # print 'CACHE FAILLEDDD@@@@@@@@@'
         cache.set(costs_cache_key, get_current_edge_costs(game))
 
     max_flow_cache_key = 'edge_max_flow'
     if not cache.get(max_flow_cache_key):
+        print 'CACHE FAILLEDDD'
         edge_max_flow = calculate_maximum_flow(game)
         cache.set(max_flow_cache_key, edge_max_flow)
 
