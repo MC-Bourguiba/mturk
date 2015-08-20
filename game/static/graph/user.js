@@ -399,6 +399,21 @@ function update_previous_cost(username, iteration) {
 
                 bindto: '#flows_chart'
             });
+
+            for (var key in json['previous_costs']) {
+                var index = Object.keys(previous_costs_dict).length-1;
+                var val = previous_cost[key][index];
+                var cum_val = cumulative_cost[key][index];
+                $("#previous_cost_table_" + String(key)).text(Math.round(val * 1000) / 1000);
+                $("#cumulative_cost_table_" + String(key)).text(Math.round(cum_val * 1000) / 1000);
+            }
+
+            for (var key in json['previous_flows']) {
+                var index = Object.keys(previous_flows_dict).length-1;
+                var val = previous_flow[key][index];
+                $("#previous_flow_table_" + String(key)).text(Math.round(val * 1000) / 1000);
+                console.log("key: " + key);
+            }
         },
 
         // handle a non-successful response

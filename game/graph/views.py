@@ -292,7 +292,6 @@ def get_previous_cost(request, username):
                 previous_flows[idx] = []
             previous_flows[idx].append(flow)
 
-
     response = dict()
 
     response['path_ids'] = path_ids
@@ -695,3 +694,5 @@ def assign_duration(request):
     # begin at the *next* turn
     time_key = game.pk + get_hash(str(game.current_turn.iteration + 1))
     cache.set(time_key, game.duration)
+
+    return JsonResponse(dict())

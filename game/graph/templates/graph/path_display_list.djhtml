@@ -19,8 +19,8 @@
           {% for i, id, weight, previous_cost, cumulative_cost, flow in path_idxs %}
             <tr>
               <td><a id="{{ id }}" href='#'>Path {{ i }} </a></td>
-              <td><p> {{previous_cost|floatformat:3}}</p></td>
-              <td><p> {{cumulative_cost|floatformat:3}}</p></td>
+              <td><p id="previous_cost_table_{{ i }}"> {{previous_cost|floatformat:3}}</p></td>
+              <td><p id="cumulative_cost_table_{{ i }}"> {{cumulative_cost|floatformat:3}}</p></td>
               <td>
               <div style="float:left;">
                 <input id="ex{{i}}" class="slider" type="text" data-slider-min="0"
@@ -28,7 +28,7 @@
               </div>
               </td>
               <td><p id="current_flow{{i}}"> </p></td>
-              <td><p> {{flow|floatformat:3}} </p></td>
+              <td><p id="previous_flow_table_{{ i }}"> {{flow|floatformat:3}} </p></td>
             </tr>
 
             <script type="text/javascript">
