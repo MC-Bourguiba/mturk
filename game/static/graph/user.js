@@ -283,14 +283,21 @@ function update_previous_cost(username, iteration) {
 
             // previous_costs_dict[iter_key] = {};
 
-            k1 = Object.keys(json['previous_costs'])[0];
-
             for (var key in json['previous_costs']) {
                 for (i = 0; i < json['previous_costs'][key].length; i += 1) {
                     if (!((iteration+i) in previous_costs_dict)) {
                         previous_costs_dict[iteration+i] = {};
                     }
                     previous_costs_dict[iteration+i][key] = json['previous_costs'][key][i];
+                }
+            }
+
+            for (var key in json['previous_flows']) {
+                for (i = 0; i < json['previous_flows'][key].length; i += 1) {
+                    if (!((iteration+i) in previous_flows_dict)) {
+                        previous_flows_dict[iteration+i] = {};
+                    }
+                    previous_flows_dict[iteration+i][key] = json['previous_flows'][key][i];
                 }
             }
 
@@ -314,8 +321,23 @@ function update_previous_cost(username, iteration) {
                 // previous_flows[key] = json['previous_flows'][key];
             }
 
-            console.log('previous cost:');
-            console.log(previous_cost);
+
+            for (var key in json['previous_flows']) {
+                previous_flow[key] = [];
+
+                for (iter in previous_flows_dict) {
+                    val = previous_flows_dict[iter][key];
+                    if (val == undefined) {
+                        continue;
+                    }
+
+                    val = parseFloat(val);
+                    previous_flow[key].push(val);
+                }
+            }
+
+            // console.log('previous cost:');
+            // console.log(previous_cost);
 
             var chart = c3.generate({
                 size: {
@@ -359,24 +381,24 @@ function update_previous_cost(username, iteration) {
                 bindto: '#cumulative_chart'
             });
 
-            // var flows_chart = c3.generate({
-            //     size: {
-            //         height: 250,
-            //     },
-            //     data: {
-            //         json : previous_flow
-            //         // json : json['previous_flows']
-            //     },
-            //     axis: {
-            //         y: {
-            //             tick: {
-            //                 format: d3.format(".3f")
-            //             }
-            //         },
-            //     },
+            var flows_chart = c3.generate({
+                size: {
+                    height: 250,
+                },
+                data: {
+                    json : previous_flow
+                    // json : json['previous_flows']
+                },
+                axis: {
+                    y: {
+                        tick: {
+                            format: d3.format(".3f")
+                        }
+                    },
+                },
 
-            //     bindto: '#flows_chart'
-            // });
+                bindto: '#flows_chart'
+            });
         },
 
         // handle a non-successful response

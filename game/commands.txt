@@ -1,0 +1,6 @@
+
+Clear out database:
+cat ../sql/drop_all.sql | psql -U bayen
+
+Sync && load fixtures:
+python manage.py syncdb --noinput &&  python manage.py loaddata fixtures/experiments/graph1.json
