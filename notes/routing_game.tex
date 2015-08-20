@@ -85,4 +85,55 @@ Then, at each iteration, each player chooses a path flow distribution $f_k$, whi
 
 Once this is done we reveal to each player $k$ the path cost vector $\ell_k$ and we start the next round.
 
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+\section{Learning dynamics}
+
+We will consider learning dynamics of the form
+\[
+x^{(t+1)}_k = \min_{x \in \Delta^{\Pcal_k}} \braket{x_k}{\ell^{(t)}_k } + \frac{1}{\eta_t^k}D_{\psi_k}(x_k, x_k^{(t)})
+\]
+This update is an iteration of the mirror descent algorithm (Nemirovski and Yudin, 1983). Here, we have
+\begin{itemize}
+\item $x$ is the normalized flow distribution. $\Delta^{\Pcal_k}$ is the simplex of distributions over $\Pcal_k$.
+\item $D_\psi$ is the Bregman divergence associated to the distance generating function $\psi$, which needs to be strongly convex. $D_\psi$ is defined as
+\[
+D_\psi(x, y) = \psi(x) - \psi(y) - \braket{\nabla \psi(y)}{x - y}
+\]
+By convexity of $\psi$, $D_\psi$ is always non negative, and $D_\psi(x, y) = 0 \eqv x = y$.
+\item $\eta_t$ is a learning rate, and can be thought of as a generalized step size. The smaller $\eta_t$, the closer $x^{(t+1)}$ will be to $x^{(t)}$ (since we put more weight on the Bregman divergence term)
+\end{itemize}
+
+One can prove that if $\eta_t^k$ satisfies certain assumptions, the joint state of the system is guaranteed to converge to equilibrium. We would like to
+\begin{enumerate}
+\item Verify that the system indeed converges to equilibrium (or close to an equilibrium)
+\item Estimate the player dynamics (i.e. their distance generating function and their learning rates). This could allow us to predict what the future flow distributions may be.
+\end{enumerate}
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+\subsection{Solution in the KL divergence case}
+When $D_\psi$ is the KL divergence, $D_\psi(x, y) = \sum_i x_i \ln \frac{x_i}{y_i}$, then there is a closed-form solution of the above minimization problem. The solution is given by
+\[
+(x_k^{(t+1)})_i = \frac{e^{-\eta_t^k (\ell^{(t)}_k)_i}}{\sum_j (x_k^{(t)})_i e^{-\eta_t^k (\ell^{(t)}_k)_i}}
+\]
+
+
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+\subsection{Estimating the player dynamics}
+We assume that each player has their own distance generating function $\psi_k$ and their own sequence of learning rates $\eta_t^k$. We want to estimate these parameters. For now, let us assume that $\psi_k$ is given, and we want to estimate $\eta_k$. At iteration $t$, we know the flow distribution $x^{(t)}_k$, the vector of losses $\ell_k^{(t)}$, so we can compute, for a given $\eta$, the solution to the minimization problem
+\[
+\hat x^{(t+1)}(\eta) = \arg\min_{x_k \in \Delta^{\Pcal_k}} \braket{x_k}{\ell^{(t)}_k} + \frac{1}{\eta} D_{\psi_k}(x_k, x^{(t)}_k)
+\]
+Then we can argue that a good value of $\eta$ is the one that minimizes the distance between the distribution predicted by the model, $\hat x^{(t+1)}_k(\eta)$, and the actual flow distribution $x^{(t+1)}_k$. So we would like to minimize
+\[
+\hat \eta^k_t = \arg\min_{\eta \geq 0} D_{\psi_k}(\hat x_k^{(t+1)}(\eta), x^{(t+1)}_k)
+\]
+I believe that this problem is convex for any $\psi$. We should check that this is true.
+
+
+Once we solve this first question, we can think about estimating the distance generating function. To simplify, we can assume that the distance generating function is a linear combination of a finite set of known distance generating functions. So we can write
+\[
+\psi_k(x, y) = \braket{\theta_k}{\Psi(x, y)}
+\]
+where $\Psi$ is a vector of known functions $\Psi(x, y) = \parenth{\psi_1(x, y), \dots, \psi_M(x, y)}^T$.
+
 \end{document}
