@@ -412,7 +412,6 @@ function update_previous_cost(username, iteration) {
                 var index = Object.keys(previous_flows_dict).length-1;
                 var val = previous_flow[key][index];
                 $("#previous_flow_table_" + String(key)).text(Math.round(val * 1000) / 1000);
-                console.log("key: " + key);
             }
         },
 

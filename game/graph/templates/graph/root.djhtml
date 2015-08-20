@@ -88,21 +88,21 @@
 
       </div>
       <div class="col-md-3">
-        <div class="input-group" style="margin-top: 10px; margin-bottom: 10px;">
-          <input type="text" class="form-control bfh-number" data-bind="value:replyNumber"
-                 id="duration-input"/>
-          <span class="input-group-btn">
-            <button class="btn btn-default" type="button" id="assign-duration-btn">Assign duration</button>
-          </span>
-        </div>
+          <div class="input-group" style="margin-top: 10px; margin-bottom: 10px;">
+              <input type="text" class="form-control bfh-number" data-bind="value:replyNumber"
+                     id="duration-input"/>
+              <span class="input-group-btn">
+                  <button class="btn btn-default" type="button" id="assign-duration-btn">Assign duration</button>
+              </span>
+          </div>
       </div>
-      <!-- <div class="col-md-2" style="overflow: hidden;">
-      <div id="user-model-info-pane" style="float: left; margin-right: 10px;" align="left">
+      <div class="col-md-2" style="overflow: hidden;">
+          <div id="user-model-info-pane" style="float: left; margin-right: 10px;" align="left">
+          </div>
+          <div id="model-info-pane" align="right">
+          </div>
       </div>
-      <div id="model-info-pane" align="right">
-      </div>
-      </div> -->
-      <div class="col-md-6" >
+      <div class="col-md-4" >
         <a id="assign-start-node" class="btn btn-default" href="#" role="button">Assign start node</a>
         <a id="assign-destination-node" class="btn btn-default" href="#" role="button">Assign destination node</a>
         <a id="assign-graph" class="btn btn-default" href="#" role="button">Assign graph</a>
