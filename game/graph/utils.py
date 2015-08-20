@@ -18,7 +18,7 @@ from django.core.cache import cache
 import md5
 
 
-duration = 10
+duration = 30
 
 root_username = 'root'
 

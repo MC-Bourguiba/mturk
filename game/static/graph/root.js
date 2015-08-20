@@ -549,3 +549,28 @@ $("#assign-flow-btn").click(function(e) {
         }
     });
 });
+
+$("#assign-duration-btn").click(function(e) {
+    e.preventDefault();
+    var duration = parseInt($("#duration-input")[0].value);
+    console.log("duration: " + duration);
+    $.ajax({
+        url : '/graph/assign_duration/',
+        type : "POST",
+
+        data : JSON.stringify({
+            'duration' : duration
+        }),
+
+        // handle a successful response
+        success : function(json) {
+            // console.log(json); // log the returned json to the console
+            console.log(json);
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+});

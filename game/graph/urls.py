@@ -56,5 +56,7 @@ urlpatterns = patterns('',
                            name='start_edge_highlight'),
                        url(r'^save_data/$', views.save_data,
                            name='save_data'),
+                       url(r'^assign_duration/$', views.assign_duration,
+                           name='assign_duration'),
                        # url(r'^get_duration/$', view.get_duration, name='get_duration'),
 )

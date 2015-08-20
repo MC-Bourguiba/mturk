@@ -20,4 +20,4 @@ def game_force_next(game_name):
 
     game.game_loop_time = datetime.now()
     game.save()
-    async_res = game_force_next.apply_async((game_name,), countdown=duration)
+    async_res = game_force_next.apply_async((game_name,), countdown=game.duration)

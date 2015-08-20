@@ -536,6 +536,16 @@ def current_state(request):
     # print 'CACHE FAILLEDDD'
     game = Game.objects.all()[0]
 
+    time_key = game.pk + get_hash(str(game.current_turn.iteration))
+
+    duration = None
+
+    if cache.get(time_key):
+        duration = cache.get(time_key)
+    else:
+        duration = game.duration
+        cache.set(time_key, duration)
+
     secs_left = duration
 
     if game.game_loop_time:
@@ -569,7 +579,7 @@ def current_state(request):
 
     response['edge_max_flow'] = cache.get(max_flow_cache_key)
     response['edge_cost'] = edge_costs
-    response['duration'] = duration
+    response['duration'] = game.duration
 
     return JsonResponse(response)
 
@@ -587,7 +597,7 @@ def start_game(request):
 
         game.save()
 
-        game_force_next.apply_async((game.name,), countdown=duration)
+        game_force_next.apply_async((game.name,), countdown=game.duration)
         return JsonResponse(dict())
 
 
@@ -670,3 +680,18 @@ def stop_edge_highlight(request):
 def save_data(request):
     dump_data_fixture('graph-' + str(datetime.now()) + '.json')
     return JsonResponse(dict())
+
+
+def assign_duration(request):
+    data = json.loads(request.body)
+    duration = data['duration']
+
+    # TODO: Fix this for multiple games
+    game = Game.objects.all()[0]
+
+    game.duration = duration
+    game.save()
+
+    # begin at the *next* turn
+    time_key = game.pk + get_hash(str(game.current_turn.iteration + 1))
+    cache.set(time_key, game.duration)

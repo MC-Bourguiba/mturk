@@ -562,6 +562,7 @@
         "game_loop_time": null,
         "edge_highlight": true,
         "stopped": false,
+        "duration": 30,
         "turns": []
     },
     "model": "graph.game",
