@@ -163,7 +163,9 @@ function update_from_state(username) {
                         clearInterval(inter);
                     }
 
-                    startTimer(json['secs'], display);
+                    if (current_iteration != json['iteration']) {
+                        startTimer(json['secs'], display);
+                    }
                 } else {
                     display.text('0');
                 }
