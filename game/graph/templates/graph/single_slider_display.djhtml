@@ -68,13 +68,15 @@
                     <td><a id="{{ id }}" href='#'>Path {{ i }} </a></td>
                     <td><p id="previous_cost_table_{{ i }}"> {{previous_cost|floatformat:3}}</p></td>
                     <td><p id="cumulative_cost_table_{{ i }}"> {{cumulative_cost|floatformat:3}}</p></td>
+                    <div style="pointer-events: none">
                     <td>
-                        <div style="float:left;" style="pointer-events: none">
+                        <div style="float:left;" >
                             <input id="ex{{i}}" class="slider" type="text" data-slider-min="0"
                                    data-slider-max="100" data-slider-step="1" data-slider-value="{{ weight }}"
                                    style="pointer-events: none"/>
                         </div>
                     </td>
+                    </div>
                     <td><p id="current_flow{{i}}"> </p></td>
                     <td><p id="previous_flow_table_{{ i }}"> {{flow|floatformat:3}} </p></td>
                 </tr>
