@@ -130,49 +130,6 @@ function submit_distribution(update_state) {
     var paths = ps[0];
     var allocation = ps[1];
 
-    // var explore_index = 0.5;
-
-    // if ($("#game-mode").prop("value") == "single_slider_mode") {
-    //     allocation = [];
-    //     if ($("#ex").exists()) {
-    //         explore_index = parseInt($("#ex")[0].value)/100;
-    //     }
-
-    //     var normalization = 1.0;
-    //     var last_iter = 1;
-
-    //     if (Object.keys(previous_costs_dict).length > 0) {
-    //         last_iter = Math.max.apply(Math, Object.keys(previous_costs_dict));
-
-    //         normalization = 0.0;
-
-    //         for (var k in Object.keys(previous_costs_dict[last_iter])) {
-    //             var previous_cost = previous_costs_dict[last_iter][k];
-    //             var previous_flow = previous_flows_dict[last_iter][k];
-    //             normalization += previous_flow*Math.exp(-explore_index*previous_cost);
-    //         }
-    //     }
-
-    //     for (var p in paths) {
-    //         if (Object.keys(previous_costs_dict).length == 0) {
-    //             console.log("IN HERE");
-    //             average_distr = 1.0/paths.length;
-
-    //             for (i=0; i < paths.length; i += 1) {
-    //                 allocation.push(average_distr);
-    //             }
-
-    //             break;
-    //         } else {
-    //             var previous_cost = previous_costs_dict[last_iter][p];
-    //             var alloc = Math.exp(-explore_index*previous_cost);
-    //             allocation.push(alloc);
-    //         }
-    //     }
-    // }
-
-    // console.log(paths);
-
     $.ajax({
         url : "/graph/submit_distribution/",
         type : "POST",
@@ -367,33 +324,28 @@ function get_paths(username, iteration) {
             });
 
             $("#ex").on("slideStop", function (ev) {
-                console.log("AAAAAAAAA");
                 var ps = get_flow_allocation();
 
                 var paths = ps[0];
                 var allocation = ps[1];
 
-                // for (i=0; i < paths.length; i += 1) {
-                //     var p = paths[i];
-                //     var alloc = allocation[i];
+                var total_alloc = 0.0;
 
-                //     // $("ex" + String(p)).
-                //     var slider_p = new Slider('#ex' + String(p), {
-                //         tooltip: 'always',
-                //         formatter: function(value) {
-                //             weights[p] = alloc;
-                //             return alloc;
-                //         }
-                //     });
-                // }
+                for (i=0; i < allocation.length; i += 1) {
+                    var alloc = allocation[i];
+                    console.log(alloc);
+                    total_alloc += parseFloat(alloc);
+                }
 
-                 // var slider{{i}} = new Slider('#ex{{i}}', {
-                 //     tooltip: 'always',
-                 //     formatter: function(value) {
-                 //         weights[{{i}}] = value;
-                 //         return value/100;
-                 //     }
-                 // });
+                console.log("allocation");
+                console.log(allocation);
+
+                for (i=0; i < paths.length; i += 1) {
+                    var pa = paths[i];
+                    var alloc = allocation[i];
+                    var sl = slider_paths_dict[pa];
+                    sl.setValue((alloc/total_alloc)*100);
+                }
             });
 
 

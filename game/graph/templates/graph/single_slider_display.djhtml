@@ -60,6 +60,9 @@
           </tr>
        </thead>
         <tbody id="path-list" >
+            <script>
+             var slider_paths_dict = {};
+            </script>
             {% for i, id, weight, previous_cost, cumulative_cost, flow in path_idxs %}
                 <tr>
                     <td><a id="{{ id }}" href='#'>Path {{ i }} </a></td>
@@ -84,6 +87,8 @@
                          return value/100;
                      }
                  });
+
+                 slider_paths_dict[{{id}}] = slider{{i}};
                 </script>
             {% endfor %}
             <script type="text/javascript">
