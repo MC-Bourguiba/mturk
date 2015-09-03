@@ -58,6 +58,7 @@ $("#clear-edge-btn").click(function(e) {
 function get_flow_allocation() {
     var paths = [];
     var allocation = [];
+    var epsilon = 0.00000001;
 
     $("#path-list tr").each(function(idx, li) {
         paths.push(parseInt($(li).find("a").attr('id')));
@@ -83,7 +84,7 @@ function get_flow_allocation() {
             for (var k in Object.keys(previous_costs_dict[last_iter])) {
                 var previous_cost = previous_costs_dict[last_iter][k];
                 var previous_flow = previous_flows_dict[last_iter][k];
-                normalization += previous_flow*Math.exp(-explore_index*previous_cost);
+                normalization += (previous_flow+epsilon)*Math.exp(-explore_index*previous_cost);
             }
         }
 
@@ -100,7 +101,7 @@ function get_flow_allocation() {
             } else {
                 var previous_cost = previous_costs_dict[last_iter][p];
                 var previous_flow = previous_flows_dict[last_iter][p];
-                var alloc = previous_flow*Math.exp(-explore_index*previous_cost)/normalization;
+                var alloc = (previous_flow+epsilon)*Math.exp(-explore_index*previous_cost)/normalization;
                 allocation.push(alloc);
             }
         }
@@ -262,6 +263,7 @@ function update_from_state(username) {
             // }
 
             if (current_iteration != json['iteration']) {
+                update_slides();
                 $("#path-btns").toggle(true);
                 // update_paths(username, json['iteration']);
                 update_previous_cost(username, json['iteration']);
@@ -325,28 +327,7 @@ function get_paths(username, iteration) {
             });
 
             $("#ex").on("slideStop", function (ev) {
-                var ps = get_flow_allocation();
-
-                var paths = ps[0];
-                var allocation = ps[1];
-
-                var total_alloc = 0.0;
-
-                for (i=0; i < allocation.length; i += 1) {
-                    var alloc = allocation[i];
-                    console.log(alloc);
-                    total_alloc += parseFloat(alloc);
-                }
-
-                console.log("allocation");
-                console.log(allocation);
-
-                for (i=0; i < paths.length; i += 1) {
-                    var pa = paths[i];
-                    var alloc = allocation[i];
-                    var sl = slider_paths_dict[pa];
-                    sl.setValue((alloc/total_alloc)*100);
-                }
+                update_slides();
             });
 
 
@@ -381,6 +362,32 @@ function get_paths(username, iteration) {
             console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
         }
     });
+}
+
+
+function update_slides() {
+    var ps = get_flow_allocation();
+
+    var paths = ps[0];
+    var allocation = ps[1];
+
+    var total_alloc = 0.0;
+
+    for (i=0; i < allocation.length; i += 1) {
+        var alloc = allocation[i];
+        console.log(alloc);
+        total_alloc += parseFloat(alloc);
+    }
+
+    console.log("allocation");
+    console.log(allocation);
+
+    for (i=0; i < paths.length; i += 1) {
+        var pa = paths[i];
+        var alloc = allocation[i];
+        var sl = slider_paths_dict[pa];
+        sl.setValue((alloc/total_alloc)*100);
+    }
 }
 
 
@@ -534,20 +541,20 @@ function update_previous_cost(username, iteration) {
                 $("#previous_cost_table").text(val_total.toFixed(3));
                 $("#cumulative_cost_table").text(cum_val_total.toFixed(3));
 
-            } else {
-                for (var key in json['previous_costs']) {
-                    var index = Object.keys(previous_costs_dict).length-1;
-                    var val = previous_cost[key][index];
-                    var cum_val = cumulative_cost[key][index];
-                    $("#previous_cost_table_" + String(key)).text(val.toFixed(3));
-                    $("#cumulative_cost_table_" + String(key)).text(cum_val.toFixed(3));
-                }
+            }
 
-                for (var key in json['previous_flows']) {
-                    var index = Object.keys(previous_flows_dict).length-1;
-                    var val = previous_flow[key][index];
-                    $("#previous_flow_table_" + String(key)).text(val.toFixed(3));
-                }
+            for (var key in json['previous_costs']) {
+                var index = Object.keys(previous_costs_dict).length-1;
+                var val = previous_cost[key][index];
+                var cum_val = cumulative_cost[key][index];
+                $("#previous_cost_table_" + String(key)).text(val.toFixed(3));
+                $("#cumulative_cost_table_" + String(key)).text(cum_val.toFixed(3));
+            }
+
+            for (var key in json['previous_flows']) {
+                var index = Object.keys(previous_flows_dict).length-1;
+                var val = previous_flow[key][index];
+                $("#previous_flow_table_" + String(key)).text(val.toFixed(3));
             }
         },
 
