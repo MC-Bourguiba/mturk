@@ -69,11 +69,11 @@
                     <td><p id="previous_cost_table_{{ i }}"> {{previous_cost|floatformat:3}}</p></td>
                     <td><p id="cumulative_cost_table_{{ i }}"> {{cumulative_cost|floatformat:3}}</p></td>
                     <div style="pointer-events: none">
-                    <td>
+                    <td class="unclickable-row"">
                         <div style="float:left;" >
                             <input id="ex{{i}}" class="slider" type="text" data-slider-min="0"
                                    data-slider-max="100" data-slider-step="1" data-slider-value="{{ weight }}"
-                                   style="pointer-events: none"/>
+                                   style="pointer-events: none" />
                         </div>
                     </td>
                     </div>
@@ -91,6 +91,7 @@
                  });
 
                  slider_paths_dict[{{id}}] = slider{{i}};
+                 slider{{i}}.disable();
                 </script>
             {% endfor %}
             <script type="text/javascript">
