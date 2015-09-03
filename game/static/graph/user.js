@@ -99,7 +99,7 @@ function get_flow_allocation() {
                 break;
             } else {
                 var previous_cost = previous_costs_dict[last_iter][p];
-                var alloc = Math.exp(-explore_index*previous_cost);
+                var alloc = previous_flow*Math.exp(-explore_index*previous_cost)/normalization;
                 allocation.push(alloc);
             }
         }
