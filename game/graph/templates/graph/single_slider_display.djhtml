@@ -46,7 +46,7 @@
 
     <!-- TODO: Delete this -->
     <!-- <div style="display: none;"> -->
-    <div style="pointer-events: none">
+    <div>
     <table class="table table-hover table-bordered">
        <thead>
           <tr>
