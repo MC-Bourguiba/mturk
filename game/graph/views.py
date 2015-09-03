@@ -601,11 +601,16 @@ def current_state(request):
 
 def start_game(request):
     # TODO: Fix this, let game be addressable in root UI
+
+    print 'Trying to start game'
     game = Game.objects.get(name=current_game)
     if(game.started):
         return JsonResponse(dict())
     else:
+        print 'Calculating equilibrium flows'
         updateEquilibriumFlows(game.graph.name)
+        print 'Finished calculating equilibrium flows'
+
         game.started = True
         game.game_loop_time = datetime.now()
         game.stopped = False
