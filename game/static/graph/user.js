@@ -263,7 +263,6 @@ function update_from_state(username) {
             // }
 
             if (current_iteration != json['iteration']) {
-                update_slides();
                 $("#path-btns").toggle(true);
                 // update_paths(username, json['iteration']);
                 update_previous_cost(username, json['iteration']);
@@ -556,6 +555,8 @@ function update_previous_cost(username, iteration) {
                 var val = previous_flow[key][index];
                 $("#previous_flow_table_" + String(key)).text(val.toFixed(3));
             }
+
+            update_slides();
         },
 
         // handle a non-successful response
