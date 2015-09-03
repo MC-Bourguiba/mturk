@@ -117,6 +117,10 @@ def show_graph(request):
     except:
         pass
 
+    context['single_slider_mode'] = 'checked' if g.single_slider_mode else 'unchecked'
+
+    context['game_mode'] = 'single_slider_mode' if g.single_slider_mode else 'normal_mode'
+
     return render(request, template, context)
 
 
@@ -279,6 +283,9 @@ def get_previous_cost(request, username):
 
         # for turn in game.turns.all():
         for turn in game.turns.filter(iteration__gte=iteration-1):
+            # cache_key_t_cost = str(turn.iteration) + game.name + "get_previous_cost" + username + "t_cost"
+            # cache_key_flow_ = str(turn.iteration) + game.name + "get_previous_cost" + username + "flow"
+            # if cache.get(cache_key_t_cost):
             e_costs = turn.graph_cost.edge_costs
             t_cost = 0
             flow_distribution = FlowDistribution.objects.get(turn=turn, player=player)
@@ -370,7 +377,16 @@ def get_paths(request, username):
     flows = map(lambda x: x/total_weight, weights)
 
     html_dict = {'path_idxs': zip(path_idxs, path_ids, weights, previous_cost, cumulative_costs, flows)}
-    html = render_to_string('graph/path_display_list.djhtml', html_dict)
+
+
+    if game.single_slider_mode:
+        previous_cost_total = sum(previous_cost)
+        cumulative_cost_total = sum(cumulative_costs)
+        html_dict['previous_cost'] = previous_cost_total
+        html_dict['cumulative_cost'] = cumulative_cost_total
+        html = render_to_string('graph/single_slider_display.djhtml', html_dict)
+    else:
+        html = render_to_string('graph/path_display_list.djhtml', html_dict)
 
     response = dict()
 
@@ -694,5 +710,18 @@ def assign_duration(request):
     # begin at the *next* turn
     time_key = game.pk + get_hash(str(game.current_turn.iteration + 1))
     cache.set(time_key, game.duration)
+
+    return JsonResponse(dict())
+
+
+def set_game_mode(request):
+    data = json.loads(request.body)
+    single_slider_mode = data['single_slider']
+
+    # TODO: Fix this for multiple games
+    game = Game.objects.all()[0]
+
+    game.single_slider_mode = single_slider_mode
+    game.save()
 
     return JsonResponse(dict())

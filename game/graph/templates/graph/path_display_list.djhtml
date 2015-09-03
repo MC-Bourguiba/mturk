@@ -23,8 +23,8 @@
               <td><p id="cumulative_cost_table_{{ i }}"> {{cumulative_cost|floatformat:3}}</p></td>
               <td>
               <div style="float:left;">
-                <input id="ex{{i}}" class="slider" type="text" data-slider-min="0"
-                       data-slider-max="100" data-slider-step="1" data-slider-value="{{ weight }}"/>
+                <input class="path_slider" id="ex{{i}}" class="slider" type="text" data-slider-min="0"
+                       data-slider-max="100" data-slider-step="1" data-slider-value="{{ weight }}" />
               </div>
               </td>
               <td><p id="current_flow{{i}}"> </p></td>
@@ -32,7 +32,6 @@
             </tr>
 
             <script type="text/javascript">
-                console.log(document.getElementById("exs{{i}}"));
                 var slider{{i}} = new Slider('#ex{{i}}', {
                     tooltip: 'always',
                     formatter: function(value) {

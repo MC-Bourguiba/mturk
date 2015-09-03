@@ -51,6 +51,8 @@
 {% endblock %}
 
 {% block bottom %}
+<input id="game-mode" value="{{ game_mode }}" type="hidden" >
+
 <!-- c3 charts -->
   <div class="container-fluid">
     <div class="row">

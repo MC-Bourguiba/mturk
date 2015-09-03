@@ -13,6 +13,11 @@ var previous_flows_dict = {};
 // var has_displayed_paths = false;
 
 
+$.fn.exists = function () {
+    return this.length !== 0;
+}
+
+
 function on_node_selected(selected_node) {
 
 }
@@ -50,9 +55,7 @@ $("#clear-edge-btn").click(function(e) {
 });
 
 
-// temporary: true if user does not want to finish turn
-function submit_distribution(update_state) {
-
+function get_flow_allocation() {
     var paths = [];
     var allocation = [];
 
@@ -61,8 +64,114 @@ function submit_distribution(update_state) {
         allocation.push(parseFloat($(li).find("input")[0].value/100));
     });
 
+    var explore_index = 0.5;
+
+    if ($("#game-mode").prop("value") == "single_slider_mode") {
+        allocation = [];
+        if ($("#ex").exists()) {
+            explore_index = parseInt($("#ex")[0].value)/100;
+        }
+
+        var normalization = 1.0;
+        var last_iter = 1;
+
+        if (Object.keys(previous_costs_dict).length > 0) {
+            last_iter = Math.max.apply(Math, Object.keys(previous_costs_dict));
+
+            normalization = 0.0;
+
+            for (var k in Object.keys(previous_costs_dict[last_iter])) {
+                var previous_cost = previous_costs_dict[last_iter][k];
+                var previous_flow = previous_flows_dict[last_iter][k];
+                normalization += previous_flow*Math.exp(-explore_index*previous_cost);
+            }
+        }
+
+        for (var p in paths) {
+            if (Object.keys(previous_costs_dict).length == 0) {
+                console.log("IN HERE");
+                average_distr = 1.0/paths.length;
+
+                for (i=0; i < paths.length; i += 1) {
+                    allocation.push(average_distr);
+                }
+
+                break;
+            } else {
+                var previous_cost = previous_costs_dict[last_iter][p];
+                var alloc = Math.exp(-explore_index*previous_cost);
+                allocation.push(alloc);
+            }
+        }
+    }
+
+    console.log(allocation);
+    console.log("explore_index: ");
+    console.log(explore_index);
+    console.log(normalization);
+
+    return [paths, allocation];
+}
+
+
+// temporary: true if user does not want to finish turn
+function submit_distribution(update_state) {
+
+    var paths = [];
+    var allocation = [];
+
+    $("#path-list tr").each(function(idx, li) {
+        paths.push(parseInt($(li).find("a").attr('id')));
+        // allocation.push(parseFloat($(li).find("input")[0].value/100));
+    });
+
+    var ps = get_flow_allocation();
+
+    var paths = ps[0];
+    var allocation = ps[1];
+
+    // var explore_index = 0.5;
+
+    // if ($("#game-mode").prop("value") == "single_slider_mode") {
+    //     allocation = [];
+    //     if ($("#ex").exists()) {
+    //         explore_index = parseInt($("#ex")[0].value)/100;
+    //     }
+
+    //     var normalization = 1.0;
+    //     var last_iter = 1;
+
+    //     if (Object.keys(previous_costs_dict).length > 0) {
+    //         last_iter = Math.max.apply(Math, Object.keys(previous_costs_dict));
+
+    //         normalization = 0.0;
+
+    //         for (var k in Object.keys(previous_costs_dict[last_iter])) {
+    //             var previous_cost = previous_costs_dict[last_iter][k];
+    //             var previous_flow = previous_flows_dict[last_iter][k];
+    //             normalization += previous_flow*Math.exp(-explore_index*previous_cost);
+    //         }
+    //     }
+
+    //     for (var p in paths) {
+    //         if (Object.keys(previous_costs_dict).length == 0) {
+    //             console.log("IN HERE");
+    //             average_distr = 1.0/paths.length;
+
+    //             for (i=0; i < paths.length; i += 1) {
+    //                 allocation.push(average_distr);
+    //             }
+
+    //             break;
+    //         } else {
+    //             var previous_cost = previous_costs_dict[last_iter][p];
+    //             var alloc = Math.exp(-explore_index*previous_cost);
+    //             allocation.push(alloc);
+    //         }
+    //     }
+    // }
+
     // console.log(paths);
-    // console.log(allocation);
 
     $.ajax({
         url : "/graph/submit_distribution/",
@@ -176,7 +285,7 @@ function update_from_state(username) {
             if (json.hasOwnProperty('edge_cost')) {
                 // console.info("Setting edge_cost!!!");
                 editor_window.edge_cost = json['edge_cost'];
-                // editor_window.restart();
+                editor_window.restart();
                 // console.info(edge_cost);
             }
 
@@ -234,10 +343,8 @@ function get_paths(username, iteration) {
             // console.log(generated_paths);
             path_ids = json['path_ids'];
 
-            // if (!has_displayed_paths) {
             $("#path-display-list").html(json['html']);
             has_displayed_paths = true;
-            // }
 
             if (editor_window == null) {
                 editor_window = document.getElementById("graph-editor").contentWindow;
@@ -258,6 +365,62 @@ function get_paths(username, iteration) {
                 // console.log(generated_paths[num]);
                 editor_window.restart();
             });
+
+            $("#ex").on("slideStop", function (ev) {
+                console.log("AAAAAAAAA");
+                var ps = get_flow_allocation();
+
+                var paths = ps[0];
+                var allocation = ps[1];
+
+                // for (i=0; i < paths.length; i += 1) {
+                //     var p = paths[i];
+                //     var alloc = allocation[i];
+
+                //     // $("ex" + String(p)).
+                //     var slider_p = new Slider('#ex' + String(p), {
+                //         tooltip: 'always',
+                //         formatter: function(value) {
+                //             weights[p] = alloc;
+                //             return alloc;
+                //         }
+                //     });
+                // }
+
+                 // var slider{{i}} = new Slider('#ex{{i}}', {
+                 //     tooltip: 'always',
+                 //     formatter: function(value) {
+                 //         weights[{{i}}] = value;
+                 //         return value/100;
+                 //     }
+                 // });
+            });
+
+
+            // $("#ex").slider({
+            //     change: function(event, ui) {
+            //         console.log("AAAAAAAAA");
+            //         var ps = get_flow_allocation();
+
+            //         var paths = ps[0];
+            //         var allocation = ps[1];
+
+            //         // for (i=0; i < paths.length; i += 1) {
+            //         //     var p = paths[i];
+            //         //     var alloc = allocation[i];
+
+            //         //     // $("ex" + String(p)).
+            //         //     var slider_p = new Slider('#ex' + String(p), {
+            //         //         tooltip: 'always',
+            //         //         formatter: function(value) {
+            //         //             weights[p] = alloc;
+            //         //             return alloc;
+            //         //             // return value/100;
+            //         //         }
+            //         //     });
+            //         // }
+            //     }
+            // });
         },
 
         // handle a non-successful response
@@ -284,6 +447,8 @@ function update_previous_cost(username, iteration) {
             var previous_flow = {};
 
             // previous_costs_dict[iter_key] = {};
+
+            console.log(json);
 
             for (var key in json['previous_costs']) {
                 for (i = 0; i < json['previous_costs'][key].length; i += 1) {
@@ -402,18 +567,34 @@ function update_previous_cost(username, iteration) {
                 bindto: '#flows_chart'
             });
 
-            for (var key in json['previous_costs']) {
+            if ($("#game-mode").prop("value") == "single_slider_mode") {
                 var index = Object.keys(previous_costs_dict).length-1;
-                var val = previous_cost[key][index];
-                var cum_val = cumulative_cost[key][index];
-                $("#previous_cost_table_" + String(key)).text(Math.round(val * 1000) / 1000);
-                $("#cumulative_cost_table_" + String(key)).text(Math.round(cum_val * 1000) / 1000);
-            }
 
-            for (var key in json['previous_flows']) {
-                var index = Object.keys(previous_flows_dict).length-1;
-                var val = previous_flow[key][index];
-                $("#previous_flow_table_" + String(key)).text(Math.round(val * 1000) / 1000);
+                var val_total = 0.0;
+                var cum_val_total = 0.0;
+
+                for (var key in previous_cost) {
+                    val_total += previous_cost[key][index];
+                    cum_val_total += cumulative_cost[key][index];
+                }
+
+                $("#previous_cost_table").text(val_total.toFixed(3));
+                $("#cumulative_cost_table").text(cum_val_total.toFixed(3));
+
+            } else {
+                for (var key in json['previous_costs']) {
+                    var index = Object.keys(previous_costs_dict).length-1;
+                    var val = previous_cost[key][index];
+                    var cum_val = cumulative_cost[key][index];
+                    $("#previous_cost_table_" + String(key)).text(val.toFixed(3));
+                    $("#cumulative_cost_table_" + String(key)).text(cum_val.toFixed(3));
+                }
+
+                for (var key in json['previous_flows']) {
+                    var index = Object.keys(previous_flows_dict).length-1;
+                    var val = previous_flow[key][index];
+                    $("#previous_flow_table_" + String(key)).text(val.toFixed(3));
+                }
             }
         },
 
@@ -431,8 +612,8 @@ function startTimer(duration, display) {
         minutes = parseInt(timer / 60, 10)
         seconds = parseInt(timer % 60, 10);
 
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
+        minutes = minutes < 10 ? minutes : minutes;
+        seconds = seconds < 10 ? seconds : seconds;
 
         display.text(seconds);
 

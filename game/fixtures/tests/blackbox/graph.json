@@ -563,6 +563,7 @@
         "edge_highlight": true,
         "stopped": false,
         "duration": 30,
+        "single_slider_mode": false,
         "turns": []
     },
     "model": "graph.game",

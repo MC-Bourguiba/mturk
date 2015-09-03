@@ -58,5 +58,7 @@ urlpatterns = patterns('',
                            name='save_data'),
                        url(r'^assign_duration/$', views.assign_duration,
                            name='assign_duration'),
+                       url(r'^set_game_mode/$', views.set_game_mode,
+                           name='set_game_mode'),
                        # url(r'^get_duration/$', view.get_duration, name='get_duration'),
 )

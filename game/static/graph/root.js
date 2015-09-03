@@ -1,7 +1,6 @@
 var graph_name = "";
 
 
-
 $('#turn-on-edge').click(function(evt) {
     $.ajax({
         url : "/graph/start_edge_highlight/",
@@ -80,6 +79,36 @@ $('#load-graph-btn').click(function(evt) {
         update_user_cost(graph_name);
         current_graph = graph_name;
     }
+});
+
+
+$('#slider-game-mode-input').click(function() {
+    var set_single_slider = false;
+    if($("#slider-game-mode-input").prop("checked")){
+        set_single_slider = true;
+        // console.log("single slider checked!!!");
+        // } else {
+        //     set_single_slider = false;
+        //     // console.log("single slider unchecked!!!");
+    }
+
+    $.ajax({
+        url : "/graph/set_game_mode/",
+        type : "POST",
+
+        data : JSON.stringify({
+            'single_slider' : set_single_slider
+        }),
+
+        success : function(json) {
+            console.log(json);
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
 });
 
 
@@ -549,6 +578,7 @@ $("#assign-flow-btn").click(function(e) {
         }
     });
 });
+
 
 $("#assign-duration-btn").click(function(e) {
     e.preventDefault();
