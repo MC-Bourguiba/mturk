@@ -21,7 +21,7 @@
                <td><p id="cumulative_cost_table"> {{cumulative_cost|floatformat:3}}</p></td>
                <td>
                    <div style="float:left" id="ex" data-slider-min="0"
-                       data-slider-max="500" data-slider-step="1" data-slider-value=0.5>
+                       data-slider-max="200" data-slider-step="1" data-slider-value=0.5>
                        <!-- <input id="ex" class="slider" type="text" data-slider-min="0"
                        data-slider-max="500" data-slider-step="1" data-slider-value=0.5 /> -->
                    </div>
