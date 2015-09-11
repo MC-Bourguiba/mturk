@@ -126,6 +126,7 @@ def computeEquilibrium(dimensions, gradientFunctions, precision):
     delta = 1
     t = 0
     while(delta > precision):
+        print 'iteration %d' % t
         xs_plus = [entropicDescentUpdate(x, g, t) for (x, g) in zip(xs, gs)]
         gs_plus = gradientFunctions(xs_plus)
         c_plus = cost(xs_plus, gs_plus)
