@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'bootstrapform',
     'graph',
     'silk',
+    'django_shell_ipynb',
     # 'bootstrap3',
 )
 
@@ -54,7 +55,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'silk.middleware.SilkyMiddleware',
+    # 'silk.middleware.SilkyMiddleware',
 )
 
 DATABASES = {
