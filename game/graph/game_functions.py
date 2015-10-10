@@ -84,8 +84,6 @@ def create_flow_distribution(game, player, allocation, path_ids, turn):
 
     return flow_distribution
 
-    return None
-
 
 def calculate_maximum_flow(game):
     """
@@ -115,7 +113,7 @@ def evalFunc(func, xVal):
     return eval(func)
 
 
-def calculate_edge_flow(current_turn, game):
+def calculate_edge_flow(current_turn, game, use_cache=True):
     """
     Returns dictionary, keys are the edge id's and
     the values are the flow on the edge.
@@ -131,7 +129,7 @@ def calculate_edge_flow(current_turn, game):
         path_ids = []
 
         # Check the cache
-        if cache.get(get_hash(player.user.username) + 'allocation'):
+        if use_cache and cache.get(get_hash(player.user.username) + 'allocation'):
             allocation = cache.get(get_hash(player.user.username) + 'allocation')
             path_ids = cache.get(get_hash(player.user.username) + 'path_ids')
             if player.user.username == 'u1':

@@ -154,7 +154,6 @@ def pathLossFunctions(costFunctions, adjMatrices, masses):
         return [np.dot(adjMatrix.T, edgeCosts) for adjMatrix in adjMatrices]
     return lossFunctions
 
-
 def computeRoutingGameEquilibrium(costFunctions, adjMatrices, masses, precision = .000000001):
     dimensions = [np.size(adjMatrix, 1) for adjMatrix in adjMatrices]
     gradientFunction = pathLossFunctions(costFunctions, adjMatrices, masses)

@@ -166,38 +166,48 @@ We estimate the learning rate, $\hat \eta^k_t$,  of the players at turn $t$ by
 \]
 
 
-From these estimated learning rate sequence, we then estimate the flow distribution of iteration $t+1$ using $\hat \eta^k_t $ and $x_k^{(t)}$ with \ref{eq:KL_update}.
-
-
-\subsection{III}
-
-In the second version of the game, each player were only to change a single parameter $\eta$. This parameter controls how much each player want to explore from their previous flow distribution according to
 
 \begin{equation} \label{eq:KL_update}
   (x_k^{(t+1)})_i = \frac{e^{-\eta_t^k (\ell^{(t)}_k)_i}}{\sum_j (x_k^{(t)})_i e^{-\eta_t^k (\ell^{(t)}_k)_i}}
 \end{equation}
 
-. The parameter for each turn is shown in \ref{fig:exploration}. We use a small $\epsilon$ to ensure that we will have no underflow for $x_k^{(t)}$ for numerical purposes. Then \ref{eq:KLupdate} becomes
 
-\begin{equation} \label{eq:KL_update_epsilon}
-  (x_k^{(t+1)})_i = \frac{e^{-\eta_t^k (\ell^{(t)}_k)_i}}{\sum_j (x_k^{(t)})_i e^{-\eta_t^k (\ell^{(t)}_k)_i}}
-\end{equation}
+From these estimated learning rate sequence, we then estimate the flow distribution of iteration $t+1$ using $\hat \eta^k_t $ and $x_k^{(t)}$ with \ref{eq:KL_update}.
 
 
 \begin{figure}
   \centering
-  \includegraphics[width=80mm]{images/slider_players_costs.png}
-  \caption{Player normalized cost for slider version.}
-  \label{fig:cost_slider}
+  \includegraphics[width=80mm]{images/no_slider_KL_divergence_surface.png}
+  \caption{KL Divergence surface.}
+  \label{fig:kl_divergence_surface}
 \end{figure}
 
 
-\begin{figure}
-  \centering
-  \includegraphics[width=80mm]{images/players_learning_rate.png}
-  \caption{Player exploration rate.}
-  \label{fig:exploration}
-\end{figure}
+% \subsection{III}
+
+% In the second version of the game, each player were only to change a single parameter $\eta$. This parameter controls how much each player want to explore from their previous flow distribution according to
+
+% % . The parameter for each turn is shown in \ref{fig:exploration}. We use a small $\epsilon$ to ensure that we will have no underflow for $x_k^{(t)}$ for numerical purposes. Then \ref{eq:KLupdate} becomes
+
+% % \begin{equation} \label{eq:KL_update_epsilon}
+% %   (x_k^{(t+1)})_i = \frac{e^{-\eta_t^k (\ell^{(t)}_k)_i}}{\sum_j (x_k^{(t)})_i e^{-\eta_t^k (\ell^{(t)}_k)_i}}
+% % \end{equation}
+
+
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=80mm]{images/slider_players_costs.png}
+%   \caption{Player normalized cost for slider version.}
+%   \label{fig:cost_slider}
+% \end{figure}
+
+
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=80mm]{images/players_learning_rate.png}
+%   \caption{Player exploration rate.}
+%   \label{fig:exploration}
+% \end{figure}
 
 
 
