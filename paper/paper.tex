@@ -138,7 +138,7 @@ In the first version of the game, each player were allowed sliders to change how
 
 \begin{figure}
   \centering
-  \includegraphics[width=80mm]{images/no_slider_players_costs.png}
+  \includegraphics[width=80mm]{images/no_slider_players_costs}
   \caption{Player normalized cost for no slider version.}
   \label{fig:cost_no_slider}
 \end{figure}
@@ -165,21 +165,25 @@ We estimate the learning rate, $\hat \eta^k_t$,  of the players at turn $t$ by
   \hat \eta^k_t = \arg\min_{\eta \geq 0} D_{\psi_k}(\hat x_k^{(t+1)}(\eta), x^{(t+1)}_k)
 \]
 
-
-
 \begin{equation} \label{eq:KL_update}
   (x_k^{(t+1)})_i = \frac{e^{-\eta_t^k (\ell^{(t)}_k)_i}}{\sum_j (x_k^{(t)})_i e^{-\eta_t^k (\ell^{(t)}_k)_i}}
 \end{equation}
 
-
 From these estimated learning rate sequence, we then estimate the flow distribution of iteration $t+1$ using $\hat \eta^k_t $ and $x_k^{(t)}$ with \ref{eq:KL_update}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=80mm]{images/no_slider_KL_divergence_surface}
+  \caption{KL Divergence surface.}
+  \label{fig:kl_divergence_surface}
+\end{figure}
 
 
 \begin{figure}
   \centering
-  \includegraphics[width=80mm]{images/no_slider_KL_divergence_surface.png}
-  \caption{KL Divergence surface.}
-  \label{fig:kl_divergence_surface}
+  \includegraphics[width=80mm]{images/no_slider_global_potential_function}
+  \caption{Global potential function.}
+  \label{fig:global_potential_function}
 \end{figure}
 
 
