@@ -1,5 +1,6 @@
 \documentclass{sig-alternate-ipsn13}
 
+\input{latex_commands}
 \begin{document}
 
 \title{Estimating learning dynamics in the routing game
@@ -30,7 +31,7 @@
 % without further effort on your part as the last section in
 % the body of your article BEFORE References or any Appendices.
 
-\numberofauthors{8} %  in this sample file, there are a *total*
+\numberofauthors{3} %  in this sample file, there are a *total*
 % of EIGHT authors. SIX appear on the 'first-page' (for formatting
 % reasons) and the remaining two appear in the \additionalauthors section.
 %
@@ -46,6 +47,15 @@
 % e-mail address with \email.
 %
 % 1st. author
+\alignauthor Kiet Lam\\
+\affaddr{UC Berkeley}
+\email{\small\texttt{kiet.lam@berkeley.edu}}
+\alignauthor Walid Krichene\\
+\affaddr{UC Berkeley}
+\email{\small\texttt{walid@eecs.berkeley.edu}}
+\alignauthor Alexandre Bayen\\
+\affaddr{UC Berkeley}
+\email{\small\texttt{bayen@berkeley.edu}}
 % \alignauthor
 % Ben Trovato\titlenote{Dr.~Trovato insisted his name be first.}\\
 %        \affaddr{Institute for Clarity in Documentation}\\
@@ -101,7 +111,6 @@
 
 \maketitle
 \begin{abstract}
-
   The routing game models congestion on transportation and communication networks.
   We consider an online learning model of player dynamics: at each iteration, every player chooses an route (or a probability distribution over routes), then the joint decision of all players determines the costs of each path, which are then revealed to the players. We first review convergence guarantees of such online learning dynamics. Then, we consider the following estimation problem: given a sequence of player decisions and the corresponding costs, we would like to fit the learning model parameters to these observations. We consider in particular entropic mirror descent dynamics, and develop a numerical solution to the estimation problem.
 
@@ -111,19 +120,70 @@
 
 \end{abstract}
 
+%============================================================================================
 \section{Introduction}
+The routing game is a non-cooperative game that models congestion in transportation and communication networks. The game is given by a directed graph that represents the network, and each player is given by a source node and destination node, and seeks to send traffic (either packets in a communication setting, or cars in a  transportation setting) while minimizing the total delay of that traffic. The delay is determined by the joint decision of all players, such that whenever an edge has high load, it becomes congested and any traffic using that edge incurs additional delay.
 
-% Sections go here.  An example of figures is shown in Figure~\ref{fig:example}.
+This model of congestion is simple yet powerful, and routing games have been studied extensively since the seminal work of Beckman~\cite{beckmann1955studies}. The Nash equilibria of the game are simple to characterize, and have been used to quantify the inefficiency of the network, using the price of anarchy~\cite{roughgarden2002bad}. However, the Nash equilibrium concept may not offer a good descriptive model of actual behavior of players, as argued by many authors, including for example~\cite{fox2013population}. Besides the assumption of rationality, which can be questioned, the Nash equilibrium assumes that players have a complete description of the structure of the game, their cost functions, and the cost functions of other players. This model is arguably not very realistic for the routing game, as one does not expect users of a network to have an accurate representation of the cost function on every edge of the network, or of the other users of the network.
+One alternative to the Nash equilibrium concept is a model of repeated play, sometimes called learning models or adjustment models. In such models, one assumes that each player makes decisions iteratively, and uses the outcome of each iteration to adjust their next decision. Formally, if $x_k^{(t)}$ is the decision of player $k$ at iteration $t$, and $\ell^{(t)}_k$ is the corresponding vector of costs, then player $k$ faces a sequential decision problem in which she chooses $x^{(t)}_k$ then observes $\ell_k^{(t)}$. These sequential decision problems are coupled through the cost functions, since $\ell_k^{(t)}$ depends not only on $x_k^{(t)}$ but also on $x_{k'}^{(t)}$ for $k' \neq k$ (but players do not necessarily model this coupling). Such models have a long history in game theory, and date back to the work of Hannan~\cite{hannan1957approximations} and Blackwell~\cite{blackwell1956analog}.
 
-% \begin{figure}
-% \centering
-% \epsfig{file=fly.eps}
-% \caption{A sample black and white graphic (.eps format).}
-% \label{fig:example}
-% \end{figure}
+When designing a model of player decisions, many properties are desirable. Perhaps the most important property is that the dynamics should be consistent with the equilibrium of the game, in the following sense: asymptotically, one should expect the learning dynamics to converge to the equilibrium of the full information, one-shot game (be it Nash equilibrium or other, more general equilibrium concepts). In this sense, players ``learn'' the equilibrium asymptotically. Much progress has been made in recent years in characterizing classes of learning dynamics which are guaranteed to converge to an equilibrium set~\cite{freund1999adaptive, hart2001general, hart2005adaptive, fox2013population}. In particular for the routing game, different models of learning have been studied for example by~\cite{fischer2004evolution,blum2006routing,kleinberg2009multiplicative,krichene2015learning,krichene2015SMD}.
 
+In this paper, we briefly review some of the known models of learning in the routing game. We focus in particular on the mirror descent model used in~\cite{krichene2015SMD}. This model describes the dynamics of the learning as solving, at each step, a simple minimization problem parameterized by a learning rate. Formally, the decision at iteration $t+1$ is obtained by solving
+\[
+x^{(t+1)}(\eta) = \argmin_{x_k \in \Delta^{\Acal_k}} \braket{x}{\ell^{(t)}_k} + \frac{1}{\eta} D_\psi(x_k, x^{(t)}_k),
+\]
+where $\psi$ is a distance generating function with corresponding Bregman divergence $D_\psi$, and $\eta^{(t)}$ is a learning rate. The model is reviewed in detail in Section~\ref{sec:model}. Intuitively, the learning rate $\eta_k^{(t)}$ determines how aggressive the player is when updating her strategy: a small learning rate results in a small change in strategy (i.e. $x^{(t+1)}_k$ is close to $x_k^{(t)}$), while a large learning rate results in a significant change.
+
+Motivated by this interpretation of learning rates, we propose in Section~\ref{sec:estimation}, the following estimation problem: given a sequence of player decisions $(x^{(t)}_k)_t$, and the sequence of corresponding losses $(\ell_k^{(t)})$, can we fit a learning model to these observations? A simple approach is to assume that the player is using a given distance generating function $\psi$, and estimate $\eta$ for example by minimizing the distance between the observed decision $\bar x^{(t+1)}$, and the decision predicted by the model, $x^{(t+1)}(\eta)$. More precisely, we can choose $\eta^{(t)}$ to minimize $D_\psi(\bar x^{(t+1)}, x^{(t+1)}(\eta))$. We show that in the entropic case (when $\psi$ is the negative entropy), this problem is convex, thus $\eta^{(t)}$ can be estimated efficiently e.g. by using gradient descent. This method allows us to estimate one parameter $\eta^{(t)}$ per iteration $t$. When we have a sequence of observations available, it can be desirable to control the complexity of the model by assuming a parameterized sequence of learning rates. Thus, we propose a second method which assumes that the learning rate is of the form $\eta^{(t)} = \eta^{(0)} t^{-\alpha}$, with $\alpha \in (0, 1)$. The resulting estimation problem is non-convex in general, but since it is a two dimensional problem, it can be solved efficiently. Finally, we consider a family of distance generating functions $\psi_\epsilon$, parameterized by $\epsilon$, that can be viewed as a generalization of the negative entropy function. These generalized entropy functions also offer some desirable properties that we discuss in Section~\ref{sec:estimation}. We also briefly discuss potential uses for the estimated model: for example, the model can be used simply to predict the decision of the players over the next few iterations, by propagating the model forward with the estimated values of the parameters; more generally, the model can be used to formulate a receding-horizon optimal control problem, by using the current estimate of the model as a plant in the control problem.
+
+In the second part of the paper, we present an experimental setting which we developed to collect data on routing decisions. We developed a web interface in which a master user can create an instance of the routing game by defining a graph and cost functions on edges of the graph. Then other users can connect to the interface as players. The game then proceeds similarly to our learning model: at each iteration, every player chooses a flow distribution on their available routes (using a graphical interface with sliders), then their decisions are sent to a backend server, which computes the total cost of each route, and sends back this information to each player. In Section~\ref{sec:experiment}, we describe the experimental setting, some implementation details, as well as the nature of the collected data. We then use this data to run the estimation tasks which were proposed in Section~\ref{sec:estimation}, and give some qualitative and quantitative insights into the behavior of players. In particular, we observed that in the first few iterations, the flow distributions oscillate, which corresponds to a high value of estimated learning rates. For later oscillations, the flow distributions are, in general, close to equilibrium, and the learning rates are lower, although some players may occasionally move the system away from equilibrium by performing an aggressive update (corresponding to a high learning rate). It is also interesting to observe that in some cases, a player may .
+
+We also solve the decay rate estimation problem
+
+%============================================================================================
+\section{The routing game and the learning model}
+\label{sec:model}
+
+\subsection{The routing game}
+\label{sec:routing_game}
+
+
+
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+\subsection{The learning model}
+\label{sec:learning}
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+\subsection{Mirror descent dynamics and brief review of convergence results}
+
+%============================================================================================
+\section{Learning model estimation}
+\label{sec:estimation}
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+\subsection{Estimating a single learning rate}
+
+
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+\subsection{Estimating the decay rate of the learning rate sequence}
+
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+\subsection{A parameterized family of distance generating functions}
+
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+\subsection{Application to prediction and receding horizon control}
+
+
+%============================================================================================
+\newpage
 \section{Experiment}
+\label{sec:experiment}
 
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \subsection{I}
 
 Two versions of the game were presented to the user. One version of the game allowed each player to select the flow distribution for each path, the other version of the game only allowed the player to choose an ``exploration'' parameter, which selects the flow distribution for the players based on the KL-divergence.
@@ -133,6 +193,7 @@ The players interfaced with the game through a web interface where they can ente
 The cost for each player's distribution were normalized by the calculated equilibrium flow to account for imbalances in the network.
 
 
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \subsection{II}
 In the first version of the game, each player were allowed sliders to change how much of the flow are distributed to each path. All paths for a player have the same origin and destination node pair, but each player had unique origin and destination node pair.
 
@@ -164,6 +225,15 @@ We estimate the learning rate, $\hat \eta^k_t$,  of the players at turn $t$ by
 \[
   \hat \eta^k_t = \arg\min_{\eta \geq 0} D_{\psi_k}(\hat x_k^{(t+1)}(\eta), x^{(t+1)}_k)
 \]
+
+
+From these estimated learning rate sequence, we then estimate the flow distribution of iteration $t+1$ using $\hat \eta^k_t $ and $x_k^{(t)}$ with \ref{eq:KL_update}.
+
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+\subsection{III}
+
+In the second version of the game, each player were only to change a single parameter $\eta$. This parameter controls how much each player want to explore from their previous flow distribution according to
 
 \begin{equation} \label{eq:KL_update}
   (x_k^{(t+1)})_i = \frac{e^{-\eta_t^k (\ell^{(t)}_k)_i}}{\sum_j (x_k^{(t)})_i e^{-\eta_t^k (\ell^{(t)}_k)_i}}
@@ -222,21 +292,27 @@ From these estimated learning rate sequence, we then estimate the flow distribut
 %   \caption{Player exploration rate.}
 %   \label{fig:exploration}
 % \end{figure}
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
+
+
+%============================================================================================
 \section{Conclusions}
 Conclusion goes here.
 
+%============================================================================================
 %ACKNOWLEDGMENTS are optional
 \section*{Acknowledgments}
 Acknowledgement goes here.
 
+%============================================================================================
 %
 % The following two commands are all you need in the
 % initial runs of your .tex file to
 % produce the bibliography for the citations in your paper.
 \bibliographystyle{abbrv}
-\bibliography{sigproc}  % sigproc.bib is the name of the Bibliography in this case
+\bibliography{bib}  % sigproc.bib is the name of the Bibliography in this case
 % You must have a proper ".bib" file
 %  and remember to run:
 % latex bibtex latex latex
@@ -246,6 +322,7 @@ Acknowledgement goes here.
 %
 %APPENDICES are optional
 %\balancecolumns
+%============================================================================================
 \appendix
 %Appendix A
 
