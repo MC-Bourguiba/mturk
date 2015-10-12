@@ -21,6 +21,7 @@
 \citation{fox2013population}
 \citation{hannan1957approximations}
 \citation{blackwell1956analog}
+\citation{cesa2006prediction}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{\thepage }{section.1}}
 \citation{freund1999adaptive}
 \citation{hart2001general}
@@ -31,18 +32,46 @@
 \citation{kleinberg2009multiplicative}
 \citation{krichene2015learning}
 \citation{krichene2015SMD}
-\citation{krichene2015SMD}
+\citation{krichene2015MD}
+\citation{sandholm2001potential}
+\citation{krichene2015learning}
+\citation{rosenthal1973class}
+\citation{roughgarden2002bad}
+\citation{boyd2010convex}
+\citation{krichene2015MD}
 \@writefile{toc}{\contentsline {section}{\numberline {2}The routing game and the learning model}{\thepage }{section.2}}
 \newlabel{sec:model}{{2}{\thepage }{The routing game and the learning model}{section.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1}The routing game}{\thepage }{subsection.2.1}}
 \newlabel{sec:routing_game}{{2.1}{\thepage }{The routing game}{subsection.2.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}The learning model}{\thepage }{subsection.2.2}}
-\newlabel{sec:learning}{{2.2}{\thepage }{The learning model}{subsection.2.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Mirror descent dynamics and brief review of convergence results}{\thepage }{subsection.2.3}}
+\@writefile{thm}{\contentsline {remark}{{Remark}{1}{A note on the player model}}{\thepage }{remark.1}}
+\@writefile{thm}{\contentsline {definition}{{Definition}{1}{Nash equilibrium}}{\thepage }{definition.1}}
+\@writefile{thm}{\contentsline {proposition}{{Proposition}{1}{Rosenthal potential}}{\thepage }{proposition.1}}
+\citation{krichene2015MD}
+\citation{beck2003mirror}
+\citation{kivinen1997exponentiated}
+\citation{nemirovski1983problem}
+\citation{krichene2015MD}
+\citation{krichene2015MD}
+\citation{krichene2015SMD}
+\citation{krichene2015SMD}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}The learning model: mirror descent dynamics}{\thepage }{subsection.2.2}}
+\newlabel{sec:learning}{{2.2}{\thepage }{The learning model: mirror descent dynamics}{subsection.2.2}{}}
+\newlabel{eq:MD_update}{{1}{\thepage }{The learning model: mirror descent dynamics}{equation.1}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Distributed mirror descent dynamics with distance generating function $\psi _k$ and learning rates $\eta _k^{(t)}$.}}{\thepage }{algorithm.1}}
+\newlabel{alg:MD}{{1}{\thepage }{The learning model: mirror descent dynamics}{algorithm.1}{}}
+\@writefile{thm}{\contentsline {theorem}{{Theorem}{1}{Theorem~3 in~\cite {krichene2015MD}}}{\thepage }{theorem.1}}
+\newlabel{thm:convergence}{{1}{\thepage }{The learning model: mirror descent dynamics}{theorem.1}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {3}Learning model estimation}{\thepage }{section.3}}
 \newlabel{sec:estimation}{{3}{\thepage }{Learning model estimation}{section.3}{}}
+\citation{beck2003mirror}
+\citation{boyd2010convex}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Estimating a single learning rate}{\thepage }{subsection.3.1}}
+\newlabel{eq:MD_update_estimation}{{2}{\thepage }{Estimating a single learning rate}{equation.2}{}}
+\newlabel{eq:estimation_eta}{{3}{\thepage }{Estimating a single learning rate}{equation.3}{}}
+\@writefile{thm}{\contentsline {theorem}{{Theorem}{2}{}}{\thepage }{theorem.2}}
+\newlabel{eq:hedge_solution}{{4}{\thepage }{Estimating a single learning rate}{equation.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Estimating the decay rate of the learning rate sequence}{\thepage }{subsection.3.2}}
+\newlabel{eq:estimation_alpha_eta0}{{5}{\thepage }{Estimating the decay rate of the learning rate sequence}{equation.5}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.3}A parameterized family of distance generating functions}{\thepage }{subsection.3.3}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Application to prediction and receding horizon control}{\thepage }{subsection.3.4}}
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Player normalized cost for no slider version.}}{\thepage }{figure.1}}
@@ -54,7 +83,7 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.3}III}{\thepage }{subsection.4.3}}
 \bibstyle{abbrv}
 \bibdata{bib}
-\bibcite{beckmann1955studies}{1}
+\bibcite{beck2003mirror}{1}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Predicted path cost.}}{\thepage }{figure.2}}
 \newlabel{fig:predicted_path_cost}{{2}{\thepage }{Predicted path cost}{figure.2}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Player flow distribution.}}{\thepage }{figure.3}}
@@ -63,19 +92,28 @@
 \newlabel{fig:cost_slider}{{4}{\thepage }{Player normalized cost for slider version}{figure.4}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Player exploration rate.}}{\thepage }{figure.5}}
 \newlabel{fig:exploration}{{5}{\thepage }{Player exploration rate}{figure.5}{}}
-\newlabel{eq:KL_update}{{1}{\thepage }{III}{equation.1}{}}
-\newlabel{eq:KL_update_epsilon}{{2}{\thepage }{III}{equation.2}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Conclusions}{\thepage }{section.5}}
+\newlabel{eq:KL_update}{{6}{\thepage }{III}{equation.6}{}}
+\newlabel{eq:KL_update_epsilon}{{7}{\thepage }{III}{equation.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Conclusion}{\thepage }{section.5}}
+\newlabel{sec:conclusion}{{5}{\thepage }{Conclusion}{section.5}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {6}References}{\thepage }{section.6}}
-\bibcite{blackwell1956analog}{2}
-\bibcite{blum2006routing}{3}
-\bibcite{fischer2004evolution}{4}
-\bibcite{fox2013population}{5}
-\bibcite{freund1999adaptive}{6}
-\bibcite{hannan1957approximations}{7}
-\bibcite{hart2005adaptive}{8}
-\bibcite{hart2001general}{9}
-\bibcite{kleinberg2009multiplicative}{10}
-\bibcite{krichene2015SMD}{11}
-\bibcite{krichene2015learning}{12}
-\bibcite{roughgarden2002bad}{13}
+\bibcite{beckmann1955studies}{2}
+\bibcite{blackwell1956analog}{3}
+\bibcite{blum2006routing}{4}
+\bibcite{boyd2010convex}{5}
+\bibcite{cesa2006prediction}{6}
+\bibcite{fischer2004evolution}{7}
+\bibcite{fox2013population}{8}
+\bibcite{freund1999adaptive}{9}
+\bibcite{hannan1957approximations}{10}
+\bibcite{hart2005adaptive}{11}
+\bibcite{hart2001general}{12}
+\bibcite{kivinen1997exponentiated}{13}
+\bibcite{kleinberg2009multiplicative}{14}
+\bibcite{krichene2015SMD}{15}
+\bibcite{krichene2015learning}{16}
+\bibcite{krichene2015MD}{17}
+\bibcite{nemirovski1983problem}{18}
+\bibcite{rosenthal1973class}{19}
+\bibcite{roughgarden2002bad}{20}
+\bibcite{sandholm2001potential}{21}

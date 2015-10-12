@@ -1,5 +1,11 @@
 \begin{thebibliography}{10}
 
+\bibitem{beck2003mirror}
+A.~Beck and M.~Teboulle.
+\newblock Mirror descent and nonlinear projected subgradient methods for convex
+  optimization.
+\newblock {\em Oper. Res. Lett.}, 31(3):167--175, May 2003.
+
 \bibitem{beckmann1955studies}
 M.~J. Beckmann, C.~B. McGuire, and C.~B. Winsten.
 \newblock Studies in the economics of transportation.
@@ -17,6 +23,16 @@ A.~Blum, E.~Even-Dar, and K.~Ligett.
 \newblock In {\em Proceedings of the twenty-fifth annual ACM symposium on
   Principles of distributed computing}, PODC '06, pages 45--52, New York, NY,
   USA, 2006. ACM.
+
+\bibitem{boyd2010convex}
+S.~Boyd and L.~Vandenberghe.
+\newblock {\em {Convex Optimization}}, volume~25.
+\newblock Cambridge University Press, 2010.
+
+\bibitem{cesa2006prediction}
+N.~Cesa-Bianchi and G.~Lugosi.
+\newblock {\em Prediction, learning, and games}.
+\newblock Cambridge University Press, 2006.
 
 \bibitem{fischer2004evolution}
 S.~Fischer and B.~V{\"o}cking.
@@ -48,6 +64,11 @@ S.~Hart and A.~Mas-Colell.
 \newblock A general class of adaptive strategies.
 \newblock {\em Journal of Economic Theory}, 98(1):26 -- 54, 2001.
 
+\bibitem{kivinen1997exponentiated}
+J.~Kivinen and M.~K. Warmuth.
+\newblock Exponentiated gradient versus gradient descent for linear predictors.
+\newblock {\em Information and Computation}, 132(1):1 -- 63, 1997.
+
 \bibitem{kleinberg2009multiplicative}
 R.~Kleinberg, G.~Piliouras, and E.~Tardos.
 \newblock Multiplicative updates outperform generic no-regret learning in
@@ -67,9 +88,29 @@ W.~Krichene, B.~Drigh{\`e}s, and A.~Bayen.
 \newblock Learning nash equilibria in congestion games.
 \newblock {\em SIAM Journal on Control and Optimization (SICON)}, 2015.
 
+\bibitem{krichene2015MD}
+W.~Krichene, S.~Krichene, and A.~Bayen.
+\newblock Convergence of mirror descent dynamics in the routing game.
+\newblock In {\em European Control Conference (ECC)}, 2015.
+
+\bibitem{nemirovski1983problem}
+A.~S. Nemirovsky and D.~B. Yudin.
+\newblock {\em Problem complexity and method efficiency in optimization}.
+\newblock Wiley-Interscience series in discrete mathematics. Wiley, 1983.
+
+\bibitem{rosenthal1973class}
+R.~W. Rosenthal.
+\newblock A class of games possessing pure-strategy nash equilibria.
+\newblock {\em International Journal of Game Theory}, 2(1):65--67, 1973.
+
 \bibitem{roughgarden2002bad}
 T.~Roughgarden and {\'E}.~Tardos.
 \newblock How bad is selfish routing?
 \newblock {\em Journal of the ACM (JACM)}, 49(2):236--259, 2002.
+
+\bibitem{sandholm2001potential}
+W.~H. Sandholm.
+\newblock Potential games with continuous player sets.
+\newblock {\em Journal of Economic Theory}, 97(1):81--108, 2001.
 
 \end{thebibliography}
