@@ -178,13 +178,13 @@ The routing game is played on a directed graph $\Gcal = (V, E)$, where $V$ is a 
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \begin{definition}[Nash equilibrium]
-A distribution $x^\star = (x_1^\star, \dots, x_K^\star)$ is a Nash equilibrium if it satisfies the following condition: for all other distributions $x = (x_1, \dots, x_K)$ and for all~$k$,
+A distribution $x^\star = (x_1^\star, \dots, x_K^\star)$ is a Nash equilibrium if it satisfies the following condition: for all other feasible  distributions $x = (x_1, \dots, x_K)$ and for all~$k$,
 \[
 \braket{\ell_k(x^\star)}{x_k - x_k^\star} \geq 0.
 \]
 \end{definition}
 In words, $x^\star$ is a Nash equilibrium if for every player $k$, the expected cost under $x_k^\star$ is lower than the expected cost under any other distribution $x_k$. If we define the inner product $\braket{x}{\ell} = \sum_{k} \braket{x_k}{\ell_k}$, then this is equivalent to: $x^\star$ is an equilibrium if and only if $\braket{\ell(x^\star)}{x - x^\star} \geq 0$ for all feasible $x$. This variational inequality is, in fact, equivalent to the first-order optimality condition of the following potential function, usually referred to as the Rosenthal potential, in reference to~\cite{rosenthal1973class}:
-\begin{proposition}[Rosenthal potential]
+\begin{proposition}[Existence of a convex potential]
 Consider a routing game and define the following function
 \[
 f(x) = \sum_{e \in E} \int_0^{\phi_e(x)} c_e(u)du.
@@ -227,7 +227,7 @@ The mirror descent method is a general method for convex optimization proposed i
 The convergence of this distributed learning model is discussed in~\cite{krichene2015MD}. In particular, the learning dynamics is guaranteed to converge under the following assumptions:
 \begin{theorem}[Theorem~3 in~\cite{krichene2015MD}]
 \label{thm:convergence}
-Consider the routing game with mirror descent dynamics defined in Algorithm~\ref{alg:MD}, and suppose that for all $k$, $\eta_k^{(t)}$ is decreasing and converges to $0$. Then $f(x^{(t)}) - f^\star = \Ocal\parenth{\sum_k \frac{1}{t\eta_k^{(t)}} + \frac{\sum_{\tau = 1}^t \eta_k^{(\tau)}}{t} }$.
+Consider the routing game with mirror descent dynamics defined in Algorithm~\ref{alg:MD}, and suppose that for all $k$, $\eta_k^{(t)}$ is decreasing to~$0$. Then $f(x^{(t)}) - f^\star = \Ocal\parenth{\sum_k \frac{1}{t\eta_k^{(t)}} + \frac{\sum_{\tau = 1}^t \eta_k^{(\tau)}}{t} }$.
 \end{theorem}
 
 In particular, if $\eta_k^{(t)} = \eta^{(0)}_k t^{-\alpha_k}$, with $\alpha_k \in (0, 1)$, then one can bound the sum $\sum_{\tau = 1}^t \eta_k^{(t)} = \eta^{(0)}_k \sum_{\tau = 1}^t \tau^{-\alpha_k} \leq \eta^{(0)}_k \int_0^t \tau^{-\alpha_k} d\tau = \frac{\eta^{(0)}_k}{1-\alpha_k} t^{1-\alpha_k}$. Therefore, $f(x^{(t)}) - f^\star = \Ocal(t^{\alpha_k - 1}) + \Ocal(t^{-\alpha_k}) = \Ocal(t^{-\min(\alpha_k, 1-\alpha_k)})$.
@@ -459,18 +459,20 @@ We also compare these methods with a parameterized sequence of learning rate in 
 %============================================================================================
 \section{Conclusion}
 \label{sec:conclusion}
-Conclusion goes here.
+We proposed a problem of model estimation in the routing game, to fit a distributed learning model to sequential observations of player decisions. The estimated model can then be used to predict the decisions at future iterations, or, more generally, as a plant model in an optimal control problem.
 
-%============================================================================================
-%ACKNOWLEDGMENTS are optional
-\section*{Acknowledgments}
-Acknowledgement goes here.
+We considered in particular a model based on the mirror descent algorithm, parameterized by a DGF $\psi_k$ and a sequence of learning rates $(\eta^{(t)}_k)$, and gave an intuitive interpretation of how this model can describe player behavior. We showed that the problem of estimating one term of the learning rate sequence is convex in the case of the KL divergence (it remains open to prove this result for general Bregman divergences). To control the complexity of the model and to make the estimation consistent with the theoretical assumptions (decreasing learning rates), we proposed to parameterize the sequence with an initial term $\eta_k^{(0)}$ and a decay rate $\alpha_k \in (0, 1)$. When we tested these methods on data collected from our routing game interface, the parameterized sequence estimation outperformed the single term estimation on the prediction task. Our test results suggest that the mirror descent model can be a good descriptive model of player behavior, although in some rare cases, a player decision can be hard to model (e.g. when a player increase traffic assignment to previously bad routes).
+
+This estimation problem can be extended in several ways: first, in our method, we fixed the DGF to be the negative entropy (regularized in order to avoid situations in which the estimation problem is ill-posed). One could also estimate the DGF itself, in addition to estimating the learning rates. One natural way to pose the estimation problem is to consider a finite collection of distance generating functions $\{\psi_i\}_{i \in \Ical}$, then to assume that each player $k$ uses a linear combination with weights $\theta_k$ $\psi = \sum_{i} \theta_{k, i} \psi_i$, then estimate the parameter vector $\theta_k$. One other natural approach is to pose the problem as a Bayesian estimation problem, by setting a prior on the model parameters (e.g. $\eta^{(0)}_k$ and $\alpha_k$), then define a likelihood model of observing a player decision given her DGF and learning rate.
+
+
 
 %============================================================================================
 %
 % The following two commands are all you need in the
 % initial runs of your .tex file to
 % produce the bibliography for the citations in your paper.
+\newpage
 \bibliographystyle{abbrv}
 \bibliography{bib}  % sigproc.bib is the name of the Bibliography in this case
 % You must have a proper ".bib" file
@@ -483,10 +485,6 @@ Acknowledgement goes here.
 %APPENDICES are optional
 %\balancecolumns
 %============================================================================================
-\appendix
-%Appendix A
-
-Appendix goes here.
 
 % That's all folks!
 \end{document}
