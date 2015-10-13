@@ -214,13 +214,13 @@ x^{(t+1)}_k = \argmin_{x_k \in \Delta^{\Pcal_k}} \eta_k^{(t)} \braket{\ell_k(x^{
 \end{equation}
 \ENDFOR
 \end{algorithmic}
-\caption{Distributed mirror descent dynamics with distance generating function $\psi_k$ and learning rates $\eta_k^{(t)}$.}
+\caption{Distributed mirror descent dynamics with DGF $\psi_k$ and learning rates $\eta_k^{(t)}$.}
 \label{alg:MD}
 \end{algorithm}
-In the update equation~\eqref{eq:MD_update}, $D_{\psi_k}(x, x^{(t)}_k)$ is the Bregman divergence between the distributions $x_k$ and $x_k^{(t)}$, defined as follows: $D_\psi(x, y) = \psi(x) - \psi(y) - \braket{\nabla \psi(y)}{x - y}$, for a strongly convex function $\psi$, called the distance generating function. Some special cases include
+In the update equation~\eqref{eq:MD_update}, $D_{\psi_k}(x, x^{(t)}_k)$ is the Bregman divergence between the distributions $x_k$ and $x_k^{(t)}$, defined as follows: $D_\psi(x, y) = \psi(x) - \psi(y) - \braket{\nabla \psi(y)}{x - y}$, for a strongly convex function $\psi$, called the distance generating function (DGF). Some special cases include
 \begin{itemize}
 \item The Euclidean case: if $\psi(x) = \frac{1}{2}\|x\|^2_2$, then $D_\psi(x, y) = \frac{1}{2}\|x - y\|_2^2$. In this case, mirror descent reduces to the projected gradient descent algorithm.
-\item The entropic case: if $\psi(x) = - H(x)$ where $H(x) = -\sum_{p} x_p \ln x_p$ is the negative entropy, then $D_\psi(x, y) = \sum_p x_p \ln \frac{x_p}{y_p}$ is the Kullback-Leibler divergence from $x$ to $y$. In this case, the mirror descent algorithm is sometimes called the entropic descent~\cite{beck2003mirror}, or exponentiated gradient descent~\cite{kivinen1997exponentiated}.
+\item The entropic case: if $\psi(x) = - H(x)$ where $H(x) = -\sum_{p} x_p \ln x_p$ is the negative entropy, then $D_\psi(x, y) = \sum_p x_p \ln \frac{x_p}{y_p}$ is the Kullback-Leibler (KL) divergence from $x$ to $y$. In this case, the mirror descent algorithm is sometimes called the entropic descent~\cite{beck2003mirror}, or exponentiated gradient descent~\cite{kivinen1997exponentiated}.
 \end{itemize}
 The mirror descent method is a general method for convex optimization proposed in~\cite{nemirovski1983problem}. The model in Algorithm~\ref{alg:MD} is a distributed version of mirror descent, applied to the potential function $f$. To give some intuition of the method, the first term $\braket{\ell_k^{(t)}}{x_k}$ in the minimization problem~\eqref{eq:MD_update} can be thought of as a linear approximation of the potential function (since $\ell(x) = \nabla f(x)$), and the second term $D_\psi(x_k, x^{(t)}_k)$ penalizes deviations from the previous iterate. The learning rate $\eta_k^{(t)}$ determines the tradeoff between the two terms, and can be thought of as a generalized step size: a smaller $\eta_k$ results in a distribution which is closer to the current $x_k^{(t)}$. Thus, from the potential function point of view, the player minimizes a linearization of the potential plus a Bregman divergence term that keeps $x_k$ close to $x_k^{(t)}$. From the routing game point of view, the first term $\braket{\ell^{(t)}_k}{x_k}$ corresponds to putting weight on the paths that have smaller cost during the previous iteration, and the second term keeps the distribution at its current value.
 
@@ -237,7 +237,7 @@ While the specific convergence rate does not matter for the purposes of the esti
 %============================================================================================
 \section{Learning model estimation}
 \label{sec:estimation}
-In this section, we assume that we have access to a sequence of observations of traffic distributions $(\bar x^{(t)}_k)$, and a sequence of loss vectors $(\bar \ell^{(t)}_k)$. We use the over bar to make a clear distinction between quantities which are observed and quantities which are estimated. Given this sequence of observations, we would like to fit a model of learning dynamics. From the previous section, the learning model in Algorithm~\ref{alg:MD} is naturally parameterized by the distance generating function $\psi_k$ and the learning rate sequence $\eta_k^{(t)}$. First, we discuss how one can estimate a single term of the learning rate sequence, given a distance generating function $\psi_k$.
+In this section, we assume that we have access to a sequence of observations of traffic distributions $(\bar x^{(t)}_k)$, and a sequence of loss vectors $(\bar \ell^{(t)}_k)$. We use the over bar to make a clear distinction between quantities which are observed and quantities which are estimated. Given this sequence of observations, we would like to fit a model of learning dynamics. From the previous section, the learning model in Algorithm~\ref{alg:MD} is naturally parameterized by the DGF $\psi_k$ and the learning rate sequence $\eta_k^{(t)}$. First, we discuss how one can estimate a single term of the learning rate sequence, given a DGF $\psi_k$.
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \subsection{Estimating a single learning rate}
@@ -255,7 +255,7 @@ The problem is then simply
 \label{eq:estimation_eta}
 \eta_k^{(t)} = \argmin_{\eta \geq 0} d^{(t)}_k(\eta)
 \end{equation}
-In the next proposition, we show that this problem is convex when the distance generating function is the negative entropy. In fact, one can explicitly compute the gradient of $d_k(\eta)$ in this case, which makes it possible to solve Problem~\eqref{eq:estimation_eta} efficiently using gradient descent for example.
+In the next proposition, we show that this problem is convex when the DGF is the negative entropy. In fact, one can explicitly compute the gradient of $d_k(\eta)$ in this case, which makes it possible to solve Problem~\eqref{eq:estimation_eta} efficiently using gradient descent for example.
 \begin{theorem}
 If $\psi_k$ is the negative entropy, then $d_k^{(t)}(\eta) = D_{\psi_k}(\bar x_k^{(t+1)}, x_k^{(t+1)}(\eta))$ is a convex function of $\eta$, and its gradient with respect to $\eta$ is given by
 \[
@@ -285,7 +285,7 @@ where we used the explicit form of $x^{(t+1)}(\eta)$ in the third equality. In t
 }
 which proves the claim.
 \end{proof}
-While we cannot prove that the problem is convex in the general case (when $\psi_k$ is any distance generating function), since the problem is one-dimensional, one can apply any non-convex optimization method, such as simulated annealing, to find a local optimum of $d_k^{(t)}(\eta)$.
+While we cannot prove that the problem is convex in the general case (when $\psi_k$ is any DGF), since the problem is one-dimensional, one can apply any non-convex optimization method, such as simulated annealing, to find a local optimum of $d_k^{(t)}(\eta)$.
 
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -302,31 +302,58 @@ then estimate $(\alpha_k, \eta^{(0)}_k)$ by solving the problem
 (\alpha_k, \eta^{(0)}_k) = \argmin_{\alpha_k \in (0, 1), \eta^{(0)} \geq 0} D^{(t)}_k(\alpha, \eta^{(0)})
 \end{equation}
 Note that this problem is non-convex in general, however, since it is two-dimensional, it can also be solved efficiently using non-convex optimization techniques.
+
+
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \subsection{A parameterized family of distance generating functions}
+In this Section, we propose to use a generalization of the entropy distance generating function, motivated by the following observation:
+according to the entropy update and its explicit solution~\ref{eq:estimation_alpha_eta0}, the support of $x^{(t+1)}_k(\eta)$ always coincides with the support of $\bar x^{(t)}_k$ (due to the multiplicative form of the solution). As a consequence, if we observe two consecutive terms $\bar x^{(t)}_k, \bar x^{(t+1)}_k$ such that some $p$ is in the support of $\bar x^{(t+1)}_k$ but not in the support of $\bar x^{(t)}_k$, the KL divergence $D_{KL}(\bar x^{(t+1)}_k, x^{(t+1)}_k(\eta))$ will be infinite since the support of $x^{(t+1)}_k(\eta)$ will not be a subset of the support of $\bar x^{(t+1)}$ (in measure theoretic terms, $x^{(t+1)}_k(\eta)$ is not absolutely continuous with respect to $\bar x^{(t+1)}$). This is problematic, as the estimation problem is ill-posed in such cases (which do occur in the data set used in Section~\ref{sec:experiment}).
+
+To solve this problem, we consider the following DGF: for $\epsilon > 0$, let
+\[
+\psi_\epsilon(x_k) = -H(x+\mathbf \epsilon) = \sum_p (x_{k, p} + \epsilon) \ln (x_{k,p} + \epsilon).
+\]
+The corresponding Bregman divergence is
+\[
+D_{\psi_\epsilon}(x_k, y_k) = \sum_p (x_{k,p}+\epsilon)\ln\frac{x_{k, p} + \epsilon}{y_{k, p} + \epsilon},
+\]
+and can be interpreted as a generalized KL divergence. In particular, for any $\epsilon > 0$, this Bregman divergence is finite for any $x_k, y_k \in \Delta^{\Pcal_k}$, unlike the KL divergence. Finally, it is worth observing that when $\epsilon > 0$, the update equation~\eqref{eq:MD_update} does not have a closed-form expression as in the special case of the KL divergence. Additionally, the support is not necessarily preserved, which was an undesirable property of the previous model. In our numerical simulations in Section~\ref{sec:experiment}, we use the generalized DGF proposed here.
+
+
 
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
-\subsection{Application to prediction and receding horizon control}
+\subsection{Application to prediction}
+We conclude this Section by briefly discussing one important application of the proposed estimation problem. Once we have estimated a model of learning dynamics, we can propagate the model forward in order to predict the distributions of the players for the next time step. More precisely, if at iteration $t$, we have observed $\bar x^{(t)}$, $\bar \ell^{(t)}$, and we have estimated the terms $(\eta_k^{(1)}, \dots, \eta_k^{(t-1)})$ for a player $k$, then we can use these terms to estimate $\eta_k^{(t)}$, and predict the next distribution by solving
+\al{
+x_k^{(t+1)} 
+&= \argmin{x_k \in \Delta^{\Pcal_k}} \braket{\eta_k^{(t)} }{ \ell(\bar x^{(t)}_k) } + D_{\psi_k}(x_k, \bar x^{(t)}_k) \\
+&\overset{\Delta}{=} g(\bar x^{(t)}_k, \eta_k^{(t)}),
+}
+where we defined the function $g$, which takes a distribution and a learning rate and propagates the model forward one step. We can inductively estimate the next terms by propagating the model further:
+\[
+x_k^{(t+i+1)} = g(x^{(t+i)}_k, \eta_k^{(t+i)}).
+\]
+Here, we assume that we can extrapolate the learning rate sequence to estimate the terms $\eta_k^{(t+i)}$. If we assume a particular form of the sequence, $\eta_k^{(t)} = \eta_k^{(0)} t^{-\alpha_k}$, then this can be done readily once we have an estimate of $\eta_k^{(0)}$ and $\alpha_k$. However, if each term of the sequence is estimated separately, we need to use a simple model to predict the next terms. We propose a few simple methods in the numerical experiments, and evaluate their generalization performance.
+
 
 
 %============================================================================================
-% \newpage
 \section{Experiment}
 \label{sec:experiment}
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
-\subsection{Game interface}
-
-
-We simulate the proposed methods with a routing game interface that implements the behavior of the network. Players are assigned a unique origin and destination node pair and are tasked to assign a flow distribution to the paths between this pair at each turn of the game. The game calculates the cost along each edge of the network after all players have submitted their flow distribution for the turn. Each player then receives feedback with the local information of the cost for each path. The players then use this path cost history to assign a new flow distribution at the subsequent turns with the objective of minimizing their cumulative path cost.
-
 \begin{figure*}
   \centering
   \includegraphics[width=160mm]{images/user_interface}
   \caption{Web interface for the routing game.}
   \label{fig:web_interface}
 \end{figure*}
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+\subsection{Game interface}
+
+
+We simulate the proposed methods with a routing game interface that implements the behavior of the network. Players are assigned a unique origin and destination node pair and are tasked to assign a flow distribution to the paths between this pair at each turn of the game. The game calculates the cost along each edge of the network after all players have submitted their flow distribution for the turn. Each player then receives feedback with the local information of the cost for each path. The players then use this path cost history to assign a new flow distribution at the subsequent turns with the objective of minimizing their cumulative path cost.
 
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
