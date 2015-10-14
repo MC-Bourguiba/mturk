@@ -326,7 +326,7 @@ and can be interpreted as a generalized KL divergence. In particular, for any $\
 \subsection{Application to prediction}
 We conclude this Section by briefly discussing one important application of the proposed estimation problem. Once we have estimated a model of learning dynamics, we can propagate the model forward in order to predict the distributions of the players for the next time step. More precisely, if at iteration $t$, we have observed $\bar x^{(t)}$, $\bar \ell^{(t)}$, and we have estimated the terms $(\eta_k^{(1)}, \dots, \eta_k^{(t-1)})$ for a player $k$, then we can use these terms to estimate $\eta_k^{(t)}$, and predict the next distribution by solving
 \al{
-x_k^{(t+1)}
+x_k^{(t+1)} 
 &= \argmin{x_k \in \Delta^{\Pcal_k}} \braket{\eta_k^{(t)} }{ \ell(\bar x^{(t)}_k) } + D_{\psi_k}(x_k, \bar x^{(t)}_k) \\
 &\overset{\Delta}{=} g(\bar x^{(t)}_k, \eta_k^{(t)}),
 }
@@ -353,6 +353,9 @@ Here, we assume that we can extrapolate the learning rate sequence to estimate t
 \subsection{Setup}
 
 We simulate the proposed methods with a routing game system that implements the behavior of the network. Players are assigned a unique origin and destination node pair and are tasked to assign a flow distribution to the paths between this pair at each turn of the game. The game calculates the cost along each edge of the network after all players have submitted their flow distribution for the turn. Each player then receives feedback with the local information of the cost for each path. The players then use this path cost history to assign a new flow distribution at the subsequent turns with the objective of minimizing their cumulative path cost.
+
+We simulate the proposed methods with a routing game interface that implements the behavior of the network. Players are assigned a unique origin and destination node pair and are tasked to assign a flow distribution to the paths between this pair at each turn of the game. The game calculates the cost along each edge of the network after all players have submitted their flow distribution for the turn. Each player then receives feedback with the local information of the cost for each path. The players then use this path cost history to assign a new flow distribution at the subsequent turns with the objective of minimizing their cumulative path cost.
+
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \subsection{Convergence}
@@ -461,6 +464,8 @@ We proposed a problem of model estimation in the routing game, to fit a distribu
 We considered in particular a model based on the mirror descent algorithm, parameterized by a DGF $\psi_k$ and a sequence of learning rates $(\eta^{(t)}_k)$, and gave an intuitive interpretation of how this model can describe player behavior. We showed that the problem of estimating one term of the learning rate sequence is convex in the case of the KL divergence (it remains open to prove this result for general Bregman divergences). To control the complexity of the model and to make the estimation consistent with the theoretical assumptions (decreasing learning rates), we proposed to parameterize the sequence with an initial term $\eta_k^{(0)}$ and a decay rate $\alpha_k \in (0, 1)$. When we tested these methods on data collected from our routing game interface, the parameterized sequence estimation outperformed the single term estimation on the prediction task. Our test results suggest that the mirror descent model can be a good descriptive model of player behavior, although in some rare cases, a player decision can be hard to model (e.g. when a player increase traffic assignment to previously bad routes).
 
 This estimation problem can be extended in several ways: first, in our method, we fixed the DGF to be the negative entropy (regularized in order to avoid situations in which the estimation problem is ill-posed). One could also estimate the DGF itself, in addition to estimating the learning rates. One natural way to pose the estimation problem is to consider a finite collection of distance generating functions $\{\psi_i\}_{i \in \Ical}$, then to assume that each player $k$ uses a linear combination with weights $\theta_k$ $\psi = \sum_{i} \theta_{k, i} \psi_i$, then estimate the parameter vector $\theta_k$. One other natural approach is to pose the problem as a Bayesian estimation problem, by setting a prior on the model parameters (e.g. $\eta^{(0)}_k$ and $\alpha_k$), then define a likelihood model of observing a player decision given her DGF and learning rate.
+
+
 
 %============================================================================================
 %
