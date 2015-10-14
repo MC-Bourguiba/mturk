@@ -4,6 +4,10 @@
 \usepackage{algorithmic}
 \usepackage{todonotes}
 
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\usetikzlibrary{calc, positioning}
+
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \input{latex_commands}
 \newtheorem{remark}{Remark}
@@ -326,7 +330,7 @@ and can be interpreted as a generalized KL divergence. In particular, for any $\
 \subsection{Application to prediction}
 We conclude this Section by briefly discussing one important application of the proposed estimation problem. Once we have estimated a model of learning dynamics, we can propagate the model forward in order to predict the distributions of the players for the next time step. More precisely, if at iteration $t$, we have observed $\bar x^{(t)}$, $\bar \ell^{(t)}$, and we have estimated the terms $(\eta_k^{(1)}, \dots, \eta_k^{(t-1)})$ for a player $k$, then we can use these terms to estimate $\eta_k^{(t)}$, and predict the next distribution by solving
 \al{
-x_k^{(t+1)} 
+x_k^{(t+1)}
 &= \argmin{x_k \in \Delta^{\Pcal_k}} \braket{\eta_k^{(t)} }{ \ell(\bar x^{(t)}_k) } + D_{\psi_k}(x_k, \bar x^{(t)}_k) \\
 &\overset{\Delta}{=} g(\bar x^{(t)}_k, \eta_k^{(t)}),
 }
@@ -343,72 +347,177 @@ Here, we assume that we can extrapolate the learning rate sequence to estimate t
 \label{sec:experiment}
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
-\begin{figure*}
-  \centering
-  \includegraphics[width=160mm]{images/user_interface}
-  \caption{Web interface for the routing game.}
-  \label{fig:web_interface}
-\end{figure*}
+% \begin{figure*}
+%   \centering
+%   \includegraphics[width=160mm]{images/user_interface}
+%   \caption{Web interface for the routing game.}
+%   \label{fig:web_interface}
+% \end{figure*}
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \subsection{Setup}
 
-We simulate the proposed methods with a routing game system that implements the behavior of the network. Players are assigned a unique origin and destination node pair and are tasked to assign a flow distribution to the paths between this pair at each turn of the game. The game calculates the cost along each edge of the network after all players have submitted their flow distribution for the turn. Each player then receives feedback with the local information of the cost for each path. The players then use this path cost history to assign a new flow distribution at the subsequent turns with the objective of minimizing their cumulative path cost.
+We simulate the proposed methods with a routing game system that implements the behavior of the network. The system is implemented with a web framework that is accessible to players through their browser. Players are assigned a unique origin and destination node pair and are tasked to assign a flow distribution to the paths between this pair at each turn of the game. The game calculates the cost along each edge of the network after all players have submitted their flow distribution for the turn. Each player then receives feedback with the local information of the cost for each path. The players then use this path cost history to assign a new flow distribution at the subsequent turns with the objective of minimizing their cumulative path cost.
 
-We simulate the proposed methods with a routing game interface that implements the behavior of the network. Players are assigned a unique origin and destination node pair and are tasked to assign a flow distribution to the paths between this pair at each turn of the game. The game calculates the cost along each edge of the network after all players have submitted their flow distribution for the turn. Each player then receives feedback with the local information of the cost for each path. The players then use this path cost history to assign a new flow distribution at the subsequent turns with the objective of minimizing their cumulative path cost.
 
+\begin{figure}
+  \centering
+  %   \includegraphics[width=0.5\textwidth]{images/fill_me}
+  \missingfigure[figwidth=6cm]{System block diagram}
+  \caption{System block diagram to be added later.}
+  \label{fig:system_block_diagram}
+\end{figure}
+
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=0.5\textwidth]{images/game_system}
+%   \caption{Player normalized cost.}
+%   \label{fig:normalized_costs}
+% \end{figure}
+
+% \tikzstyle{block} = [draw, fill=white, rectangle,
+% minimum height=3em, minimum width=6em]
+
+% \tikzstyle{block} = [draw,fill=blue!20,minimum size=2em]
+
+% \tikzstyle{sum} = [draw, fill=white, circle, node distance=1cm]
+% \tikzstyle{input} = [coordinate]
+% \tikzstyle{output} = [coordinate]
+% \tikzstyle{pinstyle} = [pin edge={to-,thin,black}]
+
+% \def\radius{.7mm}
+% \tikzstyle{branch}=[fill,shape=circle,minimum size=3pt,inner sep=0pt]
+
+% \begin{tikzpicture}[auto, node distance=2cm,>=latex']
+
+%   \node [input, name=input] {};
+%   \node [sum, right of=input] (sum) {};
+%   % \node [block, right of=sum] (controller) {Controller};
+%   \node [block, right of=sum, node distance=3cm] (system) {Network};
+
+%   \node [output, right of=system] (output) {};
+%   % \node [block, below of=system] (measurements) {Measurements};
+
+%   % \draw [draw,->] (input) -- node {$\bar x(t)$} (sum);
+%   \draw [->] (sum) -- node {$\bar x(t)$} (system);
+%   % \draw [->] (y) |- (measurements);
+%   % \draw [->] (measurements) -| node[pos=0.99] {$-$}
+%   % node [near end] {$y_m$} (sum);
+
+%   \node at (0,-1) (input1) {$i_1$};
+%   \node[block, above left = of system, anchor=west] at (2,-1) (block1) {$p_1$};
+%   \draw[->] (block1.east) -- (sum);
+%   \draw[->] (system) -- (block1);
+
+%   \node at (0,-2) (input2) {$i_2$};
+%   \node[block, left of=system, anchor=west] at (2,-2) (block2) {$p_2$};
+%   \draw[->] (block2.east) -- (sum);
+%   \draw[->] (system) -- (block2);
+
+%   \node at (0,-3) (input3) {$i_3$};
+%   \node[block, below left = of system, anchor=west] at (2,-3) (block3) {$p_3$};
+%   \draw[->] (block3.east) -- (sum);
+%   \draw[->] (system) -- (block3);
+
+%   % % Draw blocks, inputs and outputs
+%   % \foreach \y in {1,2,3} {
+%   %   \node at (0,-\y) (input\y) {$i_\y$};
+%   %   \node[block, left of=system, above of =system] at (2,-\y) (block\y) {$p_\y$};
+%   %   \draw[->] (input\y) -- (block\y);
+%   %   \draw[->] (block\y.east) -- (sum);
+%   %   \draw[->] (system) -- (block\y);
+%   % }
+
+%   % Calculate branch point coordinate
+%   \path (input1) -- coordinate (branch) (block1);
+
+%   % Define a style for shifting a coordinate upwards
+%   % Note the curly brackets around the coordinate.
+%   \tikzstyle{s}=[shift={(0mm,\radius)}]
+%   % It would be natural to use the yshift or xshift option, but that does
+%   % not seem to work when shifting coordinates.
+
+%   \draw[->] (branch) node[branch] {}{ % draw branch junction
+%     \foreach \c in {2} {
+%       % Draw semicircle junction to indicate that the lines are
+%       % not connected. The intersection between the lines are
+%       % calculated using the convenient -| syntax. Since we want
+%       % the semicircle to have its center where the lines intersect,
+%       % we have to shift the intersection coordinate using the 's'
+%       % style to account for this.
+%       [shift only] -- ([s]input\c -| branch) arc(90:-90:\radius)
+%       % Note the use of the [shift only] option. It is not necessary,
+%       % but I have used it to ensure that the semicircles have the
+%       % same size regardless of scaling.
+%     }
+%   };
+
+% \end{tikzpicture}
+
+
+To address a player who may be at a disadvantage due to having longer paths or more congested paths because of the topology of the network, we normalized the cumulative path cost of each player with their cumulative path cost at equilibrium calculated with Algorithm~\ref{alg:MD}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{images/players_costs}
+  \caption{Player cost normalized by equilibrium cost .}
+  \label{fig:normalized_costs}
+\end{figure}
+
+\section{Analysis}
+\label{sec:analysis}
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \subsection{Convergence}
 
-To address a player who may be at a disadvantage due to having longer paths or more congested paths because of the topology of the network, we normalized the cumulative path cost of each player with their cumulative path cost at equilibrium. We calculate this equilibrium path cost with Algorithm~\ref{alg:MD}.
+At the beginning of the game, there is a clear exploration phase where players tend make aggressive assignments with their flow distribution. Towards the end of the game, the players consolidate their position and tend to make more conservative flow distribution assignments. An example of this behavior can be seen in Figure~\ref{fig:player_behavior}.
 
-At the beginning of the game, there is a clear exploration phase where players tend make aggressive assignments with their flow distribution. Towards the end of the game, the players consolidate their position and make more conservative flow distribution assignments, as seen with Figure~\ref{fig:normalized_costs}.
+We can describe the convergence of the system more concretely by evaluating the Rosenthal potential of the game at each turn from Prop~\ref{prop:potential}. From Figure~\ref{fig:global_potential}, the potential of the system oscillates rapdily in the exploration phase and then converges to the minimal potential. The system also shows robustness seen in Figure~\ref{fig:global_potential} where it recovers from perturbations in the convergence phase.
 
-We can further show this consolidation from the players by computing the Rosenthal potential for the game. As the game progresses, we can see that the Rosenthal potential approaches the optimal value as seen in Figure~\ref{fig:global_potential}.
+% This consolidation from the players can be seen by Figure~\ref{fig:global_potential}, where the player makes aggressive assignments in reaction to observing their cost, then converges to a flow distribution. The player perturbs the system near the end, but quickly reverts to the optimal flow distribution.
 
 \begin{figure}
   \centering
-  \includegraphics[width=80mm]{images/players_costs}
-  \caption{Player normalized cost.}
-  \label{fig:normalized_costs}
+  \includegraphics[width=0.5\textwidth]{images/player_behavior}
+  \caption{A player flow distribution assignment for the game.}
+  \label{fig:player_behavior}
 \end{figure}
 
 \begin{figure}
   \centering
-  \includegraphics[width=80mm]{images/global_potential_function}
-  \caption{Rosenthal potential of the game.}
+  \includegraphics[width=0.5\textwidth]{images/global_potential_function}
+  \caption{Rosenthal potential values at each iteration.}
   \label{fig:global_potential}
 \end{figure}
 
 \subsection{Estimation and prediction}
 
-We can estimate the learning rate of each player with the update in Figure~\ref{eq:estimation_eta}. We can see that the learning rates of some players are negative at certain turns, which may be explained by the players assuming a contrarian play style at flow distribution assignments for those certain turns.
+We can estimate the learning rate of each player with the update in Eq~\ref{eq:estimation_eta}. We obtained these sequence of learning rates for each player and for better visualization, we plot the moving average
 
-\begin{figure}
-  \centering
-  \includegraphics[width=80mm]{images/learning_rates}
-  \caption{Learning rate for each player.}
-  \label{fig:learning_rates}
-\end{figure}
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=0.5\textwidth]{images/learning_rates}
+%   \caption{Learning rate for each player.}
+%   \label{fig:learning_rates}
+% \end{figure}
 
-With these estimated sequence of learning rates for each player, we can predict the flow distribution at turn $t+1$ with the learning rate $\eta_t$. We propose three methods for calculating $\eta_t$: first we let $\eta_t=\eta_{t-1}$, second we compute a moving average
-\[
-\eta_t=\dfrac{1}{N}\sum_{i=t-N-1}^{t-1}\eta_i
-\] and finally we compute $\eta_t$ as a linear regression from $\eta_i,\ i \in [0,\ t-1]$.
+With these estimated sequence of learning rates for each player, we can predict the flow distribution at turn $t+1$ with the learning rate $\eta_t$.
+% \[
+% \eta_t=\dfrac{1}{N}\sum_{i=t-N-1}^{t-1}\eta_i
+% \] and finally we compute $\eta_t$ as a linear regression from $\eta_i,\ i \in [0,\ t-1]$.
 
 We also compare these methods with a parameterized sequence of learning rate in Section 3.2
 
-\begin{figure}
-  \centering
-  \includegraphics[width=80mm]{images/previous_eta_predictions}
-  \caption{Flow distribution predictions $\eta_t = \eta_{t-1}$.}
-  \label{fig:previous_eta_predictions}
-\end{figure}
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=0.5\textwidth]{images/previous_eta_predictions}
+%   \caption{Flow distribution predictions $\eta_t = \eta_{t-1}$.}
+%   \label{fig:previous_eta_predictions}
+% \end{figure}
 
 
 % \begin{figure}
 %   \centering
-%   % \includegraphics[width=80mm]{images/fill_me}
+%   % \includegraphics[width=0.5\textwidth]{images/fill_me}
 %   \missingfigure[figwidth=6cm]{Testing a long text string}
 %   \caption{Flow distribution predictions moving average $\eta_t$.}
 %   \label{fig:moving_eta_predictions}
@@ -417,7 +526,7 @@ We also compare these methods with a parameterized sequence of learning rate in 
 
 % \begin{figure}
 %   \centering
-%   % \includegraphics[width=80mm]{images/fill_me}
+%   % \includegraphics[width=0.5\textwidth]{images/fill_me}
 %   \missingfigure[figwidth=6cm]{Testing a long text string}
 %   \caption{Flow distribution predictions linear regression $\eta_t$.}
 %   \label{fig:linear_regression_eta_predictions}
@@ -425,7 +534,7 @@ We also compare these methods with a parameterized sequence of learning rate in 
 
 % \begin{figure}
 %   \centering
-%   % \includegraphics[width=80mm]{images/fill_me}
+%   % \includegraphics[width=0.5\textwidth]{images/fill_me}
 %   \missingfigure[figwidth=6cm]{Testing a long text string}
 %   \caption{Flow distribution predictions parameterized $\eta_t$.}
 %   \label{fig:parameterized_eta_predictions}
@@ -434,14 +543,14 @@ We also compare these methods with a parameterized sequence of learning rate in 
 
 % \begin{figure}
 %   \centering
-%   \includegraphics[width=80mm]{images/no_slider_actual_flow_distribution.png}
+%   \includegraphics[width=0.5\textwidth]{images/no_slider_actual_flow_distribution.png}
 %   \caption{Player flow distribution.}
 %   \label{fig:no_slider_player_flow_distribution}
 % \end{figure}
 
 % \begin{figure}
 %   \centering
-%   \includegraphics[width=80mm]{images/no_slider_KL_divergence_surface}
+%   \includegraphics[width=0.5\textwidth]{images/no_slider_KL_divergence_surface}
 %   \caption{KL Divergence surface.}
 %   \label{fig:kl_divergence_surface}
 % \end{figure}
@@ -449,10 +558,11 @@ We also compare these methods with a parameterized sequence of learning rate in 
 
 \begin{figure}
   \centering
-  \includegraphics[width=80mm]{images/two_steps_ahead_prediction}
-  \caption{Two step prediction ahead for parameterized learning rate.}
+  \includegraphics[width=0.5\textwidth]{images/two_steps_predictions}
+  \caption{Two step prediction ahead for parameterized learning rate for a single player.}
   \label{fig:parameterized}
 \end{figure}
+
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -464,8 +574,6 @@ We proposed a problem of model estimation in the routing game, to fit a distribu
 We considered in particular a model based on the mirror descent algorithm, parameterized by a DGF $\psi_k$ and a sequence of learning rates $(\eta^{(t)}_k)$, and gave an intuitive interpretation of how this model can describe player behavior. We showed that the problem of estimating one term of the learning rate sequence is convex in the case of the KL divergence (it remains open to prove this result for general Bregman divergences). To control the complexity of the model and to make the estimation consistent with the theoretical assumptions (decreasing learning rates), we proposed to parameterize the sequence with an initial term $\eta_k^{(0)}$ and a decay rate $\alpha_k \in (0, 1)$. When we tested these methods on data collected from our routing game interface, the parameterized sequence estimation outperformed the single term estimation on the prediction task. Our test results suggest that the mirror descent model can be a good descriptive model of player behavior, although in some rare cases, a player decision can be hard to model (e.g. when a player increase traffic assignment to previously bad routes).
 
 This estimation problem can be extended in several ways: first, in our method, we fixed the DGF to be the negative entropy (regularized in order to avoid situations in which the estimation problem is ill-posed). One could also estimate the DGF itself, in addition to estimating the learning rates. One natural way to pose the estimation problem is to consider a finite collection of distance generating functions $\{\psi_i\}_{i \in \Ical}$, then to assume that each player $k$ uses a linear combination with weights $\theta_k$ $\psi = \sum_{i} \theta_{k, i} \psi_i$, then estimate the parameter vector $\theta_k$. One other natural approach is to pose the problem as a Bayesian estimation problem, by setting a prior on the model parameters (e.g. $\eta^{(0)}_k$ and $\alpha_k$), then define a likelihood model of observing a player decision given her DGF and learning rate.
-
-
 
 %============================================================================================
 %
