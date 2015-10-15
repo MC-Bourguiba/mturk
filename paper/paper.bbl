@@ -1,5 +1,17 @@
 \begin{thebibliography}{10}
 
+\bibitem{banerjee2005clustering}
+A.~Banerjee, S.~Merugu, I.~S. Dhillon, and J.~Ghosh.
+\newblock Clustering with bregman divergences.
+\newblock {\em J. Mach. Learn. Res.}, 6:1705--1749, Dec. 2005.
+
+\bibitem{bayen2011mobile}
+A.~Bayen, J.~Butler, A.~Patire, {\relax CCIT}, {\relax UC Berkeley ITS}, and
+  {\relax California Dpartment of Transportation, Division of Research and
+  Innovation}.
+\newblock {\em Mobile Millennium Final Report}.
+\newblock 2011.
+
 \bibitem{beck2003mirror}
 A.~Beck and M.~Teboulle.
 \newblock Mirror descent and nonlinear projected subgradient methods for convex
@@ -29,6 +41,18 @@ S.~Boyd and L.~Vandenberghe.
 \newblock {\em {Convex Optimization}}, volume~25.
 \newblock Cambridge University Press, 2010.
 
+\bibitem{canudasdewit2015grenoble}
+C.~Canudas De~Wit, F.~Morbidi, L.~Leon~Ojeda, A.~Y. Kibangou, I.~Bellicot, and
+  P.~Bellemain.
+\newblock {Grenoble Traffic Lab: An experimental platform for advanced traffic
+  monitoring and forecasting}.
+\newblock {\em {IEEE Control Systems}}, 35(3):23--39, June 2015.
+
+\bibitem{censor1997parallel}
+Y.~Censor and S.~Zenios.
+\newblock {\em Parallel Optimization: Theory, Algorithms and Applications}.
+\newblock Oxford University Press, 1997.
+
 \bibitem{cesa2006prediction}
 N.~Cesa-Bianchi and G.~Lugosi.
 \newblock {\em Prediction, learning, and games}.
@@ -48,6 +72,11 @@ M.~J. Fox and J.~S. Shamma.
 Y.~Freund and R.~E. Schapire.
 \newblock Adaptive game playing using multiplicative weights.
 \newblock {\em Games and Economic Behavior}, 29(1):79--103, 1999.
+
+\bibitem{fudenberg1998theory}
+D.~Fudenberg and D.~K. Levine.
+\newblock {\em The theory of learning in games}, volume~2.
+\newblock MIT press, 1998.
 
 \bibitem{hannan1957approximations}
 J.~Hannan.
@@ -93,24 +122,41 @@ W.~Krichene, S.~Krichene, and A.~Bayen.
 \newblock Convergence of mirror descent dynamics in the routing game.
 \newblock In {\em European Control Conference (ECC)}, 2015.
 
+\bibitem{marden2013game}
+J.~Marden and J.~Shamma.
+\newblock Game theory and distributed control.
+\newblock In H.~Young and S.~Zamir, editors, {\em Handbook of Game Theory Vol.
+  4}. Elsevier Science, 2013.
+
 \bibitem{nemirovski1983problem}
 A.~S. Nemirovsky and D.~B. Yudin.
 \newblock {\em Problem complexity and method efficiency in optimization}.
 \newblock Wiley-Interscience series in discrete mathematics. Wiley, 1983.
+
+\bibitem{ozdaglar2007incentives}
+A.~Ozdaglar and R.~Srikant.
+\newblock Incentives and pricing in communication networks.
+\newblock {\em Algorithmic Game Theory}, pages 571--591, 2007.
 
 \bibitem{rosenthal1973class}
 R.~W. Rosenthal.
 \newblock A class of games possessing pure-strategy nash equilibria.
 \newblock {\em International Journal of Game Theory}, 2(1):65--67, 1973.
 
-\bibitem{roughgarden2002bad}
-T.~Roughgarden and {\'E}.~Tardos.
-\newblock How bad is selfish routing?
-\newblock {\em Journal of the ACM (JACM)}, 49(2):236--259, 2002.
+\bibitem{roughgarden2007}
+T.~Roughgarden.
+\newblock Routing games.
+\newblock In {\em Algorithmic game theory}, chapter~18, pages 461--486.
+  Cambridge University Press, 2007.
 
 \bibitem{sandholm2001potential}
 W.~H. Sandholm.
 \newblock Potential games with continuous player sets.
 \newblock {\em Journal of Economic Theory}, 97(1):81--108, 2001.
+
+\bibitem{simon1955behavioral}
+H.~A. Simon.
+\newblock A behavioral model of rational choice.
+\newblock {\em The Quarterly Journal of Economics}, 69(1):pp. 99--118, 1955.
 
 \end{thebibliography}

@@ -310,7 +310,6 @@ While we cannot prove that the problem is convex in the general case (when $\psi
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \subsection{Estimating the decay rate of the learning rate sequence}
-\label{sec:estimation}
 In the previous section, we proposed a method to estimate one term of the learning rate sequence. One can of course repeat this procedure at every iteration, thus generating a sequence of estimated learning rates. However, the resulting sequence may not be decreasing. In order to be consistent with the assumptions of the model, we can assume a parameterized sequence of learning rates (which is by construction decreasing), then estimate the parameters of the sequence, given the observations. Motivated by Theorem~\ref{thm:convergence}, we will assume, in this section, that $\eta^{(t)}_k = \eta^{(0)}_k t^{-\alpha_k}$ with $\eta^{(0)}_k > 0$ and $\alpha_k \in (0, 1)$.
 
 Given the observations $(\bar x^{(t)}_k)$ and $(\bar \ell^{(t)}_k)$, we can define a cumulative cost,
@@ -327,6 +326,7 @@ Note that this problem is non-convex in general, however, since it is low-dimens
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \subsection{A parameterized family of distance generating functions}
+\label{subsec:reg_entropy}
 In this section, we propose to use a generalization of the entropy distance generating function, motivated by the following observation:
 according to the entropy update and its explicit solution~\eqref{eq:estimation_alpha_eta0}, the support of $x^{(t+1)}_k(\eta)$ always coincides with the support of $\bar x^{(t)}_k$ (due to the multiplicative form of the solution). As a consequence, if we observe two consecutive terms $\bar x^{(t)}_k, \bar x^{(t+1)}_k$ such that some $p$ is in the support of $\bar x^{(t+1)}_k$ but not in the support of $\bar x^{(t)}_k$, the KL divergence $D_{KL}(\bar x^{(t+1)}_k, x^{(t+1)}_k(\eta))$ will be infinite for all values of $\eta$, since $\support (x^{(t+1)}_k(\eta)) \not\subset \support (\bar x^{(t+1)})$ (in measure theoretic terms, $x^{(t+1)}_k(\eta)$ is not absolutely continuous with respect to $\bar x^{(t+1)}$). This is problematic, as the estimation problem is ill-posed in such cases (which do occur in the data set used in Section~\ref{sec:results}). To solve this problem, we consider the following DGF: For $\epsilon > 0$, let
 \[
@@ -353,18 +353,31 @@ x_k^{(t+1)}
 &\overset{\Delta}{=} g(\bar x^{(t)}_k, \eta_k^{(t)}),
 \end{aligned}
 \end{equation}
-
-where we defined the function $g$, which takes a distribution and a learning rate and propagates the model forward one step. We can inductively estimate the next terms by propagating the model further:
+where we defined the function $g$, which takes a distribution and a learning rate and propagates the model forward one step. We can inductively estimate the next terms by propagating the model further over a horizon $h$: let $x_k^{(t)} = \bar x_k^{(t)}$ and for $i \in \{0, \dots, h-1\}$,
 \begin{equation}
 \label{eq:propagation}
 x_k^{(t+i+1)} = g(x^{(t+i)}_k, \eta_k^{(t+i)}).
 \end{equation}
-Here, we assume that we can extrapolate the learning rate sequence to estimate the terms $\eta_k^{(t+i)}$. If we assume a particular form of the sequence, $\eta_k^{(t)} = \eta_k^{(0)} t^{-\alpha_k}$, then this can be done readily once we have an estimate of $\eta_k^{(0)}$ and $\alpha_k$. However, if each term of the sequence is estimated separately, we need to use model to predict the next terms. We propose a few simple methods in Section~\ref{sec:results}, and evaluate their generalization performance.
+Here, we assume that we can extrapolate the learning rate sequence to estimate the terms $\eta_k^{(t+i)}$. If we assume a particular form of the sequence, $\eta_k^{(t)} = \eta_k^{(0)} t^{-\alpha_k}$, then this can be done readily once we have an estimate of $\eta_k^{(0)}$ and $\alpha_k$. However, if each term of the sequence is estimated separately, we need to use a model to predict the next terms. We propose these simple methods that are evaluated in Section~\ref{sec:results}:
+\begin{enumerate}
+\item First, as baseline method, we set $\eta_k^{(t+i)} = \eta^{(t-1)}_k$ for all $i$ (we use the last estimated value).
+\item Second, we set $\eta_k^{(t+i)} = \frac{1}{N} \sum_{n = 1}^N \eta^{(t-n)}_k$ for all $i$ (we use the mean of the last $N$ values).
+%\item Third, we assume a polynomial decay of the form $\eta_k^{(t)} = \eta_k^{(0)} t^{-\alpha_k}$, and estimate $\alpha_k, \eta_k^{(0)}$ by performing a linear regression on the points $(\ln \tau, \ln \eta_k^{(\tau)})$ (since the model is linear in logarithmic scale).
+\end{enumerate}
 
 We conclude this section by observing that while we chose to apply the model to a simple prediction task, the estimated model can be used, more generally, in any a receding-horizon optimal control problem, by using the current estimate of the model as a plant in the control problem.
-
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+\begin{figure*}
+\centering
+\includegraphics[width=.75\textwidth]{images/user_interface}
+%\missingfigure[figwidth=.3\textwidth]{System block diagram}
+\caption{\footnotesize Screenshot of the client side of the routing game application. The table is the main interface, and can be used by the player to set weights on the different paths, using the sliders. The weights determine the flow distribution $x^{(t+1)}_k$. The table also show the previous flows ($x^{(t)}_k$), the previous costs $(\ell^{(t)}_k)$, and the cumulative costs $L^{(t)}_k = \sum_{\tau \leq t} \ell^{(\tau)}_k$. Clicking a path will also highlight the path on the graph. The bottom charts show the full history of flows $(x^{(\tau)}_k)_{\tau \leq t}$, costs $(\ell^{(\tau)}_k)_{\tau \leq t}$, and cumulative losses $(L^{(\tau)})_{\tau \leq t}$.}
+\label{fig:game_interface}
+\label{fig:system_block_diagram}
+\end{figure*}
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 %============================================================================================
-\section{Experiment}
+\section{The Routing Game Web Application}
 \label{sec:experiment}
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -375,26 +388,24 @@ We conclude this section by observing that while we chose to apply the model to 
 %   \label{fig:web_interface}
 % \end{figure*}
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
-\subsection{Setup}
 
-We simulate the proposed methods with a routing game system that implements the behavior of the network. The system is implemented with a web framework that is accessible to players through their browser. Players are assigned a unique origin and destination node pair and are tasked to assign a flow distribution to the paths between this pair at each turn of the game. The game calculates the cost along each edge of the network after all players have submitted their flow distribution for the turn. Each player then receives feedback with the local information of the cost for each path. The players then use this path cost history to assign a new flow distribution at the subsequent turns with the objective of minimizing their cumulative path cost.
+We developed a web application that implements the repeated routing game described in Section~\ref{sec:model}. The general architecture of the system is summarized in Figure~\ref{fig:system_block_diagram}. It consists of a client interface that is used by human participants, shown in Figure~\ref{fig:game_interface}, and a backend server that is responsible for collecting inputs from the clients, updating the state of the game, then broadcasting current information to each player. 
 
-
-\begin{figure}
+\begin{figure}[h]
   \centering
-  %   \includegraphics[width=0.5\textwidth]{images/fill_me}
-  \missingfigure[figwidth=6cm]{System block diagram}
-  \caption{System block diagram to be added later.}
+  \missingfigure{System block diagram to be added later}
+  \caption{\footnotesize System block diagram to be added later.}
   \label{fig:system_block_diagram}
 \end{figure}
 
 
-\begin{figure*}
-  \centering
-  \includegraphics[width=\textwidth]{images/user_interface}
-  \caption{Web interface for the game.}
-  \label{fig:game_interface}
-\end{figure*}
+A root user can set up the game by creating a graph and defining the cost functions on each edge. Then once a game is set up, players can log in to the client interface, and each player is assigned an arbitrary origin node and destination node on the graph. Once the game starts, it is played in iterations, such that each iteration lasts a specified period of time shown by the timer on top of the client interface (each iteration lasts $30$ seconds in our experiments). Each player $k$ can use the sliders to set her flow distribution $x^{(t)}_k$ during iteration $t$. At the end of the iteration, the server uses the values of $x_k^{(t)}$ for all players $k \in \{1, \dots, K\}$ to compute the cost functions $\ell^{(t)}_k$, then sends this information to the client side, which then updates the charts and the table with the last value of the cost. Note that client $k$ only has access to the information about player $k$, so in this sense, the learning is completely distributed, as players do not observe the decision or the costs of other players. The decisions of the players $(x_k^{(t)})$ and the costs $(\ell^{(t)}_k)$ are logged by the server, with no additional identifiable information about the players.
+
+The code for the web application is available on Github at the following url: \texttt{github.com/kietdlam/}. To illustrate the methods proposed in this article, we ran the experiment on a small network (shown in the interface in Figure~\ref{fig:game_interface}), with $5$ players. The numerical results are discussed in the next section.
+
+
+
+%We simulate the proposed methods with a routing game system that implements the behavior of the network. The system is implemented with a web framework that is accessible to players through their browser. Players are assigned a unique origin and destination node pair and are tasked to assign a flow distribution to the paths between this pair at each turn of the game. The game calculates the cost along each edge of the network after all players have submitted their flow distribution for the turn. Each player then receives feedback with the local information of the cost for each path. The players then use this path cost history to assign a new flow distribution at the subsequent turns with the objective of minimizing their cumulative path cost.
 
 
 % \begin{figure}
@@ -484,78 +495,96 @@ We simulate the proposed methods with a routing game system that implements the 
 % \end{tikzpicture}
 
 
-To address a player who may be at a disadvantage due to having longer paths or more congested paths because of the topology of the network, we normalized the cumulative path cost of each player with their cumulative path cost at equilibrium calculated with Algorithm~\ref{alg:MD}.
+%To address a player who may be at a disadvantage due to having longer paths or more congested paths because of the topology of the network, we normalized the cumulative path cost of each player with their cumulative path cost at equilibrium calculated with Algorithm~\ref{alg:MD}.
 
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=0.5\textwidth]{images/players_costs}
-  \caption{Player cost normalized by equilibrium cost .}
-  \label{fig:normalized_costs}
-\end{figure}
 
-\section{Results}
-\label{sec:results}
+
+
+%============================================================================================
+%============================================================================================
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
-\subsection{Convergence}
+\begin{figure*}
+  \centering
+  \includegraphics[width=0.33\textwidth]{images/global_potential_function}%
+  \includegraphics[width=0.33\textwidth]{images/player_behavior}%
+  \includegraphics[width=0.33\textwidth]{images/players_costs}%
+  \caption{\footnotesize Exploration and convergence to equilibrium. The left figure shows the distance to equilibrium, measured by the Rosenthal potential $f(x^{(t)}) - f(x^\star)$ as a function of iteration $t$, where $x^{(t)} = (x_1^{(t)}, \dots, x_K^{(t)})$ is the joint decision of all players. The middle figure shows the flow distribution for a given player, and the right plot shows the costs of all players, normalized by the equilibrium costs (so that their values are comparable).}
+  \label{fig:global_potential}
+\end{figure*}
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-At the beginning of the game, there is a clear exploration phase where players tend make aggressive assignments with their flow distribution. Towards the end of the game, the players consolidate their position and tend to make more conservative flow distribution assignments, as seen in Figure~\ref{fig:player_behavior} as an example.
+\section{Experimental Results}
+\label{sec:results}
+We use the data set collected by the experiment to illustrate the estimation and prediction problems proposed in Section~\ref{sec:estimation}, and give some comments on the decision dynamics of the players.
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+\subsection{Distance to equilibrium}
+First, we evaluate whether the (distributed) decisions of the players converges to the Nash equilibrium of the game. The distance to equilibrium can be measured simply by the Rosenthal potential defined in Proposition~\ref{prop:potential}. Figure~\ref{fig:global_potential} shows the potential $f(x^{(t)}) - f(x^\star)$ as a function of iteration $t$, as well as the corresponding player costs $\braket{\ell^{(t)}_k}{x^{(t)}_k}$ of the players. We can observe that at the beginning of the game, there is a clear exploration phase in which players tend to make aggressive adjustments in their distributions, while during later turns, the adjustments become less aggressive and the joint distribution $x^{(t)}$ remains close to equilibrium (as measured by the potential function $f$). The system does move away from equilibrium at some later turns (due to a player performing an aggressive update, see for example turn $22$ in Figure~\ref{fig:global_potential}), but it quickly recovers in general.
 
-We can describe the convergence of the system more concretely by evaluating the Rosenthal potential of the game at each turn from Proposition~\ref{prop:potential}. From Figure~\ref{fig:global_potential}, the potential of the system oscillates rapdily in the exploration phase and then converges to the minimal potential. The system also shows robustness seen in Figure~\ref{fig:global_potential} where it recovers from perturbations in the convergence phase.
+%We can describe the convergence of the system more concretely by evaluating the Rosenthal potential of the game at each turn from Proposition~\ref{prop:potential}. From Figure~\ref{fig:global_potential}, the potential of the system oscillates rapdily in the exploration phase and then converges to the minimal potential. The system also shows robustness seen in Figure~\ref{fig:global_potential} where it recovers from perturbations in the convergence phase.
 
 % This consolidation from the players can be seen by Figure~\ref{fig:global_potential}, where the player makes aggressive assignments in reaction to observing their cost, then converges to a flow distribution. The player perturbs the system near the end, but quickly reverts to the optimal flow distribution.
 
-\begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{images/player_behavior}
-  \caption{A player flow distribution assignment for the game.}
-  \label{fig:player_behavior}
-\end{figure}
+%\begin{figure}[h]
+%  \centering
+%  \includegraphics[width=0.5\textwidth]{images/players_costs}
+%  \caption{Player cost normalized by equilibrium cost.}
+%  \label{fig:normalized_costs}
+%\end{figure}
+%
+%\begin{figure}
+%  \centering
+%  \includegraphics[width=0.5\textwidth]{images/player_behavior}
+%  \caption{A player flow distribution assignment for the game.}
+%  \label{fig:player_behavior}
+%\end{figure}
 
-\begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{images/global_potential_function}
-  \caption{Rosenthal potential values at each iteration.}
-  \label{fig:global_potential}
-\end{figure}
 
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \subsection{Estimation and prediction}
+We now apply the method proposed in Section~\ref{sec:estimation} to estimate the learning rates of each player, then use the estimated rates to predict the decision of the players over a short horizon. In this section, we take the Bregman divergence to be the regularized entropy defined in Section~\ref{subsec:reg_entropy}, with $\epsilon = 10^{-3}$.
 
-We can estimate the learning rate of each player with the update in Eq~\ref{eq:estimation_eta}. We obtained these sequence of learning rates for each player and plotted the moving average of length 3 for better visualization in Figure~\ref{fig:moving_average_learning_rate}.
 
-\begin{figure}
+First, we solve Problem~\eqref{eq:estimation_eta} to estimate the learning rate sequence one term at a time. Then, we use the parameterized form $\eta^{(t)}_k = \eta_k^{(0)} t^{-\alpha_k}$, and estimate $\eta_k^{(0)}$ and $\alpha_k^{(0)}$ by solving the problem~\ref{eq:estimation_alpha_eta0}. The results of both methods are shown in Figure~\eqref{fig:moving_average_learning_rate}
+When we estimate one term at a time, the resulting sequences have very large variations, and to better visualize them, we plot a moving average (over a window of $3$ iterations).
+
+It was interesting and perhaps surprising to observe that when estimating learning rates one term at a time, in some rare instances, the objective $d^{(t)}_k(\eta_k^{(t)})$ is minimal at a negative $\eta_k^{(0)}$. In other words, the decision of the player $\bar x^{(t+1)}_k$ is best described by minimizing $\eta \braket{\ell^{(t)}_k}{x_k} + D_{\psi_k}(x_k, x^{(t)}_k)$, which means that the player shifted the probability mass towards paths with \emph{higher} costs. One such example is given in the table below.
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+\begin{figure}[h!]
   \centering
-  \includegraphics[width=0.5\textwidth]{images/moving_average_learning_rate}
-  \caption{Moving average learning rate.}
+  \includegraphics[width=0.37\textwidth]{images/moving_average_learning_rate}
+  \includegraphics[width=0.37\textwidth]{images/sequence_rate}
+  \caption{\footnotesize Estimated sequences of learning rates in logarithmic scale. In the top figure, we estimate one term of the sequence at a time then plot a moving average with a window length equal to $3$. In the bottom figure, we estimate for each player the initial term $\eta^{(0)}_k$ and the decay rate $\alpha_k$.}
   \label{fig:moving_average_learning_rate}
-\end{figure}
-
-With these estimated sequences of learning rates, we can predict $x_{t+i+1}$ by using the prediction and propagation in \eqref{eq:estimation_step} and \eqref{eq:propagation}. To obtain $\eta^{(t+i)}_k$, we propose three methods. First, we assume $\eta^{(t+i)}_k = \eta^{(t+i-1)}_k$, where $\eta^{t+i-1}_k$ is the estimated learning rate in the previous turn as a baseline method for evaluation. Second, we assume $\eta^{(t+i)}_k$ to be the moving average of the previous estimated etas in the sequence. Finally, we perform linear regression on the estimated $(\eta_k^{(1)}, \dots, \eta_k^{(t-1)})$ to calculate $\eta^{(t+i)}_k$.
-
-We also compare these methods of computing $\eta^{(t+1)}$ with a parameterized learning rate proposal in Section~\ref{sec:estimation}. To obtain the parameterized sequence of $(\eta_k^{(1)}, \eta_k^{(2)}, \dots)$, we perform solve the non-convex optimization problem in \eqref{eq:estimation_alpha_eta0} for each player $k$. Then we use the optimal $\alpha_k, \eta^{(0)}_{k}$ to obtain the learning rate $\eta^{(t+i)}_k$ for our prediction and propagation. These sequences of learning rates can be seen in Figure~\ref{fig:sequence_rate}.
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{images/sequence_rate}
-  \caption{Estimated parameterized learning rate.}
   \label{fig:sequence_rate}
 \end{figure}
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-We evaluate each method by computing the average Bregman divergence per player per turn. From the results, the farther ahead we look in our prediction, the average Bregman divergence tend to increase for all methods. As the interval of prediction increases, the modeling errors propagate and the quality of our predictions degrade, which is reflected in Figure~\ref{fig:predictions_divergence}.
 
-\begin{figure}
+
+\begin{figure}[h]
   \centering
-  \includegraphics[width=0.5\textwidth]{images/predictions_divergence}
-  \caption{Average Bregman divergence per player and per iteration.}
+  \includegraphics[width=0.37\textwidth]{images/predictions_divergence}
+  \caption{\footnotesize Average Bregman divergence per player and per iteration, between the predicted distributions and the actual distributions, as a function of the prediction horizon.}
   \label{fig:predictions_divergence}
 \end{figure}
 
-We show an example of the two-step ahead flow distribution predictions made by the parameterized method in Figure~\ref{fig:parameterized} for all of the paths of one player. The flow predictions for each path are generally close to the actual flow distribution from the player. In cases where the player makes an extreme move, the flow predictions tend to underestimate the magnitude of the change in the flow distribution.
+Next, we use the estimated learning rates to predict the distributions of the players over a short horizon $h \in \{1, \dots, 8\}$. More precisely, given a horizon $h$, we compute, at each iteration $t$, the estimated learning rates up to $t$, then propagate the model forward from $t$ to $t+h$, by iteratively applying the function $g$ defined in~\eqref{eq:propagation}. 
 
-\begin{figure}
+We evaluate each method by computing the average Bregman divergence (per player and per iteration) between the predicted distribution $x^{(t+h)}$ and the actual distribution $\bar x^{(t+h)}$,
+\[
+\frac{1}{K} \sum_{k = 1}^K \frac{1}{t_{\max} - t_{\min}} \sum_{t = t_{\min}}^{t_{\max}-1} D_{\psi_k} (\bar x^{(t+h)}_h, x^{(t+h)}_k),
+\]
+where $t_{\min}$ is taken to be equal to $5$ (so that there is always a minimal history of observations to estimate the parameters). The results are given in Figure~\ref{fig:predictions_divergence}. One can observe that for all methods, as the horizon $h$ increases, the average divergence increases, since the modeling errors propagate and the quality of our predictions degrade.
+
+The best performance is obtained with the parameterized model $\eta^{(t)}_k = \eta^{(0)}_k t^{-\alpha_k}$. To visualize the quality of the prediction, we compare, in Figure~\ref{fig:parameterized}, the predicted distribution $x^{(t+h)}_k$ to the true distribution $\bar x^{(t+h)}_k$, for a horizon $h = 2$. The estimation is generally good at predicting the direction, and in many cases, the magnitude of the update, except in some rare cases in which the player decides to perform a very aggressive update.
+
+\begin{figure}[h]
   \centering
   \includegraphics[width=0.5\textwidth]{images/two_steps_predictions}
-  \caption{Two step prediction ahead for parameterized learning rate for a single player.}
+  \caption{\footnotesize Comparison of predicted distribution (solid lines) and actual distribution (dashed lines) for a given player $k$, and a prediction horizon $h = 2$. Each subplot corresponds to a different path $p \in \Pcal_k$.}
   \label{fig:parameterized}
 \end{figure}
 
@@ -575,7 +604,6 @@ This estimation problem can be extended in several ways: First, in our method, w
 % The following two commands are all you need in the
 % initial runs of your .tex file to
 % produce the bibliography for the citations in your paper.
-\newpage
 \bibliographystyle{abbrv}
 \bibliography{bib}  % sigproc.bib is the name of the Bibliography in this case
 % You must have a proper ".bib" file
