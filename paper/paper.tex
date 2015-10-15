@@ -4,6 +4,8 @@
 \usepackage[noend]{algorithmic}
 \usepackage{todonotes}
 \usepackage{enumitem}
+\usepackage{pgfplots}
+\usepackage{filecontents}
 
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows}
@@ -17,6 +19,11 @@
 \newtheorem{definition}{Definition}
 \newtheorem{proposition}{Proposition}
 
+\tikzstyle{block} = [draw, rectangle, minimum height=2em, minimum width=4em]
+%fill=blue!20
+\tikzstyle{sum} = [draw, fill=blue!20, circle, node distance=1cm]
+\tikzstyle{input} = [coordinate] \tikzstyle{output} = [coordinate]
+\tikzstyle{pinstyle} = [pin edge={to-,thin,black}]
 
 % \usepackage{picins}
 % \usepackage{graphicx}
@@ -369,7 +376,7 @@ We conclude this section by observing that while we chose to apply the model to 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \begin{figure*}
 \centering
-\includegraphics[width=.75\textwidth]{images/user_interface}
+\includegraphics[width=.80\textwidth]{images/user_interface.pdf}
 %\missingfigure[figwidth=.3\textwidth]{System block diagram}
 \caption{\footnotesize Screenshot of the client side of the routing game application. The table is the main interface, and can be used by the player to set weights on the different paths, using the sliders. The weights determine the flow distribution $x^{(t+1)}_k$. The table also show the previous flows ($x^{(t)}_k$), the previous costs $(\ell^{(t)}_k)$, and the cumulative costs $L^{(t)}_k = \sum_{\tau \leq t} \ell^{(\tau)}_k$. Clicking a path will also highlight the path on the graph. The bottom charts show the full history of flows $(x^{(\tau)}_k)_{\tau \leq t}$, costs $(\ell^{(\tau)}_k)_{\tau \leq t}$, and cumulative losses $(L^{(\tau)})_{\tau \leq t}$.}
 \label{fig:game_interface}
@@ -389,14 +396,67 @@ We conclude this section by observing that while we chose to apply the model to 
 % \end{figure*}
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-We developed a web application that implements the repeated routing game described in Section~\ref{sec:model}. The general architecture of the system is summarized in Figure~\ref{fig:system_block_diagram}. It consists of a client interface that is used by human participants, shown in Figure~\ref{fig:game_interface}, and a backend server that is responsible for collecting inputs from the clients, updating the state of the game, then broadcasting current information to each player. 
+We developed a web application that implements the repeated routing game described in Section~\ref{sec:model}. The general architecture of the system is summarized in Figure~\ref{fig:system_block_diagram}. It consists of a client interface that is used by human participants, shown in Figure~\ref{fig:game_interface}, and a backend server that is responsible for collecting inputs from the clients, updating the state of the game, then broadcasting current information to each player.
+
+%\begin{figure*}[h]
+%  \centering
+%  \missingfigure{System block diagram to be added later}
+%  \caption{\footnotesize System block diagram to be added later.}
+%  \label{fig:system_block_diagram}
+%\end{figure*}
+
+%
+% \tikzstyle{block} = [draw, fill=white, rectangle,
+% minimum height=3em, minimum width=6em]
+%
+% \tikzstyle{block} = [draw,fill=blue!20,minimum size=2em]
+%
+% \tikzstyle{sum} = [draw, fill=white, circle, node distance=1cm]
+% \tikzstyle{input} = [coordinate]
+% \tikzstyle{output} = [coordinate]
+% \tikzstyle{pinstyle} = [pin edge={to-,thin,black}]
+
+ \def\radius{.7mm}
+ \tikzstyle{branch}=[fill,shape=circle,minimum size=3pt]
+
+\tikzstyle{dotted}= [dash pattern=on .01mm off 2.5mm,
+                                         line cap=round]
 
 \begin{figure}[h]
-  \centering
-  \missingfigure{System block diagram to be added later}
-  \caption{\footnotesize System block diagram to be added later.}
-  \label{fig:system_block_diagram}
-\end{figure}
+ \begin{tikzpicture}[auto, node distance=2cm,>=latex']
+
+    \node[block] (system) at (6, -2) {Server};
+    \node[output] at (7.3, -2) (sys_output) {};
+    \node[sum, left of=system] (sum)  at (4, -2) {};
+    \node[block, above left = of sum, anchor=west, align = left] at (1,-1) (block1) {$p_1$};
+    \node[block, left = of sum, anchor=west, align = left] at (1.6,-2) (block2) {$p_2$};
+    \node[block, below left = of sum, anchor=west, align = left] at (1,-3) (block3) {$p_3$};
+
+   \coordinate[below = 0.3cm of block1] (b1_turn);
+   \coordinate[above = 0.3cm of block2] (b2_turn);
+   \coordinate[above = 0.3cm of block3] (b3_turn);
+   \coordinate(system_b1_turn) at (3.7, 1.55);
+   \coordinate(system_b2_turn) at (3.7, -0.85);
+   \coordinate(system_b3_turn) at (3.7, -3.265);
+
+   \draw[->] (sum) -- node {$\bar x^{(t)}$} (system);
+   \draw[-] (system) -- (sys_output);
+
+   \draw[->] (block1.east) -| node [near start] {$\bar x_1^{(t)} $} (sum) ;
+   \draw[->] (sys_output) |- (system_b1_turn) -| node [near start, above right = 0.0cm and 1.5cm of block1] {$(\bar \ell_{1}^{(t)}, \bar \ell^{(t-1)}_{1}, \dots)$} (block1.north);
+
+   \draw[->] (block2) |- node [near end]  {$\bar x_2^{(t)} $} (sum);
+   \draw[->] (sys_output) |- (system_b2_turn) -| node [near start, above right = 0.0cm and 1.5cm of block1] {$(\bar \ell_{2}^{(t)}, \bar \ell_2^{(t-1)}, \dots)$}  (block2.north);
+
+   \draw[->] (block3) -| node [near start] {$\bar x_3^{(t)} $}  (sum);
+   \draw[->] (sys_output) |- (system_b3_turn) -| node [near start, above right = 0.0cm and 1.5cm of block1] {$(\bar \ell_{3}^{(t)}, \bar \ell_3^{(t-1)}, \dots)$}  (block3.north);
+
+\draw[dotted,line width = 2mm] (0.3,-5.1) -- (0.3, -5.8);
+
+  \end{tikzpicture}
+  \label{fig:system_diagram}
+  \caption{Block diagram of the system. At iteration $t$, each player $p_k$ uses the cost vector history $(\bar \ell_{k}^{(t-1)}, \bar \ell_k^{(t-2)}, \dots)$ to make the routing decision vector $\bar x_k^{(t)}$. The server then computes the cumulative flow on each edge and returns the local cost vector history $(\bar \ell_{k}^{(t)}, \bar \ell_k^{(t-1)}, \dots)$ for player $p_k$, then the game proceeds to iteration $t+1$.}
+ \end{figure}
 
 
 A root user can set up the game by creating a graph and defining the cost functions on each edge. Then once a game is set up, players can log in to the client interface, and each player is assigned an arbitrary origin node and destination node on the graph. Once the game starts, it is played in iterations, such that each iteration lasts a specified period of time shown by the timer on top of the client interface (each iteration lasts $30$ seconds in our experiments). Each player $k$ can use the sliders to set her flow distribution $x^{(t)}_k$ during iteration $t$. At the end of the iteration, the server uses the values of $x_k^{(t)}$ for all players $k \in \{1, \dots, K\}$ to compute the cost functions $\ell^{(t)}_k$, then sends this information to the client side, which then updates the charts and the table with the last value of the cost. Note that client $k$ only has access to the information about player $k$, so in this sense, the learning is completely distributed, as players do not observe the decision or the costs of other players. The decisions of the players $(x_k^{(t)})$ and the costs $(\ell^{(t)}_k)$ are logged by the server, with no additional identifiable information about the players.
@@ -415,89 +475,7 @@ The code for the web application is available on Github at the following url: \t
 %   \label{fig:normalized_costs}
 % \end{figure}
 
-% \tikzstyle{block} = [draw, fill=white, rectangle,
-% minimum height=3em, minimum width=6em]
-
-% \tikzstyle{block} = [draw,fill=blue!20,minimum size=2em]
-
-% \tikzstyle{sum} = [draw, fill=white, circle, node distance=1cm]
-% \tikzstyle{input} = [coordinate]
-% \tikzstyle{output} = [coordinate]
-% \tikzstyle{pinstyle} = [pin edge={to-,thin,black}]
-
-% \def\radius{.7mm}
-% \tikzstyle{branch}=[fill,shape=circle,minimum size=3pt,inner sep=0pt]
-
-% \begin{tikzpicture}[auto, node distance=2cm,>=latex']
-
-%   \node [input, name=input] {};
-%   \node [sum, right of=input] (sum) {};
-%   % \node [block, right of=sum] (controller) {Controller};
-%   \node [block, right of=sum, node distance=3cm] (system) {Network};
-
-%   \node [output, right of=system] (output) {};
-%   % \node [block, below of=system] (measurements) {Measurements};
-
-%   % \draw [draw,->] (input) -- node {$\bar x(t)$} (sum);
-%   \draw [->] (sum) -- node {$\bar x(t)$} (system);
-%   % \draw [->] (y) |- (measurements);
-%   % \draw [->] (measurements) -| node[pos=0.99] {$-$}
-%   % node [near end] {$y_m$} (sum);
-
-%   \node at (0,-1) (input1) {$i_1$};
-%   \node[block, above left = of system, anchor=west] at (2,-1) (block1) {$p_1$};
-%   \draw[->] (block1.east) -- (sum);
-%   \draw[->] (system) -- (block1);
-
-%   \node at (0,-2) (input2) {$i_2$};
-%   \node[block, left of=system, anchor=west] at (2,-2) (block2) {$p_2$};
-%   \draw[->] (block2.east) -- (sum);
-%   \draw[->] (system) -- (block2);
-
-%   \node at (0,-3) (input3) {$i_3$};
-%   \node[block, below left = of system, anchor=west] at (2,-3) (block3) {$p_3$};
-%   \draw[->] (block3.east) -- (sum);
-%   \draw[->] (system) -- (block3);
-
-%   % % Draw blocks, inputs and outputs
-%   % \foreach \y in {1,2,3} {
-%   %   \node at (0,-\y) (input\y) {$i_\y$};
-%   %   \node[block, left of=system, above of =system] at (2,-\y) (block\y) {$p_\y$};
-%   %   \draw[->] (input\y) -- (block\y);
-%   %   \draw[->] (block\y.east) -- (sum);
-%   %   \draw[->] (system) -- (block\y);
-%   % }
-
-%   % Calculate branch point coordinate
-%   \path (input1) -- coordinate (branch) (block1);
-
-%   % Define a style for shifting a coordinate upwards
-%   % Note the curly brackets around the coordinate.
-%   \tikzstyle{s}=[shift={(0mm,\radius)}]
-%   % It would be natural to use the yshift or xshift option, but that does
-%   % not seem to work when shifting coordinates.
-
-%   \draw[->] (branch) node[branch] {}{ % draw branch junction
-%     \foreach \c in {2} {
-%       % Draw semicircle junction to indicate that the lines are
-%       % not connected. The intersection between the lines are
-%       % calculated using the convenient -| syntax. Since we want
-%       % the semicircle to have its center where the lines intersect,
-%       % we have to shift the intersection coordinate using the 's'
-%       % style to account for this.
-%       [shift only] -- ([s]input\c -| branch) arc(90:-90:\radius)
-%       % Note the use of the [shift only] option. It is not necessary,
-%       % but I have used it to ensure that the semicircles have the
-%       % same size regardless of scaling.
-%     }
-%   };
-
-% \end{tikzpicture}
-
-
 %To address a player who may be at a disadvantage due to having longer paths or more congested paths because of the topology of the network, we normalized the cumulative path cost of each player with their cumulative path cost at equilibrium calculated with Algorithm~\ref{alg:MD}.
-
-
 
 
 %============================================================================================
@@ -547,7 +525,7 @@ We now apply the method proposed in Section~\ref{sec:estimation} to estimate the
 
 
 First, we solve Problem~\eqref{eq:estimation_eta} to estimate the learning rate sequence one term at a time. Then, we use the parameterized form $\eta^{(t)}_k = \eta_k^{(0)} t^{-\alpha_k}$, and estimate $\eta_k^{(0)}$ and $\alpha_k^{(0)}$ by solving the problem~\ref{eq:estimation_alpha_eta0}. The results of both methods are shown in Figure~\eqref{fig:moving_average_learning_rate}
-When we estimate one term at a time, the resulting sequences have very large variations, and to better visualize them, we plot a moving average (over a window of $3$ iterations).
+When we estimate one term at a time, the resulting sequences have very large variations, and to better visualize them, we plot a moving average (over a window of $5$ iterations).
 
 It was interesting and perhaps surprising to observe that when estimating learning rates one term at a time, in some rare instances, the objective $d^{(t)}_k(\eta_k^{(t)})$ is minimal at a negative $\eta_k^{(0)}$. In other words, the decision of the player $\bar x^{(t+1)}_k$ is best described by minimizing $\eta \braket{\ell^{(t)}_k}{x_k} + D_{\psi_k}(x_k, x^{(t)}_k)$, which means that the player shifted the probability mass towards paths with \emph{higher} costs. One such example is given in the table below.
 
@@ -556,7 +534,7 @@ It was interesting and perhaps surprising to observe that when estimating learni
   \centering
   \includegraphics[width=0.37\textwidth]{images/moving_average_learning_rate}
   \includegraphics[width=0.37\textwidth]{images/sequence_rate}
-  \caption{\footnotesize Estimated sequences of learning rates in logarithmic scale. In the top figure, we estimate one term of the sequence at a time then plot a moving average with a window length equal to $3$. In the bottom figure, we estimate for each player the initial term $\eta^{(0)}_k$ and the decay rate $\alpha_k$.}
+  \caption{\footnotesize Estimated sequences of learning rates in logarithmic scale. In the top figure, we estimate one term of the sequence at a time then plot a moving average with a window length equal to $5$. In the bottom figure, we estimate for each player the initial term $\eta^{(0)}_k$ and the decay rate $\alpha_k$.}
   \label{fig:moving_average_learning_rate}
   \label{fig:sequence_rate}
 \end{figure}
@@ -571,7 +549,7 @@ It was interesting and perhaps surprising to observe that when estimating learni
   \label{fig:predictions_divergence}
 \end{figure}
 
-Next, we use the estimated learning rates to predict the distributions of the players over a short horizon $h \in \{1, \dots, 8\}$. More precisely, given a horizon $h$, we compute, at each iteration $t$, the estimated learning rates up to $t$, then propagate the model forward from $t$ to $t+h$, by iteratively applying the function $g$ defined in~\eqref{eq:propagation}. 
+Next, we use the estimated learning rates to predict the distributions of the players over a short horizon $h \in \{1, \dots, 8\}$. More precisely, given a horizon $h$, we compute, at each iteration $t$, the estimated learning rates up to $t$, then propagate the model forward from $t$ to $t+h$, by iteratively applying the function $g$ defined in~\eqref{eq:propagation}.
 
 We evaluate each method by computing the average Bregman divergence (per player and per iteration) between the predicted distribution $x^{(t+h)}$ and the actual distribution $\bar x^{(t+h)}$,
 \[
