@@ -4,12 +4,7 @@
 \usepackage[noend]{algorithmic}
 \usepackage{todonotes}
 \usepackage{enumitem}
-\usepackage{pgfplots}
-\usepackage{filecontents}
 
-\usepackage{tikz}
-\usetikzlibrary{shapes,arrows}
-\usetikzlibrary{calc, positioning}
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \input{latex_commands}
@@ -19,11 +14,6 @@
 \newtheorem{definition}{Definition}
 \newtheorem{proposition}{Proposition}
 
-\tikzstyle{block} = [draw, rectangle, minimum height=2em, minimum width=4em]
-%fill=blue!20
-\tikzstyle{sum} = [draw, fill=blue!20, circle, node distance=1cm]
-\tikzstyle{input} = [coordinate] \tikzstyle{output} = [coordinate]
-\tikzstyle{pinstyle} = [pin edge={to-,thin,black}]
 
 % \usepackage{picins}
 % \usepackage{graphicx}
@@ -36,7 +26,8 @@
 
 \begin{document}
 
-\title{Estimating Learning Dynamics in the Routing Game
+\title{On Learning How Players Learn:\\
+Estimation of Learning Dynamics in the Routing Game
 % \titlenote{}
 }
 %
@@ -147,9 +138,9 @@
   The routing game models congestion in transportation networks, communication networks, and other cyber physical systems in which agents compete for shared resources.
   We consider an online learning model of player dynamics: at each iteration, every player chooses a route (or a probability distribution over routes, which corresponds to a flow allocation over the physical network), then the joint decision of all players determines the costs of each path, which are then revealed to the players.
 
-  We pose the following estimation problem: given a sequence of player decisions and the corresponding costs, we would like to estimate the learning model parameters. We consider in particular entropic mirror descent dynamics, reduce the estimation problem to estimating the learning rates of the players, and develop a numerical solution to the estimation problem.
+  We pose the following estimation problem: given a sequence of player decisions and the corresponding costs, we would like to estimate the learning model parameters. We consider in particular entropic mirror descent dynamics, reduce the problem to estimating the learning rates of each player.
 
-  We demonstrate this method using data collected from a routing game experiment, played by human participants: We develop a web interface to implement the routing game. When players log in to the web application, they are assigned an origin and destination on the graph. They can choose, at each iteration, a distribution over their available routes, and each player seeks to minimize her own cost. We collect a data set using this interface, then apply the proposed method to estimate the learning model parameters.
+  We demonstrate this method using data collected from a routing game experiment, played by human participants: We develop a web application to implement the routing game. When players log in, they are assigned an origin and destination on the graph. They can choose, at each iteration, a distribution over their available routes, and each player seeks to minimize her own cost. We collect a data set using this interface, then apply the proposed method to estimate the learning model parameters.
   We observe in particular that after an exploration phase, the joint decision of the players remains within a small distance of the Nash equilibrium. We also use the estimated model parameters to predict the flow distribution over routes, and compare these predictions to the actual distribution.
   Finally, we discuss some of the qualitative implications of the experiments, and give directions for future research.
 
@@ -170,23 +161,23 @@ We will focus in particular on the mirror descent model used in~\cite{krichene20
 \[
 x^{(t+1)}_k(\eta^{(t)}_k) = \argmin_{x_k \in \Delta^{\Acal_k}} \eta^{(t)}_k\braket{\ell^{(t)}_k}{x} + D_{\psi_k}(x_k, x^{(t)}_k),
 \]
-where $\psi_k$ is a distance generating function with corresponding Bregman divergence $D_{\psi_k}$, and $\eta^{(t)}_k$ is a learning rate. Intuitively, minimizing the first term $\braket{\ell^{(t)}_k}{x}$ will assign traffic to the routes which currently have minimal cost, and minimizing the second term $D_{\psi_k}(x_k, x^{(t)}_k)$ will keep the traffic at its current value. Minimizing the linear combination trades-off both terms, and the learning rate $\eta_k^{(t)}$ determines how aggressive the player is when updating her strategy: A small learning rate results in a small change in strategy (i.e. $x^{(t+1)}_k$ is close to $x_k^{(t)}$), while a large learning rate results in a significant change.
+where $\psi_k$ is a distance generating function with corresponding Bregman divergence $D_{\psi_k}$, and $\eta^{(t)}_k$ is a learning rate. Intuitively, minimizing the first term $\braket{\ell^{(t)}_k}{x}$ will assign traffic to the routes which currently have minimal cost, and minimizing the second term $D_{\psi_k}(x_k, x^{(t)}_k)$ will keep the traffic at its current value. Minimizing the linear combination trades-off both terms, and the learning rate $\eta_k^{(t)}$ determines how aggressive the player is in updating her strategy: A small learning rate results in a small change in strategy (i.e. $x^{(t+1)}_k$ is close to $x_k^{(t)}$), while a large learning rate results in a significant change.
 
 \subsection{Estimating the learning rates}
 Motivated by this interpretation of the learning dynamics, we propose the following estimation problem: Given a sequence of player decisions $(x^{(t)}_k)$, and the sequence of corresponding costs $(\ell_k^{(t)})$, can we estimate the learning model parameters to fit these observations? These quantities are effectively measured in our experimental setting using the routing interface, and can be measured on transportation networks using existing traffic monitoring and forecasting systems, such as the Mobile Millennium system~\cite{bayen2011mobile} or the Grenoble Traffic Lab~\cite{canudasdewit2015grenoble}.
 
-Our proposed approach is to assume that the player is using a given distance generating function $\psi_k$, and estimate $\eta_k$ for example by minimizing the distance between the observed decision $\bar x^{(t+1)}_k$, and the decision predicted by the model, $x^{(t+1)}_k(\eta_k^{(t)})$. More precisely, we can choose $\eta^{(t)}_k$ to minimize $D_{\psi_k}(\bar x^{(t+1)}_k, x^{(t+1)}_k(\eta_k^{(t)}))$. We show that in the entropic case (when $\psi_k$ is the negative entropy), this problem is convex, thus $\eta_k^{(t)}$ can be estimated efficiently e.g. by using gradient descent. This method allows us to estimate one parameter $\eta_k^{(t)}$ per iteration $t$ and per player $k$. When we have a sequence of observations available, it can be desirable to control the complexity of the model by assuming a parameterized sequence of learning rates, instead of estimating each term separately. Thus, we propose a second method which assumes that the learning rate is of the form $\eta^{(t)}_k = \eta^{(0)}_k t^{-\alpha_k}$, with $\alpha_k \in (0, 1)$. The resulting estimation problem is non-convex in general, but since it is a two dimensional problem, it can be minimized efficiently. Finally, we consider a family of distance generating functions $\psi_\epsilon$, parameterized by $\epsilon$, that can be viewed as a generalization of the negative entropy function. These generalized entropy functions offer some desirable properties that will be discussed in more detail.
+Our proposed approach is to assume that the player is using a given distance generating function $\psi_k$, and estimate $\eta_k$ for example by minimizing the distance between the observed decision $\bar x^{(t+1)}_k$, and the decision predicted by the model, $x^{(t+1)}_k(\eta_k^{(t)})$. More precisely, we can choose $\eta^{(t)}_k$ to minimize $D_{\psi_k}(\bar x^{(t+1)}_k, x^{(t+1)}_k(\eta_k^{(t)}))$. We show that in the entropic case (when $\psi_k$ is the negative entropy), this problem is convex, thus $\eta_k^{(t)}$ can be estimated efficiently e.g. by using gradient descent. This method allows us to estimate one parameter $\eta_k^{(t)}$ per iteration $t$ and per player $k$. When we have a sequence of observations available, it can be desirable to control the complexity of the model by assuming a parameterized sequence of learning rates, instead of estimating each term separately. Thus, we propose a second method which assumes that the learning rate is of the form $\eta^{(t)}_k = \eta^{(0)}_k t^{-\alpha_k}$, with $\alpha_k \in (0, 1)$. The resulting estimation problem is non-convex in general, but since it is a two dimensional problem, it can be minimized efficiently. Finally, we consider a family of distance generating functions $\psi_\epsilon$, parameterized by $\epsilon$, that can be viewed as a generalization of the negative entropy function. These generalized entropy functions have desirable properties that will be discussed in more detail.
 
 \subsection{Summary of contributions and organization of the article}
 Our main contributions are to
-\setlist[enumerate]{itemindent=\dimexpr\labelwidth+\labelsep\relax,leftmargin=0pt}
+\setlist[enumerate]{itemindent=\dimexpr\labelwidth+\labelsep\relax,topsep=.5ex,itemsep=0ex,leftmargin=0pt}
 \begin{enumerate}
 \item Pose the learning rate estimation problem, and show that it is convex problem in the entropic case. We also give an example application of the estimated model: It can be used to predict the decision of the players over the next few iterations, by propagating the model forward with the estimated values of the parameters.
 \item Develop a routing game system in order to collect data on routing decisions. We developed a web interface in which a master user can create an instance of the routing game by defining a graph and cost functions on edges of the graph. Then other users can connect to the interface as players. The game then proceeds similarly to our learning model: At each iteration, every player chooses a flow distribution on their available routes (using a graphical user interface with sliders), then their decisions are sent to a backend server, which computes the total cost of each route, and sends this information back to each player.
 \item Apply the proposed methods to the data collected from the routing game system, and give quantitative and qualitative insights into the decision dynamics of human players. In particular, we observed that in the first few iterations, the flow distributions oscillate, which corresponds to a high value of estimated learning rates. For later iterations, the flow distributions are, in general, close to equilibrium, and the learning rates are lower, although some players may occasionally move the system away from equilibrium by performing an aggressive update (high learning rate). It was also interesting to observe that in some rare cases, the estimate of the learning rate is negative, which means that the player updated her strategy by assigning more traffic to routes with higher cost, a counter-intuitive behavior which is hard to model. Finally, the prediction with the estimated model performs surprisingly well, especially for short term prediction (up to $4$ iterations), which indicates that the mirror descent model is a good descriptive and predictive model for player behavior in this setting.
 \end{enumerate}
 
-The remainder of the article is organized as follows: In Section~\ref{sec:model}, we formally define the routing game and review the characterization of its equilibrium set, then define the mirror descent dynamics and review its convergence guarantees. In Section~\ref{sec:estimation}, we pose the learning rate estimation problem in the entropy case, then extend it to the generalized entropy case. We also briefly discuss the traffic prediction problem. In Section~\ref{sec:experiment}, we describe the experimental setting, some implementation details, as well as the nature of the collected data. We then use this data to run the estimation and prediction tasks in Section~\ref{sec:results}, comment on the quality of the prediction, and give some qualitative and quantitative insights into the decision dynamics (distance to equilibrium, comparison of learning decay rates). We conclude in Section~\ref{sec:conclusion} by summarizing our results and giving directions for future research.
+The remainder of the article is organized as follows: In Section~\ref{sec:model}, we formally define the routing game and review the characterization of its equilibria, then define the mirror descent dynamics and review its convergence guarantees. In Section~\ref{sec:estimation}, we pose the learning rate estimation problem in the entropy case, then extend it to the generalized entropy case. We also briefly discuss the traffic prediction problem. In Section~\ref{sec:experiment}, we describe the experimental setting, some implementation details, and the nature of the collected data. We then use this data to run the estimation and prediction tasks in Section~\ref{sec:results}, comment on the quality of the prediction, and give some qualitative and quantitative insights into the decision dynamics. We conclude in Section~\ref{sec:conclusion} by summarizing our results and giving directions for future research.
 
 %============================================================================================
 \section{The routing game and the learning model}
@@ -196,12 +187,12 @@ In this section, we give the definition of the (one-shot) routing game, and the 
 \subsection{The routing game}
 \label{sec:routing_game}
 The routing game is played on a directed graph $\Gcal = (V, E)$, where $V$ is a vertex set and $E \subset V \times V$ is an edge set. The players will be indexed by $k \in \{1, \dots, K\}$, where every player is given by an origin vertex $o_k \in V$, a destination vertex $d_k \in V$, and a traffic mass $m_k \geq 0$ that represents the total traffic that the player needs to send from $o_k$ to $d_k$. The set of available paths connecting $o_k$ to $d_k$ will be denoted by $\Pcal_k$, and the action set of player $k$ is simply the probability simplex over $\Pcal_k$, which we denote by $\Delta^{\Pcal_k} = \{x \in \Rbb_+^{\Pcal_k} : \sum_{p \in \Pcal_k} x_p = 1\}$. In other words, each player chooses a distribution over their available paths, and their traffic is allocated to paths according to that distribution. We will denote by $x_k\in \Delta^{\Pcal_k}$ the distribution of player $k$. Note that $x_k$ is a distribution vector, so the vector of actual flows is the scaled vector $m_k x_k$. The joint decision of all players is denoted by $x = (x_1, \dots, x_K)$. The costs of the players are then determined as follows:
-\begin{enumerate}[label=\alph*)]
+\begin{enumerate}[itemsep=0ex,topsep=1ex,label=\alph*)]
 \item The cost on an edge $e$ is $c_e(\phi_e(x))$, where $c_e(\cdot)$ is a given, increasing function (this models the actual cost due to the physical process, for example delay on a road segment due to accumulation of cars), and $\phi_e(x)$ is the total traffic flow on edge $e$ induced by the distribution $x$, obtained simply by summing all the path flows that go through that edge, i.e. $\phi_e(x) = \sum_k \sum_{p \in \Pcal_k} m_k x_{k, p}$.
 \item The cost on a path $p \in \Pcal_k$ is denoted by $\ell_{k, p}(x)$, and is the sum of edge costs along the path, i.e. $\ell_{k, p}(x) = \sum_{e \in p} c_e(\phi_e(x))$.
 \item The cost for player $k$ is the total path cost for all the traffic sent by player $k$, i.e. $\sum_{p \in \Pcal_k} m_k x_{k, p} \ell_{k, p}(x)$. This is simply the inner product between the flow vector $m_k x_k$ and the path delay vector $\ell_k(x)$, which we denote by $\braket{\ell_k(x)}{x_k}$.
 \end{enumerate}
-\begin{remark}[A note on the player model] Some formulations of the routing game, e.g.~\cite{sandholm2001potential,krichene2015learning}, define the game in terms of \emph{populations} of players, such that each population is an infinite set of players with the same origin and destination. This assumes that each player contributes an infinitesimal amount of flow, so each player can pick a single path. In our model, each player is macroscopic, and can split its traffic across multiple routes. Both models are equivalent in terms of analysis, the only difference is in terms of interpretation of the model. We choose the finite player interpretation because it is more consistent with the experimental section of the article, where we run the game with finitely many players.
+\begin{remark}[A note on the player model] Some formulations of the routing game, e.g.~\cite{sandholm2001potential,krichene2015learning}, define the game in terms of \emph{populations} of players, such that each population is an infinite set of players with the same origin and destination. This assumes that each player contributes an infinitesimal amount of flow, so each player can play a single path. In our model, each player is macroscopic, and can split its traffic across multiple routes. Both models are equivalent in terms of analysis, the only difference is the interpretation of the model. We choose the finite player interpretation because it is more consistent with the experimental section of the article, where we run the game with finitely many players.
 \end{remark}
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -235,21 +226,21 @@ We will consider the model of distributed learning proposed in~\cite{krichene201
 \STATE Observe $\ell_k^{(t)} = \nabla_{x_k} f(x^{(t)})$,
 \STATE Update distribution
 \begin{equation}
-x^{(t+1)}_k = \argmin_{x_k \in \Delta^{\Pcal_k}} \left[ \eta_k^{(t)} \braket{\ell_k(x^{(t)})}{x_k} + D_{\psi_k}(x_k, x^{(t)}_k) \right]
+\hspace{-.2in}x^{(t+1)}_k = \argmin_{x_k \in \Delta^{\Pcal_k}} \left[ \eta_k^{(t)} \braket{\ell_k(x^{(t)})}{x_k} + D_{\psi_k}(x_k, x^{(t)}_k) \right]
 \label{eq:MD_update}
 \end{equation}
 \ENDFOR
 \ENDFOR
 \end{algorithmic}
-\caption{\small Distributed mirror descent dynamics with DGF $\psi_k$ and learning rates $\eta_k^{(t)}$.}
+\caption{\small Distributed mirror descent dynamics with DGF $\psi_k$ and learning rates $(\eta_k^{(t)})$.}
 \label{alg:MD}
 \end{algorithm}
 In the update equation~\eqref{eq:MD_update}, $D_{\psi_k}(x_k, x^{(t)}_k)$ is the Bregman divergence between the distributions $x_k$ and $x_k^{(t)}$, defined as $D_\psi(x, y) = \psi(x) - \psi(y) - \braket{\nabla \psi(y)}{x - y}$, for a strongly convex function $\psi$, called the distance generating function (DGF), see for example~\cite{censor1997parallel,banerjee2005clustering} for a review of Bregman divergences and their uses in optimization. Some special cases include:
-\begin{enumerate}[label=\alph*)]
+\begin{enumerate}[topsep=.5ex,itemsep=0ex,label=\alph*)]
 \item The Euclidean case: If $\psi(x) = \frac{\|x\|^2_2}{2}$, then $D_\psi(x, y) = \frac{\|x - y\|_2^2}{2}$. In this case, mirror descent reduces to the projected gradient descent algorithm.
 \item The entropic case: If $\psi(x) = - H(x)$ where $H(x) = -\sum_{p} x_p \ln x_p$ is the negative entropy, then $D_\psi(x, y) = \sum_p x_p \ln \frac{x_p}{y_p}$ is the Kullback-Leibler (KL) divergence from $x$ to $y$. In this case, the mirror descent algorithm is sometimes called the entropic descent~\cite{beck2003mirror}, or exponentiated gradient descent~\cite{kivinen1997exponentiated}.
 \end{enumerate}
-The mirror descent method is a general method for convex optimization proposed in~\cite{nemirovski1983problem}. The model in Algorithm~\ref{alg:MD} is a distributed version of mirror descent, applied to the potential function $f$ (defined in Proposition~\ref{prop:potential}). To give some intuition of the method, the first term $\braket{\ell_k^{(t)}}{x_k}$ in the minimization problem~\eqref{eq:MD_update} can be thought of as a linear approximation of the potential function (since $\ell(x) = \nabla f(x)$), and the second term $D_\psi(x_k, x^{(t)}_k)$ penalizes deviations from the previous iterate $x_k^{(t)}$. The learning rate $\eta_k^{(t)}$ determines the tradeoff between the two terms, and can be thought of as a generalized step size: A smaller $\eta_k$ results in a distribution which is closer to the current $x_k^{(t)}$. Thus, from the potential function point of view, the player minimizes a linearization of the potential plus a Bregman divergence term that keeps $x_k$ close to $x_k^{(t)}$. From the routing game point of view, the first term $\braket{\ell^{(t)}_k}{x_k}$ corresponds to putting weight on the paths that have smaller cost during the previous iteration, and the second term keeps the distribution close to its current value. The learning rate parameter $\eta^{(t)}_k$ determines how aggressive the player is in shifting traffic to the paths which appear to be the best.
+The mirror descent method is a general method for convex optimization proposed in~\cite{nemirovski1983problem}. The model in Algorithm~\ref{alg:MD} is a distributed version of mirror descent, applied to the potential function $f$ (defined in Proposition~\ref{prop:potential}). To give some intuition of the method, the first term $\braket{\ell_k^{(t)}}{x_k}$ in the minimization problem~\eqref{eq:MD_update} can be thought of as a linear approximation of the potential function (since $\ell(x) = \nabla f(x)$), and the second term $D_\psi(x_k, x^{(t)}_k)$ penalizes deviations from the previous iterate $x_k^{(t)}$. The learning rate $\eta_k^{(t)}$ determines the tradeoff between the two terms, and can be thought of as a generalized step size: A smaller $\eta_k^{(t)}$ results in a distribution which is closer to the current $x_k^{(t)}$. Thus, from the potential function point of view, the player minimizes a linearization of the potential plus a Bregman divergence term that keeps $x_k$ close to $x_k^{(t)}$. From the routing game point of view, the first term $\braket{\ell^{(t)}_k}{x_k}$ corresponds to putting weight on the paths that have smaller cost during the previous iteration, and the second term keeps the distribution close to its current value. The learning rate parameter $\eta^{(t)}_k$ determines how aggressive the player is in shifting traffic to the paths which appear to be the best.
 
 The convergence of this distributed learning model is discussed in~\cite{krichene2015MD}. The learning dynamics given in Algorithm~\ref{alg:MD} is guaranteed to converge under the following assumptions:
 \begin{theorem}[Theorem~3 in~\cite{krichene2015MD}]
@@ -328,14 +319,14 @@ then estimate $(\alpha_k, \eta^{(0)}_k)$ by solving the problem
 \label{eq:estimation_alpha_eta0}
 (\alpha_k, \eta^{(0)}_k) = \argmin_{\alpha_k \in (0, 1), \eta^{(0)} \geq 0} D^{(t)}_k(\alpha, \eta^{(0)}).
 \end{equation}
-Note that this problem is non-convex in general, however, since it is low-dimensional (only two parameters to estimate), it can also be solved efficiently using non-convex optimization techniques.
+Note that this problem is non-convex in general, however, since it is low-dimensional (two parameters to estimate), it can also be solved efficiently using non-convex optimization techniques.
 
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \subsection{A parameterized family of distance generating functions}
 \label{subsec:reg_entropy}
-In this section, we propose to use a generalization of the entropy distance generating function, motivated by the following observation:
-according to the entropy update and its explicit solution~\eqref{eq:estimation_alpha_eta0}, the support of $x^{(t+1)}_k(\eta)$ always coincides with the support of $\bar x^{(t)}_k$ (due to the multiplicative form of the solution). As a consequence, if we observe two consecutive terms $\bar x^{(t)}_k, \bar x^{(t+1)}_k$ such that some $p$ is in the support of $\bar x^{(t+1)}_k$ but not in the support of $\bar x^{(t)}_k$, the KL divergence $D_{KL}(\bar x^{(t+1)}_k, x^{(t+1)}_k(\eta))$ will be infinite for all values of $\eta$, since $\support (x^{(t+1)}_k(\eta)) \not\subset \support (\bar x^{(t+1)})$ (in measure theoretic terms, $x^{(t+1)}_k(\eta)$ is not absolutely continuous with respect to $\bar x^{(t+1)}$). This is problematic, as the estimation problem is ill-posed in such cases (which do occur in the data set used in Section~\ref{sec:results}). To solve this problem, we consider the following DGF: For $\epsilon > 0$, let
+In this section, we propose to use a generalization of the entropy DGF, motivated by the following observation:
+according to the entropy update and its explicit solution~\eqref{eq:estimation_alpha_eta0}, the support of $x^{(t+1)}_k(\eta)$ always coincides with the support of $\bar x^{(t)}_k$ (due to the multiplicative form of the solution). As a consequence, if we observe two consecutive terms $\bar x^{(t)}_k, \bar x^{(t+1)}_k$ such that some $p$ is in the support of $\bar x^{(t+1)}_k$ but not in the support of $\bar x^{(t)}_k$, the KL divergence $D_{KL}(\bar x^{(t+1)}_k, x^{(t+1)}_k(\eta))$ is infinite for all $\eta$, since $\support (\bar x^{(t+1)}) \not\subset \support (x^{(t+1)}_k(\eta))$ (in measure theoretic terms, $\bar x^{(t+1)}$ is not absolutely continuous with respect to $x^{(t+1)}_k(\eta)$). This is problematic, as the estimation problem is ill-posed in such cases (which do occur in the data set used in Section~\ref{sec:results}). To solve this problem, we consider the following DGF: For $\epsilon > 0$, let
 \[
 \psi_\epsilon(x_k) = -H(x+\mathbf \epsilon) = \sum_p (x_{k, p} + \epsilon) \ln (x_{k,p} + \epsilon).
 \]
@@ -343,7 +334,7 @@ The corresponding Bregman divergence is
 \[
 D_{\psi_\epsilon}(x_k, y_k) = \sum_p (x_{k,p}+\epsilon)\ln\frac{x_{k, p} + \epsilon}{y_{k, p} + \epsilon},
 \]
-and can be interpreted as a generalized KL divergence. In particular, for any $\epsilon > 0$, this Bregman divergence is finite for any $x_k, y_k \in \Delta^{\Pcal_k}$, unlike the KL divergence. Additionally, the support is not necessarily preserved, which was an undesirable property of the original model. Finally, it is worth observing that when $\epsilon > 0$, the update equation~\eqref{eq:MD_update} does not have a closed-form expression as in the special case of the KL divergence. In our numerical simulations in Section~\ref{sec:experiment}, we use the generalized entropy DGF proposed here.
+and can be interpreted as a generalized KL divergence. In particular, for any $\epsilon > 0$, this Bregman divergence is finite for any $x_k, y_k \in \Delta^{\Pcal_k}$, unlike the KL divergence. Additionally, the support is not necessarily preserved. Finally, it is worth observing that when $\epsilon > 0$, the update equation~\eqref{eq:MD_update} does not have a closed-form expression as in~\eqref{eq:hedge_solution}. In our numerical simulations in Section~\ref{sec:results}, we use the generalized entropy DGF proposed here.
 
 
 
@@ -351,35 +342,34 @@ and can be interpreted as a generalized KL divergence. In particular, for any $\
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \subsection{Traffic flow prediction}
 We discuss one important application of the proposed estimation problem. Once we have estimated the learning rates, we can propagate the model forward in order to predict the distributions of the players for the next time step. More precisely, if at iteration $t$, we have observed $\bar x^{(t)}$, $\bar \ell^{(t)}$, and we have estimated the terms $(\eta_k^{(1)}, \dots, \eta_k^{(t-1)})$ for a player $k$, then we can use these terms to estimate $\eta_k^{(t)}$, and predict the next distribution by solving
-
-\begin{equation}
-  \label{eq:estimation_step}
-  \begin{aligned}
+\begin{align*}
 x_k^{(t+1)}
 &= \argmin{x_k \in \Delta^{\Pcal_k}} \braket{\eta_k^{(t)} }{ \ell(\bar x^{(t)}_k) } + D_{\psi_k}(x_k, \bar x^{(t)}_k) \\
 &\overset{\Delta}{=} g(\bar x^{(t)}_k, \eta_k^{(t)}),
-\end{aligned}
-\end{equation}
+\end{align*}
 where we defined the function $g$, which takes a distribution and a learning rate and propagates the model forward one step. We can inductively estimate the next terms by propagating the model further over a horizon $h$: let $x_k^{(t)} = \bar x_k^{(t)}$ and for $i \in \{0, \dots, h-1\}$,
 \begin{equation}
 \label{eq:propagation}
 x_k^{(t+i+1)} = g(x^{(t+i)}_k, \eta_k^{(t+i)}).
 \end{equation}
 Here, we assume that we can extrapolate the learning rate sequence to estimate the terms $\eta_k^{(t+i)}$. If we assume a particular form of the sequence, $\eta_k^{(t)} = \eta_k^{(0)} t^{-\alpha_k}$, then this can be done readily once we have an estimate of $\eta_k^{(0)}$ and $\alpha_k$. However, if each term of the sequence is estimated separately, we need to use a model to predict the next terms. We propose these simple methods that are evaluated in Section~\ref{sec:results}:
-\begin{enumerate}
+\begin{enumerate}[itemsep=-1ex]
 \item First, as baseline method, we set $\eta_k^{(t+i)} = \eta^{(t-1)}_k$ for all $i$ (we use the last estimated value).
 \item Second, we set $\eta_k^{(t+i)} = \frac{1}{N} \sum_{n = 1}^N \eta^{(t-n)}_k$ for all $i$ (we use the mean of the last $N$ values).
-%\item Third, we assume a polynomial decay of the form $\eta_k^{(t)} = \eta_k^{(0)} t^{-\alpha_k}$, and estimate $\alpha_k, \eta_k^{(0)}$ by performing a linear regression on the points $(\ln \tau, \ln \eta_k^{(\tau)})$ (since the model is linear in logarithmic scale).
+\item Third, we assume a polynomial decay of the form $\eta_k^{(t)} = \eta_k^{(0)} t^{-\alpha_k}$, and estimate $\alpha_k, \eta_k^{(0)}$ by performing a linear regression on $(\ln \tau, \ln \eta_k^{(\tau)})$ (since the model is linear in logarithmic scale).
 \end{enumerate}
 
 We conclude this section by observing that while we chose to apply the model to a simple prediction task, the estimated model can be used, more generally, in any a receding-horizon optimal control problem, by using the current estimate of the model as a plant in the control problem.
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \begin{figure*}
 \centering
-\includegraphics[width=.80\textwidth]{images/user_interface.pdf}
+\includegraphics[width=.67\textwidth]{images/user_interface.pdf}\hspace{.02\textwidth}%
+\includegraphics[width=.3\textwidth]{images/diagram.pdf}
 %\missingfigure[figwidth=.3\textwidth]{System block diagram}
 \caption{\footnotesize Screenshot of the client side of the routing game application. The table is the main interface, and can be used by the player to set weights on the different paths, using the sliders. The weights determine the flow distribution $x^{(t+1)}_k$. The table also show the previous flows ($x^{(t)}_k$), the previous costs $(\ell^{(t)}_k)$, and the cumulative costs $L^{(t)}_k = \sum_{\tau \leq t} \ell^{(\tau)}_k$. Clicking a path will also highlight the path on the graph. The bottom charts show the full history of flows $(x^{(\tau)}_k)_{\tau \leq t}$, costs $(\ell^{(\tau)}_k)_{\tau \leq t}$, and cumulative losses $(L^{(\tau)})_{\tau \leq t}$.}
-\label{fig:game_interface}
+\label{fig:game_interface}  
+\label{fig:system_diagram}
+  %\caption{Block diagram of the system. At iteration $t$, each player $p_k$ uses the cost vector history $(\bar \ell_{k}^{(t-1)}, \bar \ell_k^{(t-2)}, \dots)$ to make the routing decision vector $\bar x_k^{(t)}$. The server then computes the cumulative flow on each edge and returns the local cost vector history $(\bar \ell_{k}^{(t)}, \bar \ell_k^{(t-1)}, \dots)$ for player $p_k$, then the game proceeds to iteration $t+1$.}
 \label{fig:system_block_diagram}
 \end{figure*}
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -416,50 +406,7 @@ We developed a web application that implements the repeated routing game describ
 % \tikzstyle{output} = [coordinate]
 % \tikzstyle{pinstyle} = [pin edge={to-,thin,black}]
 
- \def\radius{.7mm}
- \tikzstyle{branch}=[fill,shape=circle,minimum size=3pt]
-
-\tikzstyle{dotted}= [dash pattern=on .01mm off 2.5mm,
-                                         line cap=round]
-
-\begin{figure}[h]
- \begin{tikzpicture}[auto, node distance=2cm,>=latex']
-
-    \node[block] (system) at (6, -2) {Server};
-    \node[output] at (7.3, -2) (sys_output) {};
-    \node[sum, left of=system] (sum)  at (4, -2) {};
-    \node[block, above left = of sum, anchor=west, align = left] at (1,-1) (block1) {$p_1$};
-    \node[block, left = of sum, anchor=west, align = left] at (1.6,-2) (block2) {$p_2$};
-    \node[block, below left = of sum, anchor=west, align = left] at (1,-3) (block3) {$p_3$};
-
-   \coordinate[below = 0.3cm of block1] (b1_turn);
-   \coordinate[above = 0.3cm of block2] (b2_turn);
-   \coordinate[above = 0.3cm of block3] (b3_turn);
-   \coordinate(system_b1_turn) at (3.7, 1.55);
-   \coordinate(system_b2_turn) at (3.7, -0.85);
-   \coordinate(system_b3_turn) at (3.7, -3.265);
-
-   \draw[->] (sum) -- node {$\bar x^{(t)}$} (system);
-   \draw[-] (system) -- (sys_output);
-
-   \draw[->] (block1.east) -| node [near start] {$\bar x_1^{(t)} $} (sum) ;
-   \draw[->] (sys_output) |- (system_b1_turn) -| node [near start, above right = 0.0cm and 1.5cm of block1] {$(\bar \ell_{1}^{(t)}, \bar \ell^{(t-1)}_{1}, \dots)$} (block1.north);
-
-   \draw[->] (block2) |- node [near end]  {$\bar x_2^{(t)} $} (sum);
-   \draw[->] (sys_output) |- (system_b2_turn) -| node [near start, above right = 0.0cm and 1.5cm of block1] {$(\bar \ell_{2}^{(t)}, \bar \ell_2^{(t-1)}, \dots)$}  (block2.north);
-
-   \draw[->] (block3) -| node [near start] {$\bar x_3^{(t)} $}  (sum);
-   \draw[->] (sys_output) |- (system_b3_turn) -| node [near start, above right = 0.0cm and 1.5cm of block1] {$(\bar \ell_{3}^{(t)}, \bar \ell_3^{(t-1)}, \dots)$}  (block3.north);
-
-\draw[dotted,line width = 2mm] (0.3,-5.1) -- (0.3, -5.8);
-
-  \end{tikzpicture}
-  \label{fig:system_diagram}
-  \caption{Block diagram of the system. At iteration $t$, each player $p_k$ uses the cost vector history $(\bar \ell_{k}^{(t-1)}, \bar \ell_k^{(t-2)}, \dots)$ to make the routing decision vector $\bar x_k^{(t)}$. The server then computes the cumulative flow on each edge and returns the local cost vector history $(\bar \ell_{k}^{(t)}, \bar \ell_k^{(t-1)}, \dots)$ for player $p_k$, then the game proceeds to iteration $t+1$.}
- \end{figure}
-
-
-A root user can set up the game by creating a graph and defining the cost functions on each edge. Then once a game is set up, players can log in to the client interface, and each player is assigned an arbitrary origin node and destination node on the graph. Once the game starts, it is played in iterations, such that each iteration lasts a specified period of time shown by the timer on top of the client interface (each iteration lasts $30$ seconds in our experiments). Each player $k$ can use the sliders to set her flow distribution $x^{(t)}_k$ during iteration $t$. At the end of the iteration, the server uses the values of $x_k^{(t)}$ for all players $k \in \{1, \dots, K\}$ to compute the cost functions $\ell^{(t)}_k$, then sends this information to the client side, which then updates the charts and the table with the last value of the cost. Note that client $k$ only has access to the information about player $k$, so in this sense, the learning is completely distributed, as players do not observe the decision or the costs of other players. The decisions of the players $(x_k^{(t)})$ and the costs $(\ell^{(t)}_k)$ are logged by the server, with no additional identifiable information about the players.
+A root user can set up the game by creating a graph and defining the cost functions on each edge. Then once a game is set up, players can log in to the client interface, and each player is assigned an arbitrary origin node and destination node on the graph. Once the game starts, it is played in iterations, such that each iteration lasts a specified period of time shown by the timer on top of the client interface (each iteration lasts $30$ seconds in our experiments). Each player $k$ can use the sliders to set her flow distribution $x^{(t)}_k$ during iteration $t$. At the end of the iteration, the server uses the values of $x_k^{(t)}$ for all players $k \in \{1, \dots, K\}$ to compute the cost functions $\ell^{(t)}_k$, then sends this information to the client side, which then updates the charts and the table with the last value of the cost. Note that client $k$ only has access to the information about player $k$, so in this sense, the learning is completely distributed, as players do not observe the decision or the costs of other players. The decisions of the players $(\bar x_k^{(t)})$ and the costs $(\bar \ell^{(t)}_k)$ are logged by the server, with no additional identifiable information about the players.
 
 The code for the web application is available on Github at the following url: \texttt{github.com/kietdlam/}. To illustrate the methods proposed in this article, we ran the experiment on a small network (shown in the interface in Figure~\ref{fig:game_interface}), with $5$ players. The numerical results are discussed in the next section.
 
@@ -527,7 +474,27 @@ We now apply the method proposed in Section~\ref{sec:estimation} to estimate the
 First, we solve Problem~\eqref{eq:estimation_eta} to estimate the learning rate sequence one term at a time. Then, we use the parameterized form $\eta^{(t)}_k = \eta_k^{(0)} t^{-\alpha_k}$, and estimate $\eta_k^{(0)}$ and $\alpha_k^{(0)}$ by solving the problem~\ref{eq:estimation_alpha_eta0}. The results of both methods are shown in Figure~\eqref{fig:moving_average_learning_rate}
 When we estimate one term at a time, the resulting sequences have very large variations, and to better visualize them, we plot a moving average (over a window of $5$ iterations).
 
-It was interesting and perhaps surprising to observe that when estimating learning rates one term at a time, in some rare instances, the objective $d^{(t)}_k(\eta_k^{(t)})$ is minimal at a negative $\eta_k^{(0)}$. In other words, the decision of the player $\bar x^{(t+1)}_k$ is best described by minimizing $\eta \braket{\ell^{(t)}_k}{x_k} + D_{\psi_k}(x_k, x^{(t)}_k)$, which means that the player shifted the probability mass towards paths with \emph{higher} costs. One such example is given in the table below.
+It was interesting and perhaps surprising to observe that when estimating learning rates one term at a time, in some rare instances, the objective $d^{(t)}_k(\eta_k^{(t)})$ is minimal at a negative $\eta_k^{(t)}$, which means that the player shifted the probability mass towards paths with \emph{higher} costs. One such example is given in the table below.
+\vspace{-.1in}
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{|c|c|c|c|}
+\hline
+Path & $\bar x^{(t)}$ & $\bar \ell^{(t)}$ & $\bar x^{(t+1)}$ \\
+\hline
+$p_1$ & $.198$ & $6.455$ & $.213$ \\
+\hline
+$p_2$ & $.218$ & $6.037$ & $.240$ \\
+\hline
+$p_3$ & $.280$ & $5.933$ & $.301$ \\
+\hline
+$p_4$ & $.304$ & $6.055$ & $.246$ \\
+\hline
+\end{tabular}
+\caption{\footnotesize Example of an irrational behavior (corresponding to iteration $t = 12$ for player P2) which is hard to predict by the model. The inner product $\braket{\bar \ell_k^{(t)}}{\bar x^{(t+1)}_k - \bar x^{(t)}_k} > 0$, which means that the player shifts probability mass to paths with higher costs (in particular, the flow on path $p_1$ increased even though this is the worst path).}
+\end{table}
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \begin{figure}[h!]
@@ -562,7 +529,8 @@ The best performance is obtained with the parameterized model $\eta^{(t)}_k = \e
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.5\textwidth]{images/two_steps_predictions}
-  \caption{\footnotesize Comparison of predicted distribution (solid lines) and actual distribution (dashed lines) for a given player $k$, and a prediction horizon $h = 2$. Each subplot corresponds to a different path $p \in \Pcal_k$.}
+  \includegraphics[width=0.5\textwidth]{images/eight_steps_predictions}
+  \caption{\footnotesize Comparison of predicted distribution (solid lines) and actual distribution (dashed lines) for a given player $k$. The prediction horizon for the top figure is $h = 2$, and for the bottom figure $h = 8$. Each subplot corresponds to a different path $p \in \Pcal_k$.}
   \label{fig:parameterized}
 \end{figure}
 
@@ -576,7 +544,7 @@ We proposed a problem of model estimation in the routing game, to fit a distribu
 We considered in particular a model based on the mirror descent algorithm, parameterized by a DGF $\psi_k$ and a sequence of learning rates $(\eta^{(t)}_k)$, and gave an intuitive interpretation of how this model can describe player behavior. We showed that the problem of estimating one term of the learning rate sequence is convex in the case of the KL divergence (it remains open to prove this result for general Bregman divergences). To control the complexity of the model and to make the estimation consistent with the theoretical assumptions (decreasing learning rates), we proposed to parameterize the sequence with an initial term $\eta_k^{(0)}$ and a decay rate $\alpha_k \in (0, 1)$. When we tested these methods on data collected from our routing game interface, the parameterized sequence estimation outperformed the single term estimation on the prediction task. Our test results suggest that the mirror descent model can be a good descriptive model of player behavior, although in some rare cases, a player decision can be hard to model (e.g. when a player increase traffic assignment to previously bad routes).
 
 This estimation problem can be extended in several ways: First, in our method, we fixed the DGF to be the negative entropy (regularized in order to avoid situations in which the estimation problem is ill-posed). One could also estimate the DGF itself, in addition to estimating the learning rates. One natural way to pose the estimation problem is to consider a finite collection of distance generating functions $\{\psi_i\}_{i \in \Ical}$, then to assume that each player $k$ uses a linear combination with weights $\theta_k$ $\psi = \sum_{i} \theta_{k, i} \psi_i$, then estimate the parameter vector $\theta_k$. One other natural approach is to pose the problem as a Bayesian estimation problem, by setting a prior on the model parameters (e.g. $\eta^{(0)}_k$ and $\alpha_k$), then define a likelihood model of observing a player decision given her DGF and learning rate.
-
+\newpage
 %============================================================================================
 %
 % The following two commands are all you need in the
