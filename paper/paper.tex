@@ -399,7 +399,7 @@ We developed a web application that implements the repeated routing game describ
 \end{figure}
 
 
-A root user can set up the game by creating a graph and defining the cost functions on each edge. Then once a game is set up, players can log in to the client interface, and each player is assigned an arbitrary origin node and destination node on the graph. Once the game starts, it is played in iterations, such that each iteration lasts a specified period of time shown by the timer on top of the client interface (each iteration lasts $30$ seconds in our experiments). Each player $k$ can use the sliders to set her flow distribution $x^{(t)}_k$ during iteration $t$. At the end of the iteration, the server uses the values of $x_k^{(t)}$ for all players $k \in \{1, \dots, K\}$ to compute the cost functions $\ell^{(t)}_k$, then sends this information to the client side, which then updates the charts and the table with the last value of the cost. Note that client $k$ only has access to the information about player $k$, so in this sense, the learning is completely distributed, as players do not observe the decision or the costs of other players. The decisions of the players $(x_k^{(t)})$ and the costs $(\ell^{(t)}_k)$ are logged by the server, with no additional identifiable information about the players.
+A root user can set up the game by creating a graph and defining the cost functions on each edge. Then once a game is set up, players can log in to the client interface, and each player is assigned an arbitrary origin node and destination node on the graph. Once the game starts, it is played in iterations, such that each iteration lasts a specified period of time shown by the timer on top of the client interface (each iteration lasts $30$ seconds in our experiments). Each player $k$ can use the sliders to set her flow distribution $x^{(t)}_k$ during iteration $t$. At the end of the iteration, the server uses the values of $x_k^{(t)}$ for all players $k \in \{1, \dots, K\}$ to compute the cost functions $\ell^{(t)}_k$, then sends this information to the client side, which then updates the charts and the table with the last value of the cost. Note that client $k$ only has access to the information about player $k$, so in this sense, the learning is completely distributed, as players do not observe the decision or the costs of other players. The decisions of the players $(\bar x_k^{(t)})$ and the costs $(\bar \ell^{(t)}_k)$ are logged by the server, with no additional identifiable information about the players.
 
 The code for the web application is available on Github at the following url: \texttt{github.com/kietdlam/}. To illustrate the methods proposed in this article, we ran the experiment on a small network (shown in the interface in Figure~\ref{fig:game_interface}), with $5$ players. The numerical results are discussed in the next section.
 
@@ -549,7 +549,26 @@ We now apply the method proposed in Section~\ref{sec:estimation} to estimate the
 First, we solve Problem~\eqref{eq:estimation_eta} to estimate the learning rate sequence one term at a time. Then, we use the parameterized form $\eta^{(t)}_k = \eta_k^{(0)} t^{-\alpha_k}$, and estimate $\eta_k^{(0)}$ and $\alpha_k^{(0)}$ by solving the problem~\ref{eq:estimation_alpha_eta0}. The results of both methods are shown in Figure~\eqref{fig:moving_average_learning_rate}
 When we estimate one term at a time, the resulting sequences have very large variations, and to better visualize them, we plot a moving average (over a window of $3$ iterations).
 
-It was interesting and perhaps surprising to observe that when estimating learning rates one term at a time, in some rare instances, the objective $d^{(t)}_k(\eta_k^{(t)})$ is minimal at a negative $\eta_k^{(0)}$. In other words, the decision of the player $\bar x^{(t+1)}_k$ is best described by minimizing $\eta \braket{\ell^{(t)}_k}{x_k} + D_{\psi_k}(x_k, x^{(t)}_k)$, which means that the player shifted the probability mass towards paths with \emph{higher} costs. One such example is given in the table below.
+It was interesting and perhaps surprising to observe that when estimating learning rates one term at a time, in some rare instances, the objective $d^{(t)}_k(\eta_k^{(t)})$ is minimal at a negative $\eta_k^{(t)}$. In other words, the decision of the player $\bar x^{(t+1)}_k$ is best described by minimizing $\eta \braket{\ell^{(t)}_k}{x_k} + D_{\psi_k}(x_k, x^{(t)}_k)$ with a negative $\eta$, which means that the player shifted the probability mass towards paths with \emph{higher} costs. One such example is given in the table below.
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+\begin{table}
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+Path & $\bar x^{(t)}$ & $\bar \ell^{(t)}$ & $\bar x^{(t+1)}$ \\
+\hline
+$p_1$ & $.198$ & $6.455$ & $.213$ \\
+\hline
+$p_2$ & $.218$ & $6.037$ & $.240$ \\
+\hline
+$p_3$ & $.280$ & $5.933$ & $.301$ \\
+\hline
+$p_4$ & $.304$ & $6.055$ & $.246$ \\
+\hline
+\end{tabular}
+\caption{\footnotesize Example of an irrational behavior (corresponding to iteration $t = 12$ for player P2) which is hard to predict by the model. The inner product $\braket{\bar \ell_k^{(t)}}{\bar x^{(t+1)}_k - \bar x^{(t)}_k} > 0$, which means that the player shifts probability mass to paths with higher costs (in particular, the flow on path $p_1$ increased even though this is the worst path).}
+\end{table}
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 \begin{figure}[h!]
@@ -584,6 +603,7 @@ The best performance is obtained with the parameterized model $\eta^{(t)}_k = \e
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.5\textwidth]{images/two_steps_predictions}
+  \includegraphics[width=0.5\textwidth]{images/eight_steps_predictions}
   \caption{\footnotesize Comparison of predicted distribution (solid lines) and actual distribution (dashed lines) for a given player $k$, and a prediction horizon $h = 2$. Each subplot corresponds to a different path $p \in \Pcal_k$.}
   \label{fig:parameterized}
 \end{figure}
