@@ -45,13 +45,13 @@
 \def\radius{1.mm} 
 
  \begin{tikzpicture}[auto, node distance=2cm,>=latex']
-
+    \def \wdth{.12}
     \node[block] (system) at (6, -2) {Server};
     \node[output] at (7.3, -2) (sys_output) {};
     \node[sum, left of=system] (sum)  at (4, -2) {};
-    \node[above left = of sum, anchor=west, align = left] at (1,-1) (block1) {\includegraphics[width=.08\textwidth]{user_interface_perspective2}};
-    \node[left = of sum, anchor=west, align = left] at (1.6,-2) (block2) {\includegraphics[width=.08\textwidth]{user_interface_perspective2}};
-    \node[below left = of sum, anchor=west, align = left] at (1,-3) (block3) {\includegraphics[width=.08\textwidth]{user_interface_perspective2}};
+    \node[above left = of sum, anchor=west, align = left] at (1,-1) (block1) {\includegraphics[width=\wdth\textwidth]{user_interface_perspective2}};
+    \node[left = of sum, anchor=west, align = left] at (1.6,-2) (block2) {\includegraphics[width=\wdth\textwidth]{user_interface_perspective2}};
+    \node[below left = of sum, anchor=west, align = left] at (1,-3) (block3) {\includegraphics[width=\wdth\textwidth]{user_interface_perspective2}};
 
    \coordinate[below = 0.3cm of block1] (b1_turn);
    \coordinate[above = 0.3cm of block2] (b2_turn);
