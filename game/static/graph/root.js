@@ -1,4 +1,5 @@
 var graph_name = "";
+var user_predictions = false;
 
 
 $('#turn-on-edge').click(function(evt) {
@@ -82,6 +83,49 @@ $('#load-graph-btn').click(function(evt) {
 });
 
 
+$('#show-predictions-btn').click(function(evt) {
+    evt.preventDefault();
+    user_predictions = true;
+
+    get_user_predictions();
+
+    // $("#graph-list-display").children().each(function(i) {
+    //     if ($(this).hasClass("active")) {
+    //         graph_name = $(this).text();
+    //     }
+    // });
+});
+
+function get_user_predictions() {
+    if (user_predictions && graph_name && current_username) {
+        $.ajax({
+            url : "/graph/get_user_predictions/" + current_username + "/",
+            type : "GET",
+
+            success : function(json) {
+                console.log(json);
+
+                var chart = c3.generate({
+                    data: {
+                        x: 'x',
+
+                        json : json['predictions']
+                    },
+
+                    bindto: '#predictions_chart'
+                });
+            },
+
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+        });
+        // update_user_predictions(graph_name, current_username);
+    }
+}
+
+
 $('#slider-game-mode-input').click(function() {
     var set_single_slider = false;
     if($("#slider-game-mode-input").prop("checked")){
@@ -113,6 +157,8 @@ $('#slider-game-mode-input').click(function() {
 
 
 function update_user_cost(graph_name) {
+    get_user_predictions();
+
     $.ajax({
         url : "/graph/get_user_costs/" + graph_name + "/",
         type : "GET",
@@ -130,9 +176,9 @@ function update_user_cost(graph_name) {
 
                 var chart = c3.generate({
                     data: {
-                        json : json['cumulative_costs']
+                        json : json['user_etas']
                     },
-                    bindto: '#cumulative_chart'
+                    bindto: '#learning_chart'
                 });
             }
         },

@@ -55,6 +55,9 @@ class Player(models.Model):
     def __unicode__(self):
         return self.user.username
 
+    class Meta:
+        ordering = ['user__username']
+
 
 class Edge(models.Model):
     edge_id = models.TextField(primary_key=True)
@@ -108,6 +111,15 @@ class FlowDistribution(models.Model):
 
     class Meta:
         unique_together = ['player', 'turn']
+
+
+class LearningRate(models.Model):
+    player = models.ForeignKey('Player')
+    turn = models.ForeignKey('GameTurn', blank=True, null=True)
+    learning_rate = models.FloatField(blank=True, null=True)
+
+    def __unicode__(self):
+        return 'user: ' + str(self.player) + ' turn: ' + str(self.turn.iteration) + ' ' + str(self.learning_rate)
 
 
 class EdgeCost(models.Model):

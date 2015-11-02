@@ -34,6 +34,40 @@ from django.core import management
 from cStringIO import StringIO
 
 import random
+import math
+
+
+epsilon = 1E-4
+
+
+def KL(x, y):
+    return sum([x_i*np.log(x_i/y_i) for x_i, y_i in zip(x, y) if x_i > 0])
+
+
+class SimplexProjectionExpSort():
+    def __init__(self, epsilon = 0):
+        self.epsilon = epsilon
+    def __str__(self):
+        return 'SimplexExpSort{}'.format(self.epsilon)
+
+    def project(self, x, g, eta):
+        """Computes the Bregman projection, with exponential potential, of a vector x given a gradient vector g, using a
+        sorting method. The complexity of this method is O(d log d), where d is the size of x.
+        Takes as input
+        - the current iterate x
+        - the gradient vector (scaled by the step size) g
+        -- This is l_i(t)*eta
+        """
+        epsilon = self.epsilon
+        d = len(x)
+        y = (x+epsilon)*np.exp(-g*eta)
+        yy = sorted(y)
+        S = sum(yy)
+        j = 0
+        while((1+epsilon*(d-j))*yy[j]/S - epsilon <= 0):
+            S -= yy[j]
+            j += 1
+        return np.maximum(0, -epsilon+(1+epsilon*(d-j))*y/S)
 
 
 def dump_data_fixture(filename):
@@ -100,7 +134,8 @@ def show_graph(request):
             template = 'graph/user_wait.djhtml'
     else:
         graphs = map(lambda g: g.name, Graph.objects.all())
-        context['usernames'] = User.objects.values_list('username', flat=True)
+        context['usernames'] = Player.objects.values_list('user__username', flat=True)
+        # context['usernames'] = User.objects.values_list('username', flat=True)
         context['model_names'] = PlayerModel.objects.values_list('name', flat=True)
         context['graph_names'] = graphs
 
@@ -183,6 +218,123 @@ def get_model_info(request, modelname):
     return JsonResponse(response)
 
 
+def get_bar_values(game, player, turn_iteration):
+    path_ids = list(Path.objects.filter(player_model=player.player_model).values_list('id', flat=True))
+
+    turn = GameTurn.objects.get(game=game, iteration=turn_iteration)
+    next_turn = GameTurn.objects.get(game=game, iteration=turn_iteration+1)
+
+    fd = FlowDistribution.objects.get(player=player, turn=turn)
+    fd_next = FlowDistribution.objects.get(player=player, turn=next_turn)
+
+    e_costs = turn.graph_cost.edge_costs
+
+    current_flows = np.array([])
+    current_costs = np.array([])
+    next_flows = np.array([])
+
+    for p_id in path_ids:
+        path = Path.objects.get(id=p_id)
+
+        flow = fd.path_assignments.get(path=path).flow
+        current_flows = np.append(current_flows, flow)
+
+        # current_flows = sanitize_flows(current_flows)
+
+        next_flows = np.append(next_flows, fd_next.path_assignments.get(path=path).flow)
+
+        # next_flows = sanitize_flows(next_flows)
+
+        path_cost = 0
+        for e in path.edges.all():
+            path_cost += e_costs.get(edge=e).cost
+
+        current_costs = np.append(current_costs, path_cost)
+
+    return current_flows, current_costs, next_flows
+
+
+def estimate_best_eta_for_turn(game, player, turn_iteration):
+    eta_grid = np.logspace(-3, 1.6, 400)
+    # eta_grid = np.linspace(-10, 10, 400)
+    spe = SimplexProjectionExpSort(epsilon)
+    current_flows, current_costs, next_flows = get_bar_values(game, player, turn_iteration)
+
+    @np.vectorize
+    def calculate_divergence(eta):
+        x_predicted = spe.project(current_flows, current_costs, eta)
+        return KL(next_flows + epsilon, x_predicted + epsilon)
+
+    kl_grid = calculate_divergence(eta_grid)
+    return eta_grid[np.argmin(kl_grid)]
+
+
+def estimate_best_eta_all_turns(game, player):
+    # Don't hard-code this in the future
+    # start = 1
+    # stop = 28
+
+    best_etas = []
+
+    for turn in GameTurn.objects.all():
+        if LearningRate.objects.filter(player=player, turn=turn).exists():
+            lr = LearningRate.objects.get(player=player, turn=turn)
+            best_etas.append(lr.learning_rate)
+        else:
+            try:
+                best_eta = estimate_best_eta_for_turn(game, player, turn.iteration)
+                best_etas.append(best_eta)
+
+                lr = LearningRate(player=player, turn=turn)
+                lr.learning_rate = best_eta
+                print 'Saving learning rate for %s' % str(player)
+                lr.save()
+            except:
+                pass
+
+    return map(math.log10, best_etas)
+
+
+def predict_user_flows_all_turns(game, player):
+    predictions = dict()
+
+    path_ids = list(Path.objects.filter(player_model=player.player_model).values_list('id', flat=True))
+
+    for p_id in path_ids:
+        predictions[p_id] = []
+
+    counter = 1
+
+    predictions['x'] = []
+
+    for prev_turn, curr_turn in zip(GameTurn.objects.all(), GameTurn.objects.all()[1:]):
+        counter += 1
+        try:
+            learning_rate = LearningRate.objects.get(player=player, turn=prev_turn).learning_rate
+            current_flows, current_costs, n_ = get_bar_values(game, player, curr_turn.iteration)
+
+            spe = SimplexProjectionExpSort(epsilon)
+            x_predicted = spe.project(current_flows, current_costs, learning_rate)
+            for p_id, prediction in zip(path_ids, x_predicted.tolist()):
+                predictions[p_id].append(prediction)
+
+            predictions['x'].append(counter)
+        except Exception as e:
+            print e
+
+    return predictions
+
+
+@login_required
+def get_user_predictions(request, username):
+    game = Game.objects.all()[0]
+    player = Player.objects.get(user__username=username)
+    flow_predictions = predict_user_flows_all_turns(game, player)
+    response = dict()
+    response['predictions'] = flow_predictions
+    return JsonResponse(response)
+
+
 @login_required
 def get_user_costs(request, graph_name):
     game = Game.objects.get(graph__name=graph_name)
@@ -190,6 +342,7 @@ def get_user_costs(request, graph_name):
 
     current_costs = dict()
     cumulative_costs = dict()
+    user_etas = dict()
 
     for player in players:
         username = player.user.username
@@ -221,10 +374,20 @@ def get_user_costs(request, graph_name):
             current_costs[player.user.username].append(current_cost/normalization_const)
             cumulative_costs[player.user.username].append(cumulative_cost/normalization_const)
 
+        etas = estimate_best_eta_all_turns(game, player)
+        # print etas
+        user_etas[player.user.username] = etas
+
+    # print user_etas
+
+    for turn in game.turns.all().order_by('iteration'):
+        pass
+
     response = dict()
     response['started'] = game.started
     response['current_costs'] = current_costs
     response['cumulative_costs'] =  cumulative_costs
+    response['user_etas'] = user_etas
     return JsonResponse(response)
 
 

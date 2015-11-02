@@ -56,19 +56,19 @@
 <!-- c3 charts -->
   <div class="container-fluid">
     <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
       <div class='chart panel panel-info'>
         <div class="panel-heading">Previous Cost</div>
         <div id='chart'></div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class='cumulative_chart panel panel-info'>
-        <div class="panel-heading">Cumulative Cost</div>
-        <div id='cumulative_chart'></div>
-      </div>
+    <!-- <div class="col-md-4">
+    <div class='cumulative_chart panel panel-info'>
+    <div class="panel-heading">Cumulative Cost</div>
+    <div id='cumulative_chart'></div>
     </div>
-    <div class="col-md-4">
+    </div> -->
+    <div class="col-md-6">
       <div class='flows_chart panel panel-info'>
         <div class="panel-heading">Previous Flows</div>
         <div id='flows_chart'></div>

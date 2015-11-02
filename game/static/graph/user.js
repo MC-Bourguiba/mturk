@@ -488,24 +488,24 @@ function update_previous_cost(username, iteration) {
                 bindto: '#chart'
             });
 
-            var cumulative_chart = c3.generate({
-                size: {
-                    height: 250,
-                },
-                data: {
-                    json : cumulative_cost
-                },
+            // var cumulative_chart = c3.generate({
+            //     size: {
+            //         height: 250,
+            //     },
+            //     data: {
+            //         json : cumulative_cost
+            //     },
 
-                axis: {
-                    y: {
-                        tick: {
-                            format: d3.format(".3f")
-                        }
-                    },
-                },
+            //     axis: {
+            //         y: {
+            //             tick: {
+            //                 format: d3.format(".3f")
+            //             }
+            //         },
+            //     },
 
-                bindto: '#cumulative_chart'
-            });
+            //     bindto: '#cumulative_chart'
+            // });
 
             var flows_chart = c3.generate({
                 size: {
