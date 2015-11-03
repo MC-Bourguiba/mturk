@@ -1,6 +1,13 @@
 var graph_name = "";
 var user_predictions = false;
 
+function merge_options(obj1,obj2){
+    var obj3 = {};
+    for (var attrname in obj1) { obj3[attrname] = obj1[attrname]; }
+    for (var attrname in obj2) { obj3[attrname] = obj2[attrname]; }
+    return obj3;
+}
+
 
 $('#turn-on-edge').click(function(evt) {
     $.ajax({
@@ -96,6 +103,7 @@ $('#show-predictions-btn').click(function(evt) {
     // });
 });
 
+
 function get_user_predictions() {
     if (user_predictions && graph_name && current_username) {
         $.ajax({
@@ -105,12 +113,39 @@ function get_user_predictions() {
             success : function(json) {
                 console.log(json);
 
+                regions = {};
+
+                for (var key in json['actual']) {
+                    if (json['actual'].hasOwnProperty(key)) {
+                        regions[key] = [{'start': 2, 'end': 100, 'style':'dashed'}];
+                    }
+                }
+
+                console.log(regions);
+
                 var chart = c3.generate({
                     data: {
                         x: 'x',
-
-                        json : json['predictions']
+                        json : merge_options(json['predictions'], json['actual'])
                     },
+
+                    axis: {
+                        y: {
+                            tick: {
+                                format: d3.format(".3f")
+                            }
+                        },
+                    },
+
+                    region: regions,
+
+                    // region: {
+                    //     'actual_1': [{'start':2, 'end': 100, 'style': 'dashed'}]
+                    // },
+
+                    // region: {
+                    //     'actual_1':
+                    // },
 
                     bindto: '#predictions_chart'
                 });
@@ -171,13 +206,32 @@ function update_user_cost(graph_name) {
                     data: {
                         json : json['current_costs']
                     },
+
+                    axis: {
+                        y: {
+                            tick: {
+                                format: d3.format(".3f")
+                            }
+                        },
+                    },
+
                     bindto: '#chart'
                 });
 
                 var chart = c3.generate({
                     data: {
+                        x: 'x',
                         json : json['user_etas']
                     },
+
+                    axis: {
+                        y: {
+                            tick: {
+                                format: d3.format(".3f")
+                            }
+                        },
+                    },
+
                     bindto: '#learning_chart'
                 });
             }

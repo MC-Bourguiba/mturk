@@ -297,11 +297,13 @@ def estimate_best_eta_all_turns(game, player):
 
 def predict_user_flows_all_turns(game, player):
     predictions = dict()
+    actual = dict()
 
     path_ids = list(Path.objects.filter(player_model=player.player_model).values_list('id', flat=True))
 
     for p_id in path_ids:
         predictions[p_id] = []
+        actual['actual_%s' % str(p_id)] = []
 
     counter = 1
 
@@ -311,27 +313,41 @@ def predict_user_flows_all_turns(game, player):
         counter += 1
         try:
             learning_rate = LearningRate.objects.get(player=player, turn=prev_turn).learning_rate
-            current_flows, current_costs, n_ = get_bar_values(game, player, curr_turn.iteration)
+            current_flows, current_costs, actual_flows = get_bar_values(game, player, curr_turn.iteration)
+
+            # print 'Actual_flows:', str(actual_flows)
+            # print 'Path_ids:', str(path_ids)
+
+            # print 'predictions:', str(predictions)
+            # print 'actual:', str(actual)
 
             spe = SimplexProjectionExpSort(epsilon)
             x_predicted = spe.project(current_flows, current_costs, learning_rate)
-            for p_id, prediction in zip(path_ids, x_predicted.tolist()):
+            # print 'x_predicted.tolist():', str(x_predicted.tolist())
+
+            i = 0
+            for p_id, prediction, actual_flow in zip(path_ids, x_predicted, actual_flows):
+                # print 'i:', i
+                # print 'p_id:', p_id
                 predictions[p_id].append(prediction)
+                actual['actual_%s' % str(p_id)].append(actual_flow)
+                i += 1
 
             predictions['x'].append(counter)
         except Exception as e:
             print e
 
-    return predictions
+    return predictions, actual
 
 
 @login_required
 def get_user_predictions(request, username):
     game = Game.objects.all()[0]
     player = Player.objects.get(user__username=username)
-    flow_predictions = predict_user_flows_all_turns(game, player)
+    flow_predictions, actual_flows = predict_user_flows_all_turns(game, player)
     response = dict()
     response['predictions'] = flow_predictions
+    response['actual'] = actual_flows
     return JsonResponse(response)
 
 
@@ -380,8 +396,7 @@ def get_user_costs(request, graph_name):
 
     # print user_etas
 
-    for turn in game.turns.all().order_by('iteration'):
-        pass
+    user_etas['x'] = list(range(1, len(user_etas[user_etas.keys()[0]]) + 1))
 
     response = dict()
     response['started'] = game.started
