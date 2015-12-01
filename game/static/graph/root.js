@@ -104,6 +104,34 @@ $('#show-predictions-btn').click(function(evt) {
 });
 
 
+$('#add-game-btn').click(function(evt) {
+    evt.preventDefault();
+
+    var game_name = $("#game-input")[0].value;
+
+    if (game_name != '') {
+        window.location.href = "/graph/accounts/profile?game=" + game_name;
+    }
+});
+
+
+$('#go-game-btn').click(function(evt) {
+    evt.preventDefault();
+
+    var game_name = '';
+
+    $("#game-list-display").children().each(function(i) {
+        if ($(this).hasClass("active")) {
+            game_name = $(this).text();
+        }
+    });
+
+    if (game_name != '') {
+        window.location.href = "/graph/accounts/profile?game=" + game_name;
+    }
+});
+
+
 function get_user_predictions() {
     if (user_predictions && graph_name && current_username) {
         $.ajax({
@@ -176,7 +204,8 @@ $('#slider-game-mode-input').click(function() {
         type : "POST",
 
         data : JSON.stringify({
-            'single_slider' : set_single_slider
+            'single_slider' : set_single_slider,
+            'game' : get_game_name()
         }),
 
         success : function(json) {
@@ -291,7 +320,14 @@ function get_model_info(modelname) {
 }
 
 
+function get_game_name() {
+    return $("#game_name")[0].value;
+}
+
+
 function save_graph(nodes, links, name) {
+    var game_name = get_game_name();
+
     $.ajax({
         url : '/graph/create_graph/',
         type : "POST", // http method
@@ -300,7 +336,8 @@ function save_graph(nodes, links, name) {
         data : JSON.stringify({
             'nodes' : nodes,
             'links' : links,
-            'graph' : name
+            'graph' : name,
+            'game' : game_name
         }),
         // data : { the_post : $('#post-text').val() }, // data sent with the post request
 
@@ -318,6 +355,51 @@ function save_graph(nodes, links, name) {
         }
     });
 };
+
+
+$("#assign-game").click(function(e) {
+    e.preventDefault();
+
+    var game_name = '';
+    var username = '';
+
+    $("#game-list-display").children().each(function(i) {
+        if ($(this).hasClass("active")) {
+            game_name = $(this).text();
+        }
+    });
+
+    $("#user-list-display").children().each(function(i) {
+        if ($(this).hasClass("active")) {
+            username = $(this).text();
+        }
+    });
+
+
+    $.ajax({
+        url : '/graph/assign_game/',
+        type : "POST", // http method
+        dataType: "json",
+        contentType: 'application/json', // JSON encoding
+
+        data : JSON.stringify({
+            'username' : username,
+            'game' : game_name,
+        }),
+
+        // handle a successful response
+        success : function(json) {
+            // $('#post-text').val(''); // remove the value from the input
+            // console.log(json); // log the returned json to the console
+            console.log(json); // another sanity check
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+});
 
 
 $("#assign-start-node").click(function(e) {
@@ -345,7 +427,8 @@ $("#start-game").click(function(e) {
         contentType: 'application/json', // JSON encoding
 
         data : JSON.stringify({
-            'graph' : current_graph
+            'graph' : current_graph,
+            'game' : get_game_name()
         }),
 
         // handle a successful response
@@ -374,7 +457,8 @@ $("#stop-game").click(function(e) {
         contentType: 'application/json', // JSON encoding
 
         data : JSON.stringify({
-            'graph' : current_graph
+            'graph' : current_graph,
+            'game' : get_game_name()
         }),
 
         // handle a successful response
@@ -689,7 +773,8 @@ $("#assign-duration-btn").click(function(e) {
         type : "POST",
 
         data : JSON.stringify({
-            'duration' : duration
+            'duration' : duration,
+            'game' : get_game_name()
         }),
 
         // handle a successful response

@@ -28,6 +28,8 @@
   <!-- <a id="start-game-btn" class="btn btn-default" href="#" role="button">Start Game</a> -->
 
 {% block top_right%}
+
+  <input type="hidden" id="game_name" name="game_name" value="{{ game_name }}">
   <div>
     <div id="path-display-list">
     </div>

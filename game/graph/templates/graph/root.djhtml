@@ -12,11 +12,14 @@
 
 {% block top_left %}
 
+<input type="hidden" id="game_name" name="game_name" value="{{ game_name }}">
+
 <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-5">
           <div class="btn-group btn-toggle" id="graph-user-btn">
             <button class="btn btn-primary active" id="show-graphs-btn">Graphs</button>
             <button class="btn btn-default" id="show-users-btn">Users</button>
+            <!-- <button class="btn btn-default" id="show-games-btn">Games</button> -->
             <!-- <button class="btn btn-default" id="show-users-btn">Users</button> -->
           </div>
 
@@ -36,9 +39,29 @@
             <a id="save-graph-btn" class="btn btn-default" href="#" role="button">Save graph</a>
             <a id="load-graph-btn" class="btn btn-default" href="#" role="button">Load graph</a>
             <a id="show-predictions-btn" class="btn btn-default" href="#" role="button">Show predictions</a>
+
+            <div class="input-group" style="margin-top: 10px; margin-bottom: 10px;">
+                <input type="text" class="form-control bfh-number" data-bind="value:replyNumber"
+                       id="game-input"/>
+                <span class="input-group-btn">
+                    <button id="add-game-btn" class="btn btn-default" type="button">Add game</button>
+                </span>
+            </div>
+
+            <a id="go-game-btn" class="btn btn-default" href="#" role="button">Go to game</a>
           </div>
       </div>
-      <div class="col-md-6">
+
+      <div class="col-md-2">
+          <button class="btn btn-primary active" id="show-graphs-btn">Games</button>
+          <div class="list-group" id="game-list-display">
+              {% for game in games %}
+                  <a href="#" class="list-group-item">{{ game }}</a>
+              {% endfor %}
+          </div>
+      </div>
+
+      <div class="col-md-5">
         <span class="label label-default" >Player Model</span>
         <div class="control-group" id="fields">
           <div class="controls" id="profs">
@@ -106,13 +129,14 @@
           </div>
       </div>
       <div class="col-md-4" >
+          <a id="assign-game" class="btn btn-default" href="#" role="button">Assign game</a>
           <a id="assign-start-node" class="btn btn-default" href="#" role="button">Assign start node</a>
           <a id="assign-destination-node" class="btn btn-default" href="#" role="button">Assign destination node</a>
           <a id="assign-graph" class="btn btn-default" href="#" role="button">Assign graph</a>
           <a id="start-game" class="btn btn-default {{ hidden }}" href="#" role="button">Start game</a>
           <a id="stop-game" class="btn btn-default {{ hidden }}" href="#" role="button">Stop game</a>
-          <a id="turn-off-edge" class="btn btn-default {{ hidden }}" href="#" role="button">Turn off edge</a>
-          <a id="turn-on-edge" class="btn btn-default {{ hidden }}" href="#" role="button">Turn on edge</a>
+          <!-- <a id="turn-off-edge" class="btn btn-default {{ hidden }}" href="#" role="button">Turn off edge</a>
+          <a id="turn-on-edge" class="btn btn-default {{ hidden }}" href="#" role="button">Turn on edge</a> -->
           <a id="save-data-btn" class="btn btn-default" href="#" role="button">Save data</a>
           <div id="slider-game-mode-checkbox" class="checkbox">
               <label>
@@ -123,6 +147,7 @@
           <p> Selected node:  <span id="selected-node"></span>  </p>
           <p> Selected edge: <span id="selected-edge"></span> </p>
           <p> Edge cost function: <span id="edge-cost-function"></span> </p>
+          <p> Assigned game: <span id="assigned-game"></span> </p>
       </div>
     </div>
     <!-- <div class="row-fluid">

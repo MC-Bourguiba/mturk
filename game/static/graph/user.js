@@ -12,6 +12,10 @@ var previous_flows_dict = {};
 
 // var has_displayed_paths = false;
 
+function get_game_name() {
+    return $("#game_name")[0].value;
+}
+
 
 $.fn.exists = function () {
     return this.length !== 0;
@@ -207,7 +211,14 @@ $(document).ready(function() {
 function update_from_state(username) {
     $.ajax({
         url : "/graph/current_state/",
-        type : "GET",
+        type : "POST",
+
+        dataType: "json",
+        contentType: 'application/json', // JSON encoding
+
+        data : JSON.stringify({
+            'game' : get_game_name()
+        }),
 
         success : function(json) {
 

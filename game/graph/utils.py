@@ -1,5 +1,3 @@
-from models import *
-
 import os
 
 from celery import Celery
@@ -17,10 +15,7 @@ from django.core.cache import cache
 
 import md5
 
-
-duration = 30
-
-root_username = 'root'
+from models import *
 
 
 # TODO: Clean this up
@@ -125,7 +120,8 @@ def computeEquilibrium(dimensions, gradientFunctions, precision):
     c = cost(xs, gs)
     delta = 1
     t = 0
-    while(delta > precision and t < 10000):
+    # while(delta > precision and t < 10000):
+    while(delta > precision and t < 2500):
         print 'iteration %d' % t
         print 'delta %f' % delta
         xs_plus = [entropicDescentUpdate(x, g, t) for (x, g) in zip(xs, gs)]
@@ -158,6 +154,7 @@ def computeRoutingGameEquilibrium(costFunctions, adjMatrices, masses, precision 
     dimensions = [np.size(adjMatrix, 1) for adjMatrix in adjMatrices]
     gradientFunction = pathLossFunctions(costFunctions, adjMatrices, masses)
     return computeEquilibrium(dimensions, gradientFunction, precision)
+
 
 def updateEquilibriumFlows(graph_name):
     costFunctionDict = {}

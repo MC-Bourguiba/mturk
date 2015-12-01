@@ -10,7 +10,7 @@
               <!-- <th>Path</th> -->
               <th>Previous cost</th>
               <th>Cumulative cost</th>
-             <th>Explore index</th>
+              <th>Explore index</th>
              <!-- <th>Current Flows</th> -->
              <!-- <th>Previous index</th> -->
           </tr>

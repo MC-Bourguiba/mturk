@@ -1,4 +1,5 @@
 <div>
   <p> Player username: <span id="player-info-username"> {{ player_username }} </span> </p>
   <p> Player assigned model: <span id="player-assigned_model"> {{ player_modelname }} </span> </p>
+  <p> Player assigned model: <span id="player-assigned_game"> {{ game }} </span> </p>
 </div>

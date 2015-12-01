@@ -12,6 +12,9 @@ from django.views.generic import FormView
 from django.views.generic.base import TemplateView
 from django.contrib import messages
 
+from django.core.urlresolvers import reverse
+from django.shortcuts import redirect
+
 from django.core.files import File
 
 from utils import *
@@ -81,6 +84,12 @@ def dump_data_fixture(filename):
 current_game = 'game'
 
 def create_account(request):
+    # print 'POST'
+    # print request.POST
+    # print 'GET'
+    # print request.GET
+
+    # print request.POST.dict()['superuser'] == 'true'
 
     if not Game.objects.filter(name=current_game).exists():
         game = Game(name=current_game)
@@ -88,11 +97,12 @@ def create_account(request):
 
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
+        print form
         if form.is_valid():
             new_user = form.save()
             game = Game.objects.get(name=current_game)
 
-            if create_new_player(new_user, game):
+            if create_new_player(new_user, game, 'superuser' in request.POST.dict()):
                 return HttpResponseRedirect('/graph/index')
             else:
                 pass
@@ -106,9 +116,21 @@ def create_account(request):
     })
 
 
+def create_new_game(request):
+    response = dict()
+    return JsonResponse(response)
+
+
 def index(request):
     if request.user.is_authenticated():
-        return HttpResponseRedirect("/graph/accounts/profile")
+
+        # redir = redirect("/graph/accounts/profile/")
+        # redir['game'] = current_game
+        # print redir
+        # return redir
+        # url = reverse('show_graph', kwargs={'game': current_game})
+        # return HttpResponseRedirect(url)
+        return HttpResponseRedirect("/graph/accounts/profile/")
     else:
         return HttpResponseRedirect("/graph/accounts/login")
 
@@ -119,11 +141,18 @@ def show_graph(request):
 
     context = dict()
 
-    if request.user.username != root_username:
+    g = Game.objects.all()[0]
+
+    if 'game' in request.GET:
+        g = Game.objects.get_or_create(name=request.GET.get('game'))[0]
+
+    user = User.objects.get(username=request.user.username)
+
+    if not user.player.superuser:
         template = 'graph/user.djhtml'
-        user = User.objects.get(username=request.user.username)
 
         try:
+            g = user.player.game
             player_model = user.player.player_model
             context['graph'] = player_model.graph.name
             context['username'] = user.username
@@ -133,15 +162,17 @@ def show_graph(request):
         except:
             template = 'graph/user_wait.djhtml'
     else:
-        graphs = map(lambda g: g.name, Graph.objects.all())
-        context['usernames'] = Player.objects.values_list('user__username', flat=True)
+        graphs = [g.graph] if g.graph else []
+        # graphs = map(lambda g: g.name, Graph.objects.all())
+        context['usernames'] = Player.objects.filter(superuser=False).values_list('user__username', flat=True)
         # context['usernames'] = User.objects.values_list('username', flat=True)
-        context['model_names'] = PlayerModel.objects.values_list('name', flat=True)
+        context['model_names'] = PlayerModel.objects.all().values_list('name', flat=True)
         context['graph_names'] = graphs
+        context['games'] = Game.objects.all()
 
-    context['hidden'] = 'hidden'
-
-    g = Game.objects.all()[0]
+    # context['hidden'] = 'hidden'
+    context['hidden'] = ''
+    context['game_name'] = g.name
 
     # if not g.started:
     #     template = 'graph/user_wait.djhtml'
@@ -168,12 +199,13 @@ def editor(request):
 
 @login_required
 def create_graph(request):
-    graph_dict = json.loads(request.body)
-    graph = generate_and_save_graph(graph_dict)
+    request_dict = json.loads(request.body)
+    graph = generate_and_save_graph(request_dict)
 
-    game = Game.objects.get(name=current_game)
+    game = Game.objects.get(name=request_dict['game'])
 
     initial_turn = GameTurn()
+    initial_turn.game = game
     initial_turn.iteration = 0
     initial_turn.save()
     game.current_turn = initial_turn
@@ -276,7 +308,7 @@ def estimate_best_eta_all_turns(game, player):
 
     best_etas = []
 
-    for turn in GameTurn.objects.all():
+    for turn in GameTurn.objects.filter(game=game):
         if LearningRate.objects.filter(player=player, turn=turn).exists():
             lr = LearningRate.objects.get(player=player, turn=turn)
             best_etas.append(lr.learning_rate)
@@ -309,7 +341,8 @@ def predict_user_flows_all_turns(game, player):
 
     predictions['x'] = []
 
-    for prev_turn, curr_turn in zip(GameTurn.objects.all(), GameTurn.objects.all()[1:]):
+    for prev_turn, curr_turn in zip(GameTurn.objects.filter(game=game),
+                                    GameTurn.objects.filter(game=game)[1:]):
         counter += 1
         try:
             learning_rate = LearningRate.objects.get(player=player, turn=prev_turn).learning_rate
@@ -404,6 +437,21 @@ def get_user_costs(request, graph_name):
     response['cumulative_costs'] =  cumulative_costs
     response['user_etas'] = user_etas
     return JsonResponse(response)
+
+
+@login_required
+def assign_game(request):
+    data = json.loads(request.body)
+
+    print data
+
+    game = Game.objects.get(name=data['game'])
+    user = User.objects.get(username=data['username'])
+    user.player.game = game
+    user.save()
+    user.player.save()
+
+    return JsonResponse(dict())
 
 
 @login_required
@@ -507,9 +555,11 @@ def get_paths(request, username):
         previous_turn = game.turns.get(iteration=current_turn.iteration - 1)
 
     # TODO: Fix the cache key scheme
-    if cache.get(get_hash(user.username) + 'path_ids'):
-        prev_alloc = cache.get(get_hash(user.username) + 'allocation')
-        prev_path_ids = cache.get(get_hash(user.username) + 'path_ids')
+    path_ids_key = get_hash(user.username) + 'path_ids'
+    allocation_key = get_hash(user.username) + 'allocation'
+    if cache.get(path_ids_key):
+        prev_alloc = cache.get(allocation_key)
+        prev_path_ids = cache.get(path_ids_key)
 
 
     for idx, p_id in zip(path_idxs, path_ids):
@@ -603,6 +653,7 @@ def user_model_info(request, username):
 
     user_dict = dict()
     user_dict['player_username'] = username
+    user_dict['game'] = user.player.game
 
     try:
         if hasattr(user, 'player') and hasattr(user.player, 'player_model'):
@@ -726,8 +777,9 @@ def submit_distribution(request):
 
 @login_required
 def current_state(request):
-    # print 'CACHE FAILLEDDD'
-    game = Game.objects.all()[0]
+    data = json.loads(request.body)
+    print data
+    game = Game.objects.get(name=data['game'])
 
     time_key = game.pk + get_hash(str(game.current_turn.iteration))
 
@@ -748,7 +800,7 @@ def current_state(request):
         secs_left = (es_started + duration) - secs_now
 
 
-    cache.set('time_left', secs_left)
+    # cache.set('time_left', secs_left)
 
     response = dict()
     response['iteration'] = game.current_turn.iteration
@@ -756,7 +808,7 @@ def current_state(request):
 
     edge_costs = dict()
 
-    costs_cache_key = 'iteration %d' % game.current_turn.iteration
+    costs_cache_key = get_hash(game.pk) + 'iteration %d' % game.current_turn.iteration
 
     if cache.get(costs_cache_key):
         edge_costs = cache.get(costs_cache_key)
@@ -764,9 +816,9 @@ def current_state(request):
         # print 'CACHE FAILLEDDD@@@@@@@@@'
         cache.set(costs_cache_key, get_current_edge_costs(game))
 
-    max_flow_cache_key = 'edge_max_flow'
+    max_flow_cache_key = get_hash(game.pk) + 'edge_max_flow'
     if not cache.get(max_flow_cache_key):
-        print 'CACHE FAILLEDDD'
+        print 'max flow CACHE FAILLEDDD'
         edge_max_flow = calculate_maximum_flow(game)
         cache.set(max_flow_cache_key, edge_max_flow)
 
@@ -778,10 +830,10 @@ def current_state(request):
 
 
 def start_game(request):
-    # TODO: Fix this, let game be addressable in root UI
+    data = json.loads(request.body)
 
-    print 'Trying to start game'
-    game = Game.objects.get(name=current_game)
+    game = Game.objects.get(name=data['game'])
+
     if(game.started):
         return JsonResponse(dict())
     else:
@@ -800,7 +852,9 @@ def start_game(request):
 
 
 def stop_game(request):
-    game = Game.objects.all()[0]
+
+    data = json.loads(request.body)
+    game = Game.objects.get(name=data['game'])
     game.stopped = True
     game.save()
 
@@ -810,6 +864,7 @@ def stop_game(request):
     return JsonResponse(response)
 
 
+# TODO: Fix this later!
 def reset_game(game):
 
     users, pms = [], []
@@ -819,13 +874,14 @@ def reset_game(game):
         pms.append(player.player_model)
 
     EdgeCost.objects.all().delete()
-    GameTurn.objects.all().delete()
+    GameTurn.objects.filter(game=game).delete()
     FlowDistribution.objects.all().delete()
     GraphCost.objects.all().delete()
     PathFlowAssignment.objects.all().delete()
     cache.clear()
 
     initial_turn = GameTurn()
+    initial_turn.game = game
     initial_turn.iteration = 0
     initial_turn.save()
     game.current_turn = initial_turn
@@ -885,7 +941,7 @@ def assign_duration(request):
     duration = data['duration']
 
     # TODO: Fix this for multiple games
-    game = Game.objects.all()[0]
+    game = Game.objects.get(name=data['game'])
 
     game.duration = duration
     game.save()
@@ -902,7 +958,7 @@ def set_game_mode(request):
     single_slider_mode = data['single_slider']
 
     # TODO: Fix this for multiple games
-    game = Game.objects.all()[0]
+    game = Game.objects.get(name=data['game'])
 
     game.single_slider_mode = single_slider_mode
     game.save()

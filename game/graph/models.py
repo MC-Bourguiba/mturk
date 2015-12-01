@@ -2,8 +2,6 @@ from django.db import models
 
 from django.contrib.auth.models import User
 
-# from uuidfield import UUIDField
-
 
 class Graph(models.Model):
     name = models.TextField(primary_key=True)
@@ -16,7 +14,6 @@ class Graph(models.Model):
 class Node(models.Model):
     graph = models.ForeignKey('Graph')
     node_id = models.TextField(primary_key=True)
-    # node_id = UUIDField(primary_key=True, auto=True)
     ui_id = models.IntegerField()
 
     def __unicode__(self):
@@ -51,6 +48,7 @@ class Player(models.Model):
     # completed_task = models.BooleanField(default=False)
     game = models.ForeignKey('Game', null=True, blank=True)
     # flow_distribution = models.ForeignKey('FlowDistribution', null=True, blank=True)
+    superuser = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.user.username
@@ -144,6 +142,12 @@ class Game(models.Model):
     game_loop_time = models.DateTimeField(blank=True, null=True)
     stopped = models.BooleanField(default=False)
     edge_highlight = models.BooleanField(default=True)
-    duration = models.IntegerField(default=30)
+    duration = models.IntegerField(default=10)
     single_slider_mode = models.BooleanField(default=False)
     # thread_iteration = models.IntegerField(blank=True, null=True)
+
+    def __unicode__(self):
+        return self.name
+
+    def __str__(self):
+        return self.name

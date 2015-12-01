@@ -6,32 +6,32 @@ from datetime import datetime
 from utils import *
 from models import *
 
-
 import redis_lock
 from redis_lock import StrictRedis
 
 
-def create_new_player(user, game):
+def create_new_player(user, game, superuser):
     success = False
 
-    if user.username != root_username:
+    pms = PlayerModel.objects.filter(in_use=False, graph__isnull=False)
+    player = Player(user=user)
+    player.save()
+    # player.user = user
+    player.game = game
 
-        pms = PlayerModel.objects.filter(in_use=False, graph__isnull=False)
-        player = Player(user=user)
-        player.save()
-        # player.user = user
-        player.game = game
+    if pms:
+        pm = PlayerModel.objects.filter(in_use=False, graph__isnull=False)[:1].get()
+        pm.in_use = True
+        flow_distribution = create_default_distribution(pm, game, player)
+        player.flow_distribution = flow_distribution
+        player.player_model = pm
+        flow_distribution.save()
+        pm.save()
 
-        if pms:
-            pm = PlayerModel.objects.filter(in_use=False, graph__isnull=False)[:1].get()
-            pm.in_use = True
-            flow_distribution = create_default_distribution(pm, game, player)
-            player.flow_distribution = flow_distribution
-            player.player_model = pm
-            flow_distribution.save()
-            pm.save()
-            success = True
-        player.save()
+    success = True
+
+    player.superuser = superuser
+    player.save()
 
     return success
 
@@ -40,7 +40,7 @@ def iterate_next_turn(game):
     update_cost(game)
 
     game.turns.add(game.current_turn)
-    next_turn = GameTurn()
+    next_turn = GameTurn(game=game)
     next_turn.iteration = game.current_turn.iteration + 1
     next_turn.save()
 
@@ -168,7 +168,14 @@ def calculate_edge_flow(current_turn, game, use_cache=True):
 def get_current_edge_costs(game):
     edge_costs = dict()
     if game.current_turn.iteration > 0 and game.edge_highlight:
-        gc = GameTurn.objects.get(iteration=game.current_turn.iteration - 1).graph_cost
+        # TODO: Clean this up, a bit messy! Add game to GameTurn model?
+        gc = GameTurn.objects.get(game=game, iteration=game.current_turn.iteration-1).graph_cost
+        # for gt in GameTurn.objects.get(game=game, iteration=game.current_turn.iteration-1):
+        #     if gt.graph_cost and gt.graph_cost.graph == game.graph:
+        #         gc = gt.graph_cost
+        #         break
+
+        # gc = GameTurn.objects.get(iteration=game.current_turn.iteration - 1).graph_cost
         for ec in gc.edge_costs.all():
             edge_costs[ec.edge_id] = ec.cost
     return edge_costs
@@ -201,5 +208,5 @@ def update_cost(game):
     game.current_turn.graph_cost = graph_cost
     game.current_turn.save()
 
-    costs_cache_key = 'iteration %d' % game.current_turn.iteration
+    costs_cache_key = get_hash(game.pk) + 'iteration %d' % game.current_turn.iteration
     cache.set(costs_cache_key, get_current_edge_costs(game))
