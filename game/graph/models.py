@@ -142,7 +142,7 @@ class Game(models.Model):
     game_loop_time = models.DateTimeField(blank=True, null=True)
     stopped = models.BooleanField(default=False)
     edge_highlight = models.BooleanField(default=True)
-    duration = models.IntegerField(default=10)
+    duration = models.IntegerField(default=30)
     single_slider_mode = models.BooleanField(default=False)
     # thread_iteration = models.IntegerField(blank=True, null=True)
 
