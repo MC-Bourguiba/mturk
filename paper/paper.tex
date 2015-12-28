@@ -159,7 +159,7 @@ When designing a model of player decisions, many properties are desirable. Perha
 \subsection{A mirror descent model of learning}
 We will focus in particular on the mirror descent model used in~\cite{krichene2015MD}, since it offers a large family of models that have strong convergence guarantees to Nash equilibria. This model describes the learning dynamics as solving, at each step, a simple minimization problem parameterized by a learning rate $\eta$. Formally, the decision at iteration $t+1$ is obtained by solving
 \[
-x^{(t+1)}_k(\eta^{(t)}_k) = \argmin_{x_k \in \Delta^{\Acal_k}} \eta^{(t)}_k\braket{\ell^{(t)}_k}{x} + D_{\psi_k}(x_k, x^{(t)}_k),
+x^{(t+1)}_k(\eta^{(t)}_k) = \argmin_{x_k \in \Delta^{\Pcal_k}} \eta^{(t)}_k\braket{\ell^{(t)}_k}{x} + D_{\psi_k}(x_k, x^{(t)}_k),
 \]
 where $\psi_k$ is a distance generating function with corresponding Bregman divergence $D_{\psi_k}$, and $\eta^{(t)}_k$ is a learning rate. Intuitively, minimizing the first term $\braket{\ell^{(t)}_k}{x}$ will assign traffic to the routes which currently have minimal cost, and minimizing the second term $D_{\psi_k}(x_k, x^{(t)}_k)$ will keep the traffic at its current value. Minimizing the linear combination trades-off both terms, and the learning rate $\eta_k^{(t)}$ determines how aggressive the player is in updating her strategy: A small learning rate results in a small change in strategy (i.e. $x^{(t+1)}_k$ is close to $x_k^{(t)}$), while a large learning rate results in a significant change.
 
@@ -262,7 +262,7 @@ In this section, we assume that we have access to a sequence of observations of 
 Given the current flow distribution $\bar x^{(t)}_k$ and the current delay vector $\bar \ell^{(t)}_k$, the mirror descent model prescribes that the next distribution is given by
 \begin{equation}
 \label{eq:MD_update_estimation}
-x_k^{(t+1)}(\eta) = \argmin_{x \in \Delta^{\Pcal_k}} \eta \braket{\bar \ell_k^{(t)}}{x_k} + D_{\psi_k}(x_k, \bar x^{(t)}_k),
+x_k^{(t+1)}(\eta) = \argmin_{x_k \in \Delta^{\Pcal_k}} \eta \braket{\bar \ell_k^{(t)}}{x_k} + D_{\psi_k}(x_k, \bar x^{(t)}_k),
 \end{equation}
 where $\psi_k$ is given. Therefore, $x^{(t+1)}_k$ can be viewed as a function of $\eta$, (hence the notation $x_k^{(t+1)}(\eta)$) and to estimate $\eta$, one can minimize
 \[
