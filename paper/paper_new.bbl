@@ -1,0 +1,162 @@
+\begin{thebibliography}{10}
+
+\bibitem{banerjee2005clustering}
+A.~Banerjee, S.~Merugu, I.~S. Dhillon, and J.~Ghosh.
+\newblock Clustering with bregman divergences.
+\newblock {\em J. Mach. Learn. Res.}, 6:1705--1749, Dec. 2005.
+
+\bibitem{bayen2011mobile}
+A.~Bayen, J.~Butler, A.~Patire, {\relax CCIT}, {\relax UC Berkeley ITS}, and
+  {\relax California Dpartment of Transportation, Division of Research and
+  Innovation}.
+\newblock {\em Mobile Millennium Final Report}.
+\newblock 2011.
+
+\bibitem{beck2003mirror}
+A.~Beck and M.~Teboulle.
+\newblock Mirror descent and nonlinear projected subgradient methods for convex
+  optimization.
+\newblock {\em Oper. Res. Lett.}, 31(3):167--175, May 2003.
+
+\bibitem{beckmann1955studies}
+M.~J. Beckmann, C.~B. McGuire, and C.~B. Winsten.
+\newblock Studies in the economics of transportation.
+\newblock 1955.
+
+\bibitem{blackwell1956analog}
+D.~Blackwell.
+\newblock An analog of the minimax theorem for vector payoffs.
+\newblock {\em Pacific Journal of Mathematics}, 6(1):1--8, 1956.
+
+\bibitem{blum2006routing}
+A.~Blum, E.~Even-Dar, and K.~Ligett.
+\newblock Routing without regret: on convergence to nash equilibria of
+  regret-minimizing algorithms in routing games.
+\newblock In {\em Proceedings of the twenty-fifth annual ACM symposium on
+  Principles of distributed computing}, PODC '06, pages 45--52, New York, NY,
+  USA, 2006. ACM.
+
+\bibitem{boyd2010convex}
+S.~Boyd and L.~Vandenberghe.
+\newblock {\em {Convex Optimization}}, volume~25.
+\newblock Cambridge University Press, 2010.
+
+\bibitem{canudasdewit2015grenoble}
+C.~Canudas De~Wit, F.~Morbidi, L.~Leon~Ojeda, A.~Y. Kibangou, I.~Bellicot, and
+  P.~Bellemain.
+\newblock {Grenoble Traffic Lab: An experimental platform for advanced traffic
+  monitoring and forecasting}.
+\newblock {\em {IEEE Control Systems}}, 35(3):23--39, June 2015.
+
+\bibitem{censor1997parallel}
+Y.~Censor and S.~Zenios.
+\newblock {\em Parallel Optimization: Theory, Algorithms and Applications}.
+\newblock Oxford University Press, 1997.
+
+\bibitem{cesa2006prediction}
+N.~Cesa-Bianchi and G.~Lugosi.
+\newblock {\em Prediction, learning, and games}.
+\newblock Cambridge University Press, 2006.
+
+\bibitem{fischer2004evolution}
+S.~Fischer and B.~V{\"o}cking.
+\newblock On the evolution of selfish routing.
+\newblock In {\em Algorithms--ESA 2004}, pages 323--334. Springer, 2004.
+
+\bibitem{fox2013population}
+M.~J. Fox and J.~S. Shamma.
+\newblock Population games, stable games, and passivity.
+\newblock {\em Games}, 4(4):561--583, 2013.
+
+\bibitem{freund1999adaptive}
+Y.~Freund and R.~E. Schapire.
+\newblock Adaptive game playing using multiplicative weights.
+\newblock {\em Games and Economic Behavior}, 29(1):79--103, 1999.
+
+\bibitem{fudenberg1998theory}
+D.~Fudenberg and D.~K. Levine.
+\newblock {\em The theory of learning in games}, volume~2.
+\newblock MIT press, 1998.
+
+\bibitem{hannan1957approximations}
+J.~Hannan.
+\newblock {Approximation to Bayes risk in repeated plays}.
+\newblock {\em Contributions to the Theory of Games}, 3:97--139, 1957.
+
+\bibitem{hart2005adaptive}
+S.~Hart.
+\newblock Adaptive heuristics.
+\newblock {\em Econometrica}, 73(5):1401--1430, 2005.
+
+\bibitem{hart2001general}
+S.~Hart and A.~Mas-Colell.
+\newblock A general class of adaptive strategies.
+\newblock {\em Journal of Economic Theory}, 98(1):26 -- 54, 2001.
+
+\bibitem{kivinen1997exponentiated}
+J.~Kivinen and M.~K. Warmuth.
+\newblock Exponentiated gradient versus gradient descent for linear predictors.
+\newblock {\em Information and Computation}, 132(1):1 -- 63, 1997.
+
+\bibitem{kleinberg2009multiplicative}
+R.~Kleinberg, G.~Piliouras, and E.~Tardos.
+\newblock Multiplicative updates outperform generic no-regret learning in
+  congestion games.
+\newblock In {\em Proceedings of the 41st annual ACM symposium on Theory of
+  computing}, pages 533--542. ACM, 2009.
+
+\bibitem{krichene2015SMD}
+S.~Krichene, W.~Krichene, R.~Dong, and A.~Bayen.
+\newblock Convergence of heterogeneous distributed learning in stochastic
+  routing games.
+\newblock In {\em 53rd Allerton Conference on Communication, Control and
+  Computing}, 2015.
+
+\bibitem{krichene2015learning}
+W.~Krichene, B.~Drigh{\`e}s, and A.~Bayen.
+\newblock Learning nash equilibria in congestion games.
+\newblock {\em SIAM Journal on Control and Optimization (SICON)}, 2015.
+
+\bibitem{krichene2015MD}
+W.~Krichene, S.~Krichene, and A.~Bayen.
+\newblock Convergence of mirror descent dynamics in the routing game.
+\newblock In {\em European Control Conference (ECC)}, 2015.
+
+\bibitem{marden2013game}
+J.~Marden and J.~Shamma.
+\newblock Game theory and distributed control.
+\newblock In H.~Young and S.~Zamir, editors, {\em Handbook of Game Theory Vol.
+  4}. Elsevier Science, 2013.
+
+\bibitem{nemirovski1983problem}
+A.~S. Nemirovsky and D.~B. Yudin.
+\newblock {\em Problem complexity and method efficiency in optimization}.
+\newblock Wiley-Interscience series in discrete mathematics. Wiley, 1983.
+
+\bibitem{ozdaglar2007incentives}
+A.~Ozdaglar and R.~Srikant.
+\newblock Incentives and pricing in communication networks.
+\newblock {\em Algorithmic Game Theory}, pages 571--591, 2007.
+
+\bibitem{rosenthal1973class}
+R.~W. Rosenthal.
+\newblock A class of games possessing pure-strategy nash equilibria.
+\newblock {\em International Journal of Game Theory}, 2(1):65--67, 1973.
+
+\bibitem{roughgarden2007}
+T.~Roughgarden.
+\newblock Routing games.
+\newblock In {\em Algorithmic game theory}, chapter~18, pages 461--486.
+  Cambridge University Press, 2007.
+
+\bibitem{sandholm2001potential}
+W.~H. Sandholm.
+\newblock Potential games with continuous player sets.
+\newblock {\em Journal of Economic Theory}, 97(1):81--108, 2001.
+
+\bibitem{simon1955behavioral}
+H.~A. Simon.
+\newblock A behavioral model of rational choice.
+\newblock {\em The Quarterly Journal of Economics}, 69(1):pp. 99--118, 1955.
+
+\end{thebibliography}

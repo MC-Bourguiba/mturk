@@ -1,0 +1,54 @@
+This is BibTeX, Version 0.99d (TeX Live 2015)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: paper_new.aux
+The style file: abbrv.bst
+Database file #1: bib.bib
+Name 5 in "Bayen, A.M. and Butler, J. and Patire, A.D. and {\relax CCIT} and {\relax UC Berkeley ITS}, and {\relax California Dpartment of Transportation, Division of Research and Innovation}" has a comma at the end for entry bayen2011mobile
+while executing---line 1049 of file abbrv.bst
+Name 5 in "Bayen, A.M. and Butler, J. and Patire, A.D. and {\relax CCIT} and {\relax UC Berkeley ITS}, and {\relax California Dpartment of Transportation, Division of Research and Innovation}" has a comma at the end for entry bayen2011mobile
+while executing---line 1090 of file abbrv.bst
+Warning--empty publisher in bayen2011mobile
+Warning--empty journal in beckmann1955studies
+Warning--can't use both author and editor fields in boyd2010convex
+You've used 29 entries,
+            2118 wiz_defined-function locations,
+            680 strings with 8537 characters,
+and the built_in function-call counts, 9689 in all, are:
+= -- 954
+> -- 428
+< -- 8
++ -- 172
+- -- 138
+* -- 658
+:= -- 1599
+add.period$ -- 93
+call.type$ -- 29
+change.case$ -- 149
+chr.to.int$ -- 0
+cite$ -- 32
+duplicate$ -- 391
+empty$ -- 789
+format.name$ -- 138
+if$ -- 2052
+int.to.chr$ -- 0
+int.to.str$ -- 29
+missing$ -- 35
+newline$ -- 148
+num.names$ -- 60
+pop$ -- 172
+preamble$ -- 1
+purify$ -- 126
+quote$ -- 0
+skip$ -- 264
+stack$ -- 0
+substring$ -- 588
+swap$ -- 78
+text.length$ -- 8
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 104
+warning$ -- 3
+while$ -- 94
+width$ -- 31
+write$ -- 318
+(There were 2 error messages)

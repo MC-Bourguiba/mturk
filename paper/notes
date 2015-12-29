@@ -1,0 +1,41 @@
+Todo:
+
+* Reviewer 1
+
+** Seems to worry about the novelty of the theoretical work
+** Need to mention about possible connections between routing games and multi-armed bandit (new information per turn etc...)
+** "There are some results on the convergence of potential games,
+see the work of Shamma, for example. Are those results related to
+Theorem 1?"
+** Elaborate on players who participated in the game
+
+
+* Reviewer 2
+
+** Definition 1 is stronger than classical Nash
+** Typo in equation 2 (fixed).
+
+
+* Reviewer 3
+
+** Axes in Figure 1 is too small to read, I can increase the font size?
+
+* Reviewer 4
+
+** Wants legend on Figure 5, I guess we can add it in or state it in the caption? I thought it followed from the Figure 3.
+** Concerned about notation inconsistencies with the probability simplex
+** Wants us to include estimation error average.
+** Wants to discuss irrational behavior, negative etas
+
+* Reviewer 5
+
+** Fix notational inconcsistencies
+** I think we should explain \Delta^{P_k} in the first equation of Section 1.2?
+** Address negative learning rates
+
+* Reviewer 6
+
+** Works has shown distributed convergence without full information. So we might change the introduction section
+** Concerns about notations in Section 1.2 as with other previous reviewers
+** Concerns about negative learning rates
+** Concerns about Section 3, the reviewer's comments are more in detail
