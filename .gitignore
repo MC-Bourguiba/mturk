@@ -87,8 +87,7 @@ notes/routing_game.aux
 
 
 # latex files
-paper/*.pdf
-paper/*.syntec.gz
+paper/*.synctex.gz
 paper/*.blg
 paper/*.out
 paper/*.aux
