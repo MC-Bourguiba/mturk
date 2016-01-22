@@ -85,4 +85,11 @@ notes/routing_game.aux
 *migrations*
 .idea/codeStyleSettings.xml
 
-*.pdf
+
+# latex files
+paper/*.pdf
+paper/*.syntec.gz
+paper/*.blg
+paper/*.out
+paper/*.aux
+
