@@ -1,5 +1,12 @@
 \begin{thebibliography}{10}
 
+\bibitem{arslan2004distributed}
+G.~Arslan and J.~Shamma.
+\newblock Distributed convergence to {N}ash equilibria with local utility
+  measurements.
+\newblock In {\em 43rd IEEE Conference on Decision and Control}, volume~2,
+  pages 1538--1543 Vol.2, Dec 2004.
+
 \bibitem{banerjee2005clustering}
 A.~Banerjee, S.~Merugu, I.~S. Dhillon, and J.~Ghosh.
 \newblock Clustering with bregman divergences.
@@ -122,11 +129,23 @@ W.~Krichene, S.~Krichene, and A.~Bayen.
 \newblock Convergence of mirror descent dynamics in the routing game.
 \newblock In {\em European Control Conference (ECC)}, 2015.
 
+\bibitem{krichene2015efficient}
+W.~Krichene, S.~Krichene, and A.~Bayen.
+\newblock Efficient bregman projections onto the simplex.
+\newblock In {\em IEEE Conference on Decision and Control, in review}, 2015.
+
 \bibitem{marden2013game}
 J.~Marden and J.~Shamma.
 \newblock Game theory and distributed control.
 \newblock In H.~Young and S.~Zamir, editors, {\em Handbook of Game Theory Vol.
   4}. Elsevier Science, 2013.
+
+\bibitem{marden2013model}
+J.~R. Marden, S.~D. Ruben, and L.~Y. Pao.
+\newblock A model-free approach to wind farm control using game theoretic
+  methods.
+\newblock {\em Control Systems Technology, IEEE Transactions on},
+  21(4):1207--1214, 2013.
 
 \bibitem{nemirovski1983problem}
 A.~S. Nemirovsky and D.~B. Yudin.
