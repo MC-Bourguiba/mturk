@@ -90,6 +90,7 @@ class PathFlowAssignment(models.Model):
 class GameTurn(models.Model):
     iteration = models.IntegerField(default=0)
     graph_cost = models.ForeignKey('GraphCost', blank=True, null=True)
+    game_object = models.ForeignKey('Game', blank=True, null=True)
 
     def __unicode__(self):
         return str(self.iteration)

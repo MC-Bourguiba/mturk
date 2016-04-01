@@ -40,7 +40,7 @@ def iterate_next_turn(game):
     update_cost(game)
 
     game.turns.add(game.current_turn)
-    next_turn = GameTurn(game=game)
+    next_turn = GameTurn(game_object=game)
     next_turn.iteration = game.current_turn.iteration + 1
     next_turn.save()
 
@@ -124,7 +124,7 @@ def calculate_edge_flow(current_turn, game, use_cache=True):
     for e in Edge.objects.filter(graph=game.graph):
         edge_flow[e] = 0.0
 
-    for player in Player.objects.filter(game=game):
+    for player in Player.objects.filter(game=game, superuser=False):
         allocation = []
         path_ids = []
 
