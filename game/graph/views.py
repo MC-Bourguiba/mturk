@@ -162,12 +162,12 @@ def show_graph(request):
         except:
             template = 'graph/user_wait.djhtml'
     else:
-        graphs = [g.graph] if g.graph else []
+        #graphs = [g.graph] if g.graph else []
         # graphs = map(lambda g: g.name, Graph.objects.all())
         context['usernames'] = Player.objects.filter(superuser=False).values_list('user__username', flat=True)
         # context['usernames'] = User.objects.values_list('username', flat=True)
         context['model_names'] = PlayerModel.objects.all().values_list('name', flat=True)
-        context['graph_names'] = graphs
+        context['graph_names'] = Graph.objects.all()
         context['games'] = Game.objects.all()
 
     # context['hidden'] = 'hidden'
