@@ -41,7 +41,7 @@ import math
 
 
 epsilon = 1E-4
-
+cache.set('waiting_time',100)
 
 def KL(x, y):
     return sum([x_i*np.log(x_i/y_i) for x_i, y_i in zip(x, y) if x_i > 0])
@@ -130,7 +130,9 @@ def index(request):
         # return redir
         # url = reverse('show_graph', kwargs={'game': current_game})
         # return HttpResponseRedirect(url)
+
         return HttpResponseRedirect("/graph/accounts/profile/")
+
     else:
         return HttpResponseRedirect("/graph/accounts/login")
 
@@ -147,28 +149,38 @@ def show_graph(request):
         g = Game.objects.get_or_create(name=request.GET.get('game'))[0]
 
     user = User.objects.get(username=request.user.username)
+    #if not user.player.superuser:
+      #  if not(g.started):
+           # if len(PlayerModel.objects.filter(in_use=False))>0:
+               # return HttpResponseRedirect ("/graph/waiting_room/")
+    if False:
+        return HttpResponse("test")
 
-    if not user.player.superuser:
-        template = 'graph/user.djhtml'
-
-        try:
-            g = user.player.game
-            player_model = user.player.player_model
-            context['graph'] = player_model.graph.name
-            context['username'] = user.username
-            context['start'] = player_model.start_node.ui_id
-            context['destination'] = player_model.destination_node.ui_id
-            context['flow'] = player_model.flow
-        except:
-            template = 'graph/user_wait.djhtml'
     else:
-        #graphs = [g.graph] if g.graph else []
-        # graphs = map(lambda g: g.name, Graph.objects.all())
-        context['usernames'] = Player.objects.filter(superuser=False).values_list('user__username', flat=True)
-        # context['usernames'] = User.objects.values_list('username', flat=True)
-        context['model_names'] = PlayerModel.objects.all().values_list('name', flat=True)
-        context['graph_names'] = Graph.objects.all()
-        context['games'] = Game.objects.all()
+        if not user.player.superuser:
+            template = 'graph/user.djhtml'
+            if not(g.started):
+                if len(PlayerModel.objects.filter(in_use=False))>0:
+                    return HttpResponseRedirect ("/graph/waiting_room/")
+
+            try:
+                g = user.player.game
+                player_model = user.player.player_model
+                context['graph'] = player_model.graph.name
+                context['username'] = user.username
+                context['start'] = player_model.start_node.ui_id
+                context['destination'] = player_model.destination_node.ui_id
+                context['flow'] = player_model.flow
+            except:
+                template = 'graph/user_wait.djhtml'
+        else:
+            #graphs = [g.graph] if g.graph else []
+            # graphs = map(lambda g: g.name, Graph.objects.all())
+            context['usernames'] = Player.objects.filter(superuser=False).values_list('user__username', flat=True)
+            # context['usernames'] = User.objects.values_list('username', flat=True)
+            context['model_names'] = PlayerModel.objects.all().values_list('name', flat=True)
+            context['graph_names'] = Graph.objects.all()
+            context['games'] = Game.objects.all()
 
     # context['hidden'] = 'hidden'
     context['hidden'] = ''
@@ -375,6 +387,7 @@ def predict_user_flows_all_turns(game, player):
 
 @login_required
 def get_user_predictions(request, username):
+    #TODO hard coded ?
     game = Game.objects.all()[0]
     player = Player.objects.get(user__username=username)
     flow_predictions, actual_flows = predict_user_flows_all_turns(game, player)
@@ -387,7 +400,7 @@ def get_user_predictions(request, username):
 @login_required
 def get_user_costs(request, graph_name):
     game = Game.objects.get(graph__name=graph_name)
-    players = Player.objects.filter(game=game)
+    players = Player.objects.filter(game=game,superuser=False)
 
     current_costs = dict()
     cumulative_costs = dict()
@@ -398,13 +411,15 @@ def get_user_costs(request, graph_name):
         paths = Path.objects.filter(player_model=player.player_model)
         # path_assignments = player.flow_distribution.path_assignments
         cumulative_cost = 0
-        normalization_const = player.player_model.normalization_const
+        #TODO fix normilzation const
+        #
+        #normalization_const = player.player_model.normalization_const
+        normalization_const = 2.5
         for turn in game.turns.all().order_by('iteration'):
             # if turn.iteration == 0:
             #     continue
 
-            path_assignments = FlowDistribution.objects.get(turn=turn,
-                                                            player=player).path_assignments
+            path_assignments = FlowDistribution.objects.get(turn=turn,player=player).path_assignments
             # path_assignments = turn.flow_distributions.get(username=username).path_assignments
             e_costs = turn.graph_cost.edge_costs
             current_cost = 0
@@ -413,7 +428,9 @@ def get_user_costs(request, graph_name):
                 cumulative_costs[player.user.username] = []
 
             for path in paths:
+                #TODO fix request 
                 flow = path_assignments.get(path=path).flow
+                #flow = 0.25
                 current_path_cost = 0
                 for e in path.edges.all():
                     current_path_cost += e_costs.get(edge=e).cost
@@ -830,6 +847,7 @@ def current_state(request):
 
 
 def start_game(request):
+
     data = json.loads(request.body)
 
     game = Game.objects.get(name=data['game'])
@@ -964,3 +982,27 @@ def set_game_mode(request):
     game.save()
 
     return JsonResponse(dict())
+
+@login_required
+def waiting_room(request):
+    user = User.objects.get(username=request.user.username)
+    response = dict()
+    response['Success']=True
+    template = 'graph/user_wait.djhtml'
+    response['players_to_go'] = len(PlayerModel.objects.filter(in_use=False))
+    if(len(PlayerModel.objects.filter(in_use=False))== 0) or int(cache.get("waiting_time"))<=0:
+        return HttpResponseRedirect('/graph/accounts/profile/')
+
+    response['time_countdown'] = cache.get('waiting_time')
+    response['username'] = user.username
+    response['time_countdown'] = cache.get('waiting_time')
+    return render(request,template,response)
+
+@login_required
+def waiting_countdown(request):
+    val = int (cache.get("waiting_time"))
+    val = val-1
+    cache.set("waiting_time",val)
+    response = dict()
+    response['ping']=val
+    return JsonResponse(response)

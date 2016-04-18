@@ -40,6 +40,8 @@
     <div id="completed-turn" style="display: none" align="right">
       <p> You finished your turn! </p>
     </div>
+   
+
     <a id="show-edge-btn" class="btn btn-default " href="#" role="button">Show edge costs</a>
     <a id="clear-edge-btn" class="btn btn-default " href="#" role="button">Clear edge costs</a>
 
@@ -82,5 +84,9 @@
 {% endblock %}
 
 {% block scripts %}
+  <script>
+  var is_admin = false;
+  </script>
+
   </script><script src="{% static 'graph/user.js' %}"></script>
 {% endblock %}

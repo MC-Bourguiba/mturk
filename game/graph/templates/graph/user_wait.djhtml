@@ -1,4 +1,4 @@
-{% extends "graph/index.djhtml" %}
+{% extends "graph/index-wait.djhtml" %}
 {% load staticfiles %}
 
 {% block navbar_extra_buttons %}
@@ -19,4 +19,18 @@
       <a id="start-game-btn" class="btn btn-default " href="{% url 'logout' %}" role="button">Logout</a>
     </p>
   </li>
+
+{% endblock %}
+
+{% block top_right%}
+
+
+
+
+
+
+
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'graph/waiting.js' %}"></script>
 {% endblock %}
