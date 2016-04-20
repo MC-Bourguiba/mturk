@@ -1,6 +1,8 @@
 from math import exp, sqrt
 
 
+
+
 def hedge_Algorithm(losses_vector,previous_distributions,iteration, path_ids):
     lr= learning_rate(iteration)
     #ub = upper_bound(iteration)
@@ -9,7 +11,7 @@ def hedge_Algorithm(losses_vector,previous_distributions,iteration, path_ids):
     next_distributions = dict()
     normalization_const = 0
     for id in path_ids:
-        next_distributions[id]=exp_computation(lr,ub,losses_vector[id],previous_distributions[id])
+        next_distributions[id]=exp_computation(lr,ub,float(losses_vector[id])*1000,float(previous_distributions[id]))
         normalization_const= normalization_const+ next_distributions[id]
     for id in path_ids:
         next_distributions[id]= next_distributions[id]/normalization_const
@@ -19,11 +21,12 @@ def learning_rate(iteration):
     lr = 1.0/sqrt(iteration)
     return lr
 
-#TODO depending on the learning rate
+
 def upper_bound(iteration):
     return
 
 def exp_computation(lr,ub,loss,pd):
     print-(lr*loss/ub)
     return pd*exp(-(lr*loss/ub))
+
 

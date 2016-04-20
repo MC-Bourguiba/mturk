@@ -16,11 +16,16 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 
 from django.core.files import File
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
+
 
 from utils import *
 from models import *
 from tasks import *
 from game_functions import *
+from AI import *
+import requests
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm
@@ -429,8 +434,8 @@ def get_user_costs(request, graph_name):
 
             for path in paths:
                 #TODO fix request 
-                flow = path_assignments.get(path=path).flow
-                #flow = 0.25
+                #flow = path_assignments.get(path=path).flow
+                flow = 0.25
                 current_path_cost = 0
                 for e in path.edges.all():
                     current_path_cost += e_costs.get(edge=e).cost
@@ -1006,3 +1011,25 @@ def waiting_countdown(request):
     response = dict()
     response['ping']=val
     return JsonResponse(response)
+
+
+@login_required
+def ai_play(request,username):
+
+    int_iteration = int(request.GET.dict()['iteration'])
+    js = dict()
+    if int_iteration>1:
+        str_iteration = str(int_iteration-1)
+        response = requests.get('http://127.0.0.1:8000/graph/get_previous_cost/'+username+'/?iteration='+str_iteration).json()
+        previous_cost = {int(k):v[:-1][0] for k,v in response['previous_costs'].iteritems()}
+        previous_flow = {int(k):v[:-1][0] for k,v in response['previous_flows'].iteritems()}
+        paths_ids = response['path_ids']
+
+        js['path_ids'] = paths_ids
+        js['iteration'] =str_iteration
+        js['previous_costs']= previous_cost.values()
+        js['previosu_flows']= previous_flow.values()
+        new_distrib = hedge_Algorithm(previous_cost,previous_flow,int_iteration,range(len(paths_ids)))
+        js["new_distrib"] =new_distrib.values()
+
+    return JsonResponse(js)
