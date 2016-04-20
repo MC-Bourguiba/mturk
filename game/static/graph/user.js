@@ -188,7 +188,14 @@ function update_loop() {
 
 function post_temporary_distribution_loop() {
     setTimeout(post_temporary_distribution_loop, 1000); // Update every second.
+    ai_play(username);
+    if(username!="user_1"){
     submit_distribution(true);
+    }
+
+
+
+
 }
 
 
@@ -287,7 +294,7 @@ function update_from_state(username) {
             }
 
             current_iteration = json['iteration'];
-            // console.log(json);
+            console.log(current_iteration);
         },
 
         // handle a non-successful response
@@ -597,3 +604,71 @@ function startTimer(duration, display) {
         }
     }, 1000);
 }
+
+function ai_play(username){
+ $.ajax({
+        url : "/graph/ai_play/" + username + "/",
+        type : "GET",
+        data : {"iteration": current_iteration},
+
+
+         success : function(json) {
+             console.log(json);
+             if(username=="user_1" && current_iteration>0){
+
+
+                var paths = [];
+                var allocation = [];
+
+                $("#path-list tr").each(function(idx, li) {
+                 paths.push(parseInt($(li).find("a").attr('id')));
+                 // allocation.push(parseFloat($(li).find("input")[0].value/100));
+                });
+
+
+
+                var paths = json['path_ids'];
+                var allocation = json['new_distrib'];
+
+                $.ajax({
+                    url : "/graph/submit_distribution/",
+                    type : "POST",
+                    data : JSON.stringify({
+                            "username" : $("#username-hidden")[0].value,
+                            "allocation" : allocation,
+                            "ids" : paths,
+                     }),
+
+                    success : function(json) {
+
+                        if (true) {
+                            update_from_state(username);
+                         }
+
+                        // console.log(json);
+                     },
+
+                    // handle a non-successful response
+                     error : function(xhr,errmsg,err) {
+                        console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                     }
+                });
+
+             }
+
+
+          }
+    });
+
+
+}
+
+$(document).ready(function() {
+    if (username=="user_1") {
+        setTimeout(function(){
+        window.location.reload(1);
+        }, 15000);
+    }
+
+
+});
