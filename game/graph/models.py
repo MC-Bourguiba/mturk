@@ -24,8 +24,8 @@ class PlayerModel(models.Model):
     name = models.TextField(primary_key=True)
     graph = models.ForeignKey(Graph, null=True, blank=True)
     start_node = models.ForeignKey(Node, related_name='start_node', null=True, blank=True)
-    destination_node = models.ForeignKey(Node, related_name='destination_node',
-                                         null=True, blank=True)
+    destination_node = models.ForeignKey(Node, related_name='destination_node', null=True, blank=True)
+    is_a_bot = models.BooleanField(default=False)
     flow = models.FloatField(null=True, blank=True)
     in_use = models.BooleanField(default=False)
     normalization_const = models.FloatField(null=True, blank=True)

@@ -789,3 +789,50 @@ $("#assign-duration-btn").click(function(e) {
         }
     });
 });
+
+
+
+function start_countdown(){
+   $.ajax({
+        url : "/graph/waiting_countdown/",
+        type : "GET",
+
+        success : function(json) {
+            console.log(json);
+            document.getElementById("wait").innerHTML=json['ping'];
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+}
+
+
+$('#start-countdown').click(function(evt) {
+    setInterval(start_countdown ,100);
+});
+
+$('#stop-countdown').click(function(evt) {
+    window.location.reload();
+});
+
+
+$('#set-countdown').click(function(evt) {
+     $.ajax({
+        url : "/graph/set_waiting_time/",
+        type : "GET",
+
+        success : function(json) {
+            console.log(json);
+            document.getElementById("wait").innerHTML=json['countdown'];
+
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+});

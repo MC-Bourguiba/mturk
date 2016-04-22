@@ -135,9 +135,12 @@
           <a id="assign-destination-node" class="btn btn-default" href="#" role="button">Assign destination node</a>
           <a id="assign-graph" class="btn btn-default" href="#" role="button">Assign graph</a>
           <a id="start-game" class="btn btn-default {{ hidden }}" href="#" role="button">Start game</a>
+          <a id="set-countdown" class="btn btn-default {{ hidden }}" href="#" role="button">Set wait countdown</a>
           <a id="start-countdown" class="btn btn-default {{ hidden }}" href="#" role="button">Start wait countdown</a>
-          <p id="wait"></p>
+
           <a id="stop-countdown" class="btn btn-default {{ hidden }}" href="#" role="button">Stop wait countdown</a>
+          <p id="wait"></p>
+
           <a id="stop-game" class="btn btn-default {{ hidden }}" href="#" role="button">Stop game</a>
           <!-- <a id="turn-off-edge" class="btn btn-default {{ hidden }}" href="#" role="button">Turn off edge</a>
           <a id="turn-on-edge" class="btn btn-default {{ hidden }}" href="#" role="button">Turn on edge</a> -->

@@ -189,7 +189,7 @@ function update_loop() {
 function post_temporary_distribution_loop() {
     setTimeout(post_temporary_distribution_loop, 1000); // Update every second.
     ai_play(username);
-    if(username!="user_1"){
+    if(is_bot=='False'){
     submit_distribution(true);
     }
 
@@ -201,7 +201,7 @@ function post_temporary_distribution_loop() {
 
 $(document).ready(function() {
     username = $("#username-hidden")[0].value;
-
+    is_bot = $("#bot-hidden")[0].value;
     if (editor_window == null) {
         editor_window = document.getElementById("graph-editor").contentWindow;
     }
@@ -614,7 +614,7 @@ function ai_play(username){
 
          success : function(json) {
              console.log(json);
-             if(username=="user_1" && current_iteration>0){
+             if(is_bot =='True' && current_iteration>0){
 
 
                 var paths = [];
@@ -664,7 +664,7 @@ function ai_play(username){
 }
 
 $(document).ready(function() {
-    if (username=="user_1") {
+    if (is_bot=='True') {
         setTimeout(function(){
         window.location.reload(1);
         }, 15000);

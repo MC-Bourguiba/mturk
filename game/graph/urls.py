@@ -67,7 +67,15 @@ urlpatterns = patterns('',
                            name='crate_new_game'),
                        url(r'^waiting_room/$', views.waiting_room,
                            name='waiting_room'),
-                        url(r'^waiting_countdown/$', views.waiting_countdown,
+                       url(r'^waiting_countdown/$', views.waiting_countdown,
                            name='waiting_countdown'),
+                       url(r'^ai_play/(?P<username>[a-zA-Z0-9_]+)', views.ai_play,
+                           name='ai_play'),
+                       url(r'^get_countdown/', views.get_countdown,
+                           name='get_countdown'),
+                        url(r'^set_waiting_time/', views.set_waiting_time,
+                           name='set_waiting_time'),
+
+
                        # url(r'^get_duration/$', view.get_duration, name='get_duration'),
 )
