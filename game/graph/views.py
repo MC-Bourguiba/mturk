@@ -406,6 +406,9 @@ def get_user_predictions(request, username):
 
 @login_required
 def get_user_costs(request, graph_name):
+    if not Game.objects.filter(graph__name=graph_name).count():
+        return JsonResponse({'started': False})
+
     game = Game.objects.get(graph__name=graph_name)
     players = Player.objects.filter(game=game,superuser=False)
 
