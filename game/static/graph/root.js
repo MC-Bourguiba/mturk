@@ -591,7 +591,8 @@ $("#add-model").click(function(e) {
         contentType: 'application/json', // JSON encoding
 
         data : JSON.stringify({
-            'model_name' : model_name
+            'model_name' : model_name,
+            'graph_name': graph_name
         }),
 
         // handle a successful response

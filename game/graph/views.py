@@ -512,6 +512,9 @@ def add_model(request):
     else:
         player_model = PlayerModel(name=data['model_name'])
         player_model.in_use = False
+        if data['graph_name']:
+            player_model.graph = Graph.objects.get(name=data['graph_name'])
+
         player_model.save()
         response['success'] = True
 
