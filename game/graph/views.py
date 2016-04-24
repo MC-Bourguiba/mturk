@@ -46,8 +46,9 @@ import math
 
 
 epsilon = 1E-4
-cache.set('waiting_time',100)
-
+first_player = True
+waiting_time = 100
+cache.set('waiting_time',waiting_time)
 def KL(x, y):
     return sum([x_i*np.log(x_i/y_i) for x_i, y_i in zip(x, y) if x_i > 0])
 
@@ -165,7 +166,7 @@ def show_graph(request):
         if not user.player.superuser:
             template = 'graph/user.djhtml'
             if not(g.started):
-                if len(PlayerModel.objects.filter(in_use=False))>0:
+                if len(PlayerModel.objects.filter(in_use=False))>0 and int(cache.get("waiting_time"))>=0:
                     return HttpResponseRedirect ("/graph/waiting_room/")
 
             try:
@@ -176,6 +177,7 @@ def show_graph(request):
                 context['start'] = player_model.start_node.ui_id
                 context['destination'] = player_model.destination_node.ui_id
                 context['flow'] = player_model.flow
+                context['is_bot'] = player_model.is_a_bot
             except:
                 template = 'graph/user_wait.djhtml'
         else:
@@ -990,12 +992,18 @@ def set_game_mode(request):
 
 @login_required
 def waiting_room(request):
+    first_visit = first_player
+    if(first_visit):
+        cache.set("waiting_time",waiting_time)
+        global first_player
+        first_player = False
     user = User.objects.get(username=request.user.username)
     response = dict()
     response['Success']=True
+    response['first'] = first_visit
     template = 'graph/user_wait.djhtml'
     response['players_to_go'] = len(PlayerModel.objects.filter(in_use=False))
-    if(len(PlayerModel.objects.filter(in_use=False))== 0) or int(cache.get("waiting_time"))<=0:
+    if(len(PlayerModel.objects.filter(in_use=False))== 0) or int(cache.get("waiting_time"))<0:
         return HttpResponseRedirect('/graph/accounts/profile/')
 
     response['time_countdown'] = cache.get('waiting_time')
@@ -1012,13 +1020,31 @@ def waiting_countdown(request):
     response['ping']=val
     return JsonResponse(response)
 
+@login_required
+def get_countdown(request):
+    response= dict()
+    response['first'] = first_player
+    if(first_player):
+        response['countdown'] = waiting_time
+    else:
+        response['countdown'] =cache.get('waiting_time')
+    return JsonResponse(response)
+
+def set_waiting_time(request):
+    cache.set('waiting_time',waiting_time)
+    response = dict()
+    response['Success'] = True
+    response['countdown'] = int (cache.get("waiting_time"))
+    return JsonResponse(response)
+
+
 
 @login_required
 def ai_play(request,username):
 
     int_iteration = int(request.GET.dict()['iteration'])
     js = dict()
-    if int_iteration>1:
+    if int_iteration>0:
         str_iteration = str(int_iteration-1)
         response = requests.get('http://127.0.0.1:8000/graph/get_previous_cost/'+username+'/?iteration='+str_iteration).json()
         previous_cost = {int(k):v[:-1][0] for k,v in response['previous_costs'].iteritems()}

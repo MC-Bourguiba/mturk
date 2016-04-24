@@ -15,6 +15,7 @@
         <input id="graph-hidden" type="hidden" name="graph" value="{{ graph }}" />
         <input id="username-hidden" type="hidden" name="graph" value="{{ username }}" />
         <input id="source-hidden" type="hidden" name="graph" value="{{ start }}" />
+        <input id="bot-hidden" type="hidden" name="graph" value="{{ is_bot }}" />
         <input id="destination-hidden" type="hidden" name="graph" value="{{ destination }}" />
     </ul>
   </li>

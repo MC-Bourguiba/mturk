@@ -10,7 +10,8 @@
         </div>
         <div>Game starts in :</div>
         <div  id = "timer"></div>
-        <span id ="time_countdown">{{time_countdown}}</span>
+        <span id ="wait"></span>
+        <span id ="time_countdown">{{first}}</span>
  </div>
 {% endblock %}
 
