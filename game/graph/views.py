@@ -433,7 +433,7 @@ def get_user_costs(request, graph_name):
                 cumulative_costs[player.user.username] = []
 
             for path in paths:
-                #TODO fix request 
+                #TODO fix request
                 #flow = path_assignments.get(path=path).flow
                 flow = 0.25
                 current_path_cost = 0
@@ -1028,8 +1028,16 @@ def ai_play(request,username):
         js['path_ids'] = paths_ids
         js['iteration'] =str_iteration
         js['previous_costs']= previous_cost.values()
-        js['previosu_flows']= previous_flow.values()
+        js['previous_flows']= previous_flow.values()
         new_distrib = hedge_Algorithm(previous_cost,previous_flow,int_iteration,range(len(paths_ids)))
         js["new_distrib"] =new_distrib.values()
 
     return JsonResponse(js)
+
+
+def heartbeat(request):
+    post_data = request.POST
+    username = post_data['username']
+    timestamp = post_data['timestamp']
+    cache.set(username + '_ts', timestamp)
+    return JsonResponse(response)

@@ -190,12 +190,25 @@ function post_temporary_distribution_loop() {
     setTimeout(post_temporary_distribution_loop, 1000); // Update every second.
     ai_play(username);
     if(username!="user_1"){
-    submit_distribution(true);
+        submit_distribution(true);
     }
+}
 
 
+function heartbeat_loop() {
+    var ts = Date.now()/1000;
+    var username = $("#username-hidden")[0].value;
 
+    $.ajax({
+        url : "/graph/heartbeat/",
+        type : "POST",
+        data : {"username": username,
+                "timestamp": ts},
 
+        success : function(json) {
+            console.log(json);
+        }
+    });
 }
 
 
@@ -659,8 +672,6 @@ function ai_play(username){
 
           }
     });
-
-
 }
 
 $(document).ready(function() {

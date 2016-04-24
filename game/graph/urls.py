@@ -69,5 +69,6 @@ urlpatterns = patterns('',
                            name='waiting_room'),
                         url(r'^waiting_countdown/$', views.waiting_countdown,
                            name='waiting_countdown'),
+                       url(r'^heartbeat/$', views.heartbeat, name='heartbeat'),
                        # url(r'^get_duration/$', view.get_duration, name='get_duration'),
 )
