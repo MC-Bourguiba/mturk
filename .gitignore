@@ -92,3 +92,4 @@ paper/*.blg
 paper/*.out
 paper/*.aux
 
+dump.rdb
