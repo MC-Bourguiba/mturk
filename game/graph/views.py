@@ -410,6 +410,10 @@ def get_user_costs(request, graph_name):
         return JsonResponse({'started': False})
 
     game = Game.objects.get(graph__name=graph_name)
+
+    if not game.started:
+        return JsonResponse({'started': game.started})
+
     players = Player.objects.filter(game=game,superuser=False)
 
     current_costs = dict()
