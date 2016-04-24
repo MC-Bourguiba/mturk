@@ -347,6 +347,7 @@ function save_graph(nodes, links, name) {
             // console.log(json); // log the returned json to the console
             console.log("success"); // another sanity check
             current_graph = name;
+            location.reload();
         },
 
         // handle a non-successful response
