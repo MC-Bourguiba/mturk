@@ -347,6 +347,7 @@ function save_graph(nodes, links, name) {
             // console.log(json); // log the returned json to the console
             console.log("success"); // another sanity check
             current_graph = name;
+            location.reload();
         },
 
         // handle a non-successful response
@@ -590,7 +591,8 @@ $("#add-model").click(function(e) {
         contentType: 'application/json', // JSON encoding
 
         data : JSON.stringify({
-            'model_name' : model_name
+            'model_name' : model_name,
+            'graph_name': graph_name
         }),
 
         // handle a successful response

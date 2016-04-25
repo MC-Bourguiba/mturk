@@ -9,6 +9,9 @@ from models import *
 import redis_lock
 from redis_lock import StrictRedis
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 def create_new_player(user, game, superuser):
     success = False
@@ -133,7 +136,8 @@ def calculate_edge_flow(current_turn, game, use_cache=True):
             allocation = cache.get(get_hash(player.user.username) + 'allocation')
             path_ids = cache.get(get_hash(player.user.username) + 'path_ids')
             if player.user.username == 'u1':
-                print 'Getting allocation from cache:', allocation
+                logger.debug('Getting allocation from cache:' + str(allocation))
+
         else:
             flow_distribution = None
 

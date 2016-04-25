@@ -16,6 +16,10 @@ function get_game_name() {
     return $("#game_name")[0].value;
 }
 
+function get_username() {
+    return $("#username-hidden")[0].value;
+}
+
 
 $.fn.exists = function () {
     return this.length !== 0;
@@ -140,7 +144,7 @@ function submit_distribution(update_state) {
         url : "/graph/submit_distribution/",
         type : "POST",
         data : JSON.stringify({
-            "username" : $("#username-hidden")[0].value,
+            "username" : get_username(),
             "allocation" : allocation,
             "ids" : paths,
         }),
@@ -148,7 +152,7 @@ function submit_distribution(update_state) {
         success : function(json) {
 
             if (update_state) {
-                update_from_state($("#username-hidden")[0].value);
+                update_from_state(get_username());
             }
 
             // console.log(json);
@@ -168,39 +172,34 @@ graph_window.onload = function() {
 };
 
 
-function update_loop() {
-    update_from_state($("#username-hidden")[0].value);
-
-    // TODO: Use duration to do the timer in client-side.
-
-    // if (duration == -1) {
-    //     setTimeout(update_loop, 5); // Update every 5 seconds
-    // } else {
-    //     display = $('#time_countdown');
-    //     setTimeout(update_loop, 1000 * duration); // or duration seconds
-    //     if (inter != null) {
-    //         clearInterval(inter);
-    //     }
-    //     startTimer(duration, display);
-    // }
-}
-
-
 function post_temporary_distribution_loop() {
     setTimeout(post_temporary_distribution_loop, 1000); // Update every second.
     ai_play(username);
     if(is_bot=='False'){
-    submit_distribution(true);
+        submit_distribution(true);
     }
+}
 
 
+function heartbeat_loop() {
+    var ts = Date.now()/1000;
+    var username = get_username();
 
+    $.ajax({
+        url : "/graph/heartbeat/",
+        type : "POST",
+        data : {"username": username,
+                "timestamp": ts},
 
+        success : function(json) {
+            console.log(json);
+        }
+    });
 }
 
 
 $(document).ready(function() {
-    username = $("#username-hidden")[0].value;
+    username = get_username();
     is_bot = $("#bot-hidden")[0].value;
     if (editor_window == null) {
         editor_window = document.getElementById("graph-editor").contentWindow;
@@ -208,7 +207,8 @@ $(document).ready(function() {
 
     get_paths(username, current_iteration);
     update_previous_cost(username, current_iteration);
-    update_loop();
+
+    update_from_state(get_username());
     setTimeout(post_temporary_distribution_loop, 5000); // Some timing bug here! Should not have to wait 5s to post distribution!
     display = $('#time_countdown');
     // startTimer(duration, display);
@@ -634,7 +634,7 @@ function ai_play(username){
                     url : "/graph/submit_distribution/",
                     type : "POST",
                     data : JSON.stringify({
-                            "username" : $("#username-hidden")[0].value,
+                            "username" : get_username(),
                             "allocation" : allocation,
                             "ids" : paths,
                      }),
@@ -659,8 +659,6 @@ function ai_play(username){
 
           }
     });
-
-
 }
 
 $(document).ready(function() {

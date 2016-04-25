@@ -44,6 +44,9 @@ from cStringIO import StringIO
 import random
 import math
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 epsilon = 1E-4
 first_player = True
@@ -90,20 +93,13 @@ def dump_data_fixture(filename):
 current_game = 'game'
 
 def create_account(request):
-    # print 'POST'
-    # print request.POST
-    # print 'GET'
-    # print request.GET
-
-    # print request.POST.dict()['superuser'] == 'true'
-
     if not Game.objects.filter(name=current_game).exists():
         game = Game(name=current_game)
         game.save()
 
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
-        print form
+        logger.debug(form)
         if form.is_valid():
             new_user = form.save()
             game = Game.objects.get(name=current_game)
@@ -132,7 +128,6 @@ def index(request):
 
         # redir = redirect("/graph/accounts/profile/")
         # redir['game'] = current_game
-        # print redir
         # return redir
         # url = reverse('show_graph', kwargs={'game': current_game})
         # return HttpResponseRedirect(url)
@@ -336,7 +331,7 @@ def estimate_best_eta_all_turns(game, player):
 
                 lr = LearningRate(player=player, turn=turn)
                 lr.learning_rate = best_eta
-                print 'Saving learning rate for %s' % str(player)
+                logger.debug('Saving learning rate for %s' % str(player))
                 lr.save()
             except:
                 pass
@@ -365,27 +360,18 @@ def predict_user_flows_all_turns(game, player):
             learning_rate = LearningRate.objects.get(player=player, turn=prev_turn).learning_rate
             current_flows, current_costs, actual_flows = get_bar_values(game, player, curr_turn.iteration)
 
-            # print 'Actual_flows:', str(actual_flows)
-            # print 'Path_ids:', str(path_ids)
-
-            # print 'predictions:', str(predictions)
-            # print 'actual:', str(actual)
-
             spe = SimplexProjectionExpSort(epsilon)
             x_predicted = spe.project(current_flows, current_costs, learning_rate)
-            # print 'x_predicted.tolist():', str(x_predicted.tolist())
 
             i = 0
             for p_id, prediction, actual_flow in zip(path_ids, x_predicted, actual_flows):
-                # print 'i:', i
-                # print 'p_id:', p_id
                 predictions[p_id].append(prediction)
                 actual['actual_%s' % str(p_id)].append(actual_flow)
                 i += 1
 
             predictions['x'].append(counter)
         except Exception as e:
-            print e
+            logger.error(e)
 
     return predictions, actual
 
@@ -404,7 +390,14 @@ def get_user_predictions(request, username):
 
 @login_required
 def get_user_costs(request, graph_name):
+    if not Game.objects.filter(graph__name=graph_name).count():
+        return JsonResponse({'started': False})
+
     game = Game.objects.get(graph__name=graph_name)
+
+    if not game.started:
+        return JsonResponse({'started': game.started})
+
     players = Player.objects.filter(game=game,superuser=False)
 
     current_costs = dict()
@@ -433,7 +426,7 @@ def get_user_costs(request, graph_name):
                 cumulative_costs[player.user.username] = []
 
             for path in paths:
-                #TODO fix request 
+                #TODO fix request
                 #flow = path_assignments.get(path=path).flow
                 flow = 0.25
                 current_path_cost = 0
@@ -446,10 +439,7 @@ def get_user_costs(request, graph_name):
             cumulative_costs[player.user.username].append(cumulative_cost/normalization_const)
 
         etas = estimate_best_eta_all_turns(game, player)
-        # print etas
         user_etas[player.user.username] = etas
-
-    # print user_etas
 
     user_etas['x'] = list(range(1, len(user_etas[user_etas.keys()[0]]) + 1))
 
@@ -465,7 +455,7 @@ def get_user_costs(request, graph_name):
 def assign_game(request):
     data = json.loads(request.body)
 
-    print data
+    logger.debug('Data:' + str(data))
 
     game = Game.objects.get(name=data['game'])
     user = User.objects.get(username=data['username'])
@@ -507,6 +497,9 @@ def add_model(request):
     else:
         player_model = PlayerModel(name=data['model_name'])
         player_model.in_use = False
+        if data['graph_name']:
+            player_model.graph = Graph.objects.get(name=data['graph_name'])
+
         player_model.save()
         response['success'] = True
 
@@ -719,9 +712,7 @@ def assign_user_model(request):
 @login_required
 def assign_model_flow(request):
     data = json.loads(request.body)
-    # print data
     model = PlayerModel.objects.get(name=data['modelname'])
-    # print model.flow
     flow = float(data['flow'])
 
     model.flow = flow
@@ -800,7 +791,7 @@ def submit_distribution(request):
 @login_required
 def current_state(request):
     data = json.loads(request.body)
-    print data
+    logger.debug(data)
     game = Game.objects.get(name=data['game'])
 
     time_key = game.pk + get_hash(str(game.current_turn.iteration))
@@ -835,12 +826,11 @@ def current_state(request):
     if cache.get(costs_cache_key):
         edge_costs = cache.get(costs_cache_key)
     else:
-        # print 'CACHE FAILLEDDD@@@@@@@@@'
         cache.set(costs_cache_key, get_current_edge_costs(game))
 
     max_flow_cache_key = get_hash(game.pk) + 'edge_max_flow'
     if not cache.get(max_flow_cache_key):
-        print 'max flow CACHE FAILLEDDD'
+        logger.debug('max flow CACHE FAILLEDDD')
         edge_max_flow = calculate_maximum_flow(game)
         cache.set(max_flow_cache_key, edge_max_flow)
 
@@ -860,9 +850,9 @@ def start_game(request):
     if(game.started):
         return JsonResponse(dict())
     else:
-        print 'Calculating equilibrium flows'
+        logger.debug('Calculating equilibrium flows')
         updateEquilibriumFlows(game.graph.name)
-        print 'Finished calculating equilibrium flows'
+        logger.debug('Finished calculating equilibrium flows')
 
         game.started = True
         game.game_loop_time = datetime.now()
@@ -1050,9 +1040,18 @@ def ai_play(request,username):
         js['path_ids'] = paths_ids
         js['iteration'] =str_iteration
         js['previous_costs']= previous_cost.values()
-        js['previosu_flows']= previous_flow.values()
+        js['previous_flows']= previous_flow.values()
         new_distrib = hedge_Algorithm(previous_cost,previous_flow,int_iteration,range(len(paths_ids)))
         js["new_distrib"] =new_distrib.values()
 
     return JsonResponse(js)
+
+
+
+def heartbeat(request):
+    post_data = request.POST
+    username = post_data['username']
+    timestamp = post_data['timestamp']
+    cache.set(username + '_ts', timestamp)
+    return JsonResponse(dict())
 

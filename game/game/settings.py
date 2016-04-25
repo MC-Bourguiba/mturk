@@ -83,6 +83,30 @@ USE_L10N = True
 USE_TZ = True
 
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.7/howto/static-files/
+
+STATIC_URL = '/static/'
+
+
+# Additional locations of static files
+STATICFILES_DIRS = (
+    # Put strings here, like "/home/html/static" or "C:/www/django/static".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+    # os.path.join(
+    #     os.path.dirname(__file__),
+    #     'static',
+    # ),
+    # os.path.join(BASE_DIR, "static"),
+)
+
+
+APPEND_SLASH = True
+
+
+
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -109,7 +133,7 @@ LOGGING = {
         'logfile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': PROJECT_PATH + '/../logs/bayen.log',
+            'filename': PROJECT_PATH + '/../logs/test.log',
             'maxBytes': 1024 * 1024 * 20,  # 20MB
             'backupCount': 10,
             'formatter': 'verbose',
@@ -126,8 +150,18 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False
         },
+        'django': {
+            'handlers':['logfile'],
+            'propagate': True,
+            'level':'DEBUG',
+        },
+        'graph': {
+            'handlers': ['logfile'],
+            'level': 'DEBUG',
+        },
     }
 }
+
 
 
 # Static files (CSS, JavaScript, Images)
@@ -150,6 +184,7 @@ STATICFILES_DIRS = (
 
 
 APPEND_SLASH = True
+
 
 
 # CELERY SETTINGS
