@@ -25,7 +25,6 @@ class PlayerModel(models.Model):
     graph = models.ForeignKey(Graph, null=True, blank=True)
     start_node = models.ForeignKey(Node, related_name='start_node', null=True, blank=True)
     destination_node = models.ForeignKey(Node, related_name='destination_node', null=True, blank=True)
-    is_a_bot = models.BooleanField(default=False)
     flow = models.FloatField(null=True, blank=True)
     in_use = models.BooleanField(default=False)
     normalization_const = models.FloatField(null=True, blank=True)
@@ -47,6 +46,7 @@ class Player(models.Model):
     player_model = models.ForeignKey(PlayerModel, blank=True, null=True)
     # completed_task = models.BooleanField(default=False)
     game = models.ForeignKey('Game', null=True, blank=True)
+    is_a_bot = models.BooleanField(default=False)
     # flow_distribution = models.ForeignKey('FlowDistribution', null=True, blank=True)
     superuser = models.BooleanField(default=False)
 

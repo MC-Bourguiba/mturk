@@ -145,7 +145,7 @@ STATICFILES_DIRS = (
     #     os.path.dirname(__file__),
     #     'static',
     # ),
-    # os.path.join(BASE_DIR, "static"),
+    #os.path.join(BASE_DIR, "static"),
 )
 
 

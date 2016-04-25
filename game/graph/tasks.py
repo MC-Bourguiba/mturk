@@ -15,7 +15,7 @@ def game_force_next(game_name):
 
     if game.stopped:
         return
-
+    
     iterate_next_turn(game)
 
     game.game_loop_time = datetime.now()

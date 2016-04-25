@@ -24,7 +24,7 @@ from utils import *
 from models import *
 from tasks import *
 from game_functions import *
-from AI import *
+from hedge_algorithm import *
 import requests
 
 from django.contrib.auth import authenticate, login
@@ -47,7 +47,7 @@ import math
 
 epsilon = 1E-4
 first_player = True
-waiting_time = 100
+waiting_time = 10
 cache.set('waiting_time',waiting_time)
 def KL(x, y):
     return sum([x_i*np.log(x_i/y_i) for x_i, y_i in zip(x, y) if x_i > 0])
@@ -155,19 +155,17 @@ def show_graph(request):
         g = Game.objects.get_or_create(name=request.GET.get('game'))[0]
 
     user = User.objects.get(username=request.user.username)
-    #if not user.player.superuser:
-      #  if not(g.started):
-           # if len(PlayerModel.objects.filter(in_use=False))>0:
-               # return HttpResponseRedirect ("/graph/waiting_room/")
+
     if False:
         return HttpResponse("test")
 
     else:
         if not user.player.superuser:
             template = 'graph/user.djhtml'
-            if not(g.started):
-                if len(PlayerModel.objects.filter(in_use=False))>0 and int(cache.get("waiting_time"))>=0:
-                    return HttpResponseRedirect ("/graph/waiting_room/")
+            if False:
+                return HttpResponse("test")
+                #if len(PlayerModel.objects.filter(in_use=False))>0 and int(cache.get("waiting_time"))>=0:
+                    #return HttpResponseRedirect ("/graph/waiting_room/")
 
             try:
                 g = user.player.game
@@ -992,11 +990,6 @@ def set_game_mode(request):
 
 @login_required
 def waiting_room(request):
-    first_visit = first_player
-    if(first_visit):
-        cache.set("waiting_time",waiting_time)
-        global first_player
-        first_player = False
     user = User.objects.get(username=request.user.username)
     response = dict()
     response['Success']=True
@@ -1015,6 +1008,9 @@ def waiting_room(request):
 def waiting_countdown(request):
     val = int (cache.get("waiting_time"))
     val = val-1
+    if(val<=0):
+        for pm in PlayerModel.objects.filter(in_use=False):
+            pm.delete()
     cache.set("waiting_time",val)
     response = dict()
     response['ping']=val
@@ -1059,3 +1055,4 @@ def ai_play(request,username):
         js["new_distrib"] =new_distrib.values()
 
     return JsonResponse(js)
+

@@ -800,6 +800,9 @@ function start_countdown(){
         success : function(json) {
             console.log(json);
             document.getElementById("wait").innerHTML=json['ping'];
+            if(json['ping']<0){
+            window.location.reload();
+            }
         },
 
         // handle a non-successful response
@@ -811,7 +814,7 @@ function start_countdown(){
 
 
 $('#start-countdown').click(function(evt) {
-    setInterval(start_countdown ,100);
+    setInterval(start_countdown ,1000);
 });
 
 $('#stop-countdown').click(function(evt) {
