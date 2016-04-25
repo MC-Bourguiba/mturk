@@ -151,36 +151,29 @@ def show_graph(request):
 
     user = User.objects.get(username=request.user.username)
 
-    if False:
-        return HttpResponse("test")
-
+    if not user.player.superuser:
+        template = 'graph/user.djhtml'
+        if not(g.started):
+                if len(PlayerModel.objects.filter(in_use=False))>0 and int(cache.get("waiting_time"))>=0:
+                    return HttpResponseRedirect ("/graph/waiting_room/")
+        try:
+            g = user.player.game
+            player_model = user.player.player_model
+            context['graph'] = player_model.graph.name
+            context['username'] = user.username
+            context['start'] = player_model.start_node.ui_id
+            context['destination'] = player_model.destination_node.ui_id
+            context['flow'] = player_model.flow
+        except:
+            template = 'graph/user_wait.djhtml'
     else:
-        if not user.player.superuser:
-            template = 'graph/user.djhtml'
-            if False:
-                return HttpResponse("test")
-                #if len(PlayerModel.objects.filter(in_use=False))>0 and int(cache.get("waiting_time"))>=0:
-                    #return HttpResponseRedirect ("/graph/waiting_room/")
-
-            try:
-                g = user.player.game
-                player_model = user.player.player_model
-                context['graph'] = player_model.graph.name
-                context['username'] = user.username
-                context['start'] = player_model.start_node.ui_id
-                context['destination'] = player_model.destination_node.ui_id
-                context['flow'] = player_model.flow
-                context['is_bot'] = player_model.is_a_bot
-            except:
-                template = 'graph/user_wait.djhtml'
-        else:
-            #graphs = [g.graph] if g.graph else []
-            # graphs = map(lambda g: g.name, Graph.objects.all())
-            context['usernames'] = Player.objects.filter(superuser=False).values_list('user__username', flat=True)
-            # context['usernames'] = User.objects.values_list('username', flat=True)
-            context['model_names'] = PlayerModel.objects.all().values_list('name', flat=True)
-            context['graph_names'] = Graph.objects.all()
-            context['games'] = Game.objects.all()
+        #graphs = [g.graph] if g.graph else []
+        # graphs = map(lambda g: g.name, Graph.objects.all())
+        context['usernames'] = Player.objects.filter(superuser=False).values_list('user__username', flat=True)
+        # context['usernames'] = User.objects.values_list('username', flat=True)
+        context['model_names'] = PlayerModel.objects.all().values_list('name', flat=True)
+        context['graph_names'] = Graph.objects.all()
+        context['games'] = Game.objects.all()
 
     # context['hidden'] = 'hidden'
     context['hidden'] = ''
@@ -983,7 +976,6 @@ def waiting_room(request):
     user = User.objects.get(username=request.user.username)
     response = dict()
     response['Success']=True
-    response['first'] = first_visit
     template = 'graph/user_wait.djhtml'
     response['players_to_go'] = len(PlayerModel.objects.filter(in_use=False))
     if(len(PlayerModel.objects.filter(in_use=False))== 0) or int(cache.get("waiting_time"))<0:
@@ -1009,11 +1001,7 @@ def waiting_countdown(request):
 @login_required
 def get_countdown(request):
     response= dict()
-    response['first'] = first_player
-    if(first_player):
-        response['countdown'] = waiting_time
-    else:
-        response['countdown'] =cache.get('waiting_time')
+    response['countdown'] =cache.get('waiting_time')
     return JsonResponse(response)
 
 def set_waiting_time(request):
