@@ -25,6 +25,7 @@ from models import *
 from tasks import *
 from game_functions import *
 from hedge_algorithm import *
+from ai import *
 import requests
 
 from django.contrib.auth import authenticate, login
@@ -164,6 +165,7 @@ def show_graph(request):
             context['start'] = player_model.start_node.ui_id
             context['destination'] = player_model.destination_node.ui_id
             context['flow'] = player_model.flow
+            context['is_bot'] =user.player.is_a_bot
         except:
             template = 'graph/user_wait.djhtml'
     else:
@@ -511,6 +513,11 @@ def get_previous_cost(request, username):
     previous_flows = dict()
     previous_costs = dict()
 
+    #TODO to simulate disconnection
+    if(random.random()<0.10):
+        player.is_a_bot =True
+        player.save()
+
     for idx, p_id in zip(path_idxs, path_ids):
         path = Path.objects.get(id=p_id)
         paths[idx] = list(path.edges.values_list('edge_id', flat=True))
@@ -761,16 +768,21 @@ def get_user_info(request, username):
 
 
 # TODO: Remove all the saves that aren't needed!
-@login_required
+
 def submit_distribution(request):
     data = json.loads(request.body)
     user = User.objects.get(username=data['username'])
     player = Player.objects.get(user=user)
-    allocation = data['allocation']
-    path_ids = data['ids']
+    if player.is_a_bot:
+      allocation , path_ids = ai_play_server(user)
+    else:
+        allocation = data['allocation']
+        path_ids = data['ids']
 
     response = dict()
     game = player.game
+    response['all'] = allocation
+    response['ids'] = path_ids
 
     if not game.started:
         return JsonResponse(response)
@@ -1013,26 +1025,6 @@ def set_waiting_time(request):
 
 
 
-@login_required
-def ai_play(request,username):
-
-    int_iteration = int(request.GET.dict()['iteration'])
-    js = dict()
-    if int_iteration>0:
-        str_iteration = str(int_iteration-1)
-        response = requests.get('http://127.0.0.1:8000/graph/get_previous_cost/'+username+'/?iteration='+str_iteration).json()
-        previous_cost = {int(k):v[:-1][0] for k,v in response['previous_costs'].iteritems()}
-        previous_flow = {int(k):v[:-1][0] for k,v in response['previous_flows'].iteritems()}
-        paths_ids = response['path_ids']
-
-        js['path_ids'] = paths_ids
-        js['iteration'] =str_iteration
-        js['previous_costs']= previous_cost.values()
-        js['previous_flows']= previous_flow.values()
-        new_distrib = hedge_Algorithm(previous_cost,previous_flow,int_iteration,range(len(paths_ids)))
-        js["new_distrib"] =new_distrib.values()
-
-    return JsonResponse(js)
 
 
 

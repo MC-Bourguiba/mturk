@@ -98,7 +98,7 @@ function get_flow_allocation() {
 
         for (var p in paths) {
             if (Object.keys(previous_costs_dict).length == 0) {
-                console.log("IN HERE");
+                //console.log("IN HERE");
                 average_distr = 1.0/paths.length;
 
                 for (i=0; i < paths.length; i += 1) {
@@ -115,10 +115,10 @@ function get_flow_allocation() {
         }
     }
 
-    console.log(allocation);
-    console.log("explore_index: ");
-    console.log(explore_index);
-    console.log(normalization);
+    //console.log(allocation);
+    //console.log("explore_index: ");
+   // console.log(explore_index);
+    //console.log(normalization);
 
     return [paths, allocation];
 }
@@ -174,10 +174,9 @@ graph_window.onload = function() {
 
 function post_temporary_distribution_loop() {
     setTimeout(post_temporary_distribution_loop, 1000); // Update every second.
-    ai_play(username);
-    if(is_bot=='False'){
-        submit_distribution(true);
-    }
+    submit_distribution(true);
+
+
 }
 
 
@@ -207,6 +206,7 @@ $(document).ready(function() {
 
     get_paths(username, current_iteration);
     update_previous_cost(username, current_iteration);
+    console.log($("#bot-hidden")[0].value);
 
     update_from_state(get_username());
     setTimeout(post_temporary_distribution_loop, 5000); // Some timing bug here! Should not have to wait 5s to post distribution!
@@ -243,6 +243,9 @@ function update_from_state(username) {
 
             if (json.hasOwnProperty('secs')) {
                 if (json['secs'] >= 0) {
+                    /*if(json['secs'] == 6 && $("#bot-hidden")[0].value=='True'){
+                       window.location.reload();
+                    }*/
                     display.text(json['secs']);
 
                     if (inter != null) {
@@ -294,7 +297,7 @@ function update_from_state(username) {
             }
 
             current_iteration = json['iteration'];
-            console.log(current_iteration);
+            //console.log(current_iteration);
         },
 
         // handle a non-successful response
@@ -392,12 +395,12 @@ function update_slides() {
 
     for (i=0; i < allocation.length; i += 1) {
         var alloc = allocation[i];
-        console.log(alloc);
+        //console.log(alloc);
         total_alloc += parseFloat(alloc);
     }
 
-    console.log("allocation");
-    console.log(allocation);
+   // console.log("allocation");
+    //console.log(allocation);
 
     for (i=0; i < paths.length; i += 1) {
         var pa = paths[i];
@@ -417,7 +420,7 @@ function update_previous_cost(username, iteration) {
         data : {"iteration": iteration},
 
         success : function(json) {
-            console.log(json);
+           // console.log(json);
 
             var cumulative_cost = {};
             var previous_cost = {};
@@ -425,7 +428,7 @@ function update_previous_cost(username, iteration) {
 
             // previous_costs_dict[iter_key] = {};
 
-            console.log(json);
+            //console.log(json);
 
             for (var key in json['previous_costs']) {
                 for (i = 0; i < json['previous_costs'][key].length; i += 1) {
@@ -605,68 +608,3 @@ function startTimer(duration, display) {
     }, 1000);
 }
 
-function ai_play(username){
- $.ajax({
-        url : "/graph/ai_play/" + username + "/",
-        type : "GET",
-        data : {"iteration": current_iteration},
-
-
-         success : function(json) {
-             console.log(json);
-             if(is_bot =='True' && current_iteration>0){
-
-
-                var paths = [];
-                var allocation = [];
-
-                $("#path-list tr").each(function(idx, li) {
-                 paths.push(parseInt($(li).find("a").attr('id')));
-                 // allocation.push(parseFloat($(li).find("input")[0].value/100));
-                });
-
-
-
-                var paths = json['path_ids'];
-                var allocation = json['new_distrib'];
-
-                $.ajax({
-                    url : "/graph/submit_distribution/",
-                    type : "POST",
-                    data : JSON.stringify({
-                            "username" : get_username(),
-                            "allocation" : allocation,
-                            "ids" : paths,
-                     }),
-
-                    success : function(json) {
-
-                        if (true) {
-                            update_from_state(username);
-                         }
-
-                        // console.log(json);
-                     },
-
-                    // handle a non-successful response
-                     error : function(xhr,errmsg,err) {
-                        console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-                     }
-                });
-
-             }
-
-
-          }
-    });
-}
-
-$(document).ready(function() {
-    if (is_bot=='True') {
-        setTimeout(function(){
-        window.location.reload(1);
-        }, 15000);
-    }
-
-
-});

@@ -13,8 +13,7 @@ import math
 
 current_game = 'game'
 
-def ai_play(user,current_game):
-    game = Game.objects.get(name=current_game)
+def get_previous_cost_server_side(user,current_game):
     game = user.player.game
     iteration = game.current_turn.iteration
     player = Player.objects.get(user__username=user.username)
@@ -29,11 +28,9 @@ def ai_play(user,current_game):
         path = Path.objects.get(id=p_id)
         paths[idx] = list(path.edges.values_list('edge_id', flat=True))
 
-        # for turn in game.turns.all():
-        for turn in game.turns.filter(iteration__gte=iteration-1):
-            # cache_key_t_cost = str(turn.iteration) + game.name + "get_previous_cost" + username + "t_cost"
-            # cache_key_flow_ = str(turn.iteration) + game.name + "get_previous_cost" + username + "flow"
-            # if cache.get(cache_key_t_cost):
+
+        for turn in game.turns.filter(iteration=iteration-1):
+
             e_costs = turn.graph_cost.edge_costs
             t_cost = 0
             flow_distribution = FlowDistribution.objects.get(turn=turn, player=player)
@@ -53,5 +50,21 @@ def ai_play(user,current_game):
     response['paths'] = paths
     response['previous_costs'] = previous_costs
     response['previous_flows'] = previous_flows
-    print(response)
-    return
+
+    return response
+
+def ai_play_server(user):
+    game = user.player.game
+    previous_costs_and_flows = get_previous_cost_server_side(user,game.name)
+    paths_ids= previous_costs_and_flows['path_ids']
+
+    if(game.current_turn.iteration>0):
+
+        previous_costs = {int(k):v[0] for k,v in previous_costs_and_flows['previous_costs'].iteritems()}
+        previous_flows = {int(k):v[0] for k,v in previous_costs_and_flows['previous_flows'].iteritems()}
+        new_flow= hedge_Algorithm(previous_costs,previous_flows,game.current_turn.iteration,range(len(paths_ids)))
+        new_distrib=new_flow.values()
+
+        return new_distrib,paths_ids
+    else :
+        return [1.0/len(paths_ids)]*len(paths_ids),paths_ids
