@@ -287,6 +287,7 @@ $(document).ready(function() {
     }
 
     update_ui()
+    check_connection_loss();
 });
 
 
@@ -803,7 +804,8 @@ function start_countdown(){
             console.log(json);
             document.getElementById("wait").innerHTML=json['ping'];
             if(json['ping']<0){
-            window.location.reload();
+            $("#start-game").click();
+            setTimeout(window.location.reload(),3000);
             }
         },
 
@@ -841,3 +843,38 @@ $('#set-countdown').click(function(evt) {
         }
     });
 });
+
+
+function get_duration() {
+    return $("#duration-hidden")[0].value;
+}
+
+
+function check_connection_loss() {
+    current_duration = get_duration();
+    setTimeout(check_connection_loss, (current_duration)*1000);
+    check_connection();
+
+
+}
+
+function check_connection(){
+    $.ajax({
+        url : "/graph/check_connection/",
+        type : "POST",
+
+        data : JSON.stringify({
+            'game' : get_game_name()
+        }),
+
+        success : function(json) {
+            console.log(json);
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+
+}

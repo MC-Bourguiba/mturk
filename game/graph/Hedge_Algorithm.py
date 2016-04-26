@@ -1,6 +1,6 @@
 from math import exp, sqrt
-
-
+from models import *
+from ai import *
 
 
 def hedge_Algorithm(losses_vector,previous_distributions,iteration, path_ids):
@@ -30,3 +30,11 @@ def exp_computation(lr,ub,loss,pd):
     return pd*exp(-(lr*loss/ub))
 
 
+def get_order_of_magnitude(number):
+    return
+
+
+def get_max_cost():
+    users = User.objects.all()
+    game = User.objects.first().player.game
+    return game.name

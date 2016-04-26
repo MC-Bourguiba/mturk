@@ -155,8 +155,8 @@ def show_graph(request):
     if not user.player.superuser:
         template = 'graph/user.djhtml'
         if not(g.started):
-                if len(PlayerModel.objects.filter(in_use=False))>0 and int(cache.get("waiting_time"))>=0:
-                    return HttpResponseRedirect ("/graph/waiting_room/")
+                #if len(PlayerModel.objects.filter(in_use=False))>0 and int(cache.get("waiting_time"))>=0:
+            return HttpResponseRedirect ("/graph/waiting_room/")
         try:
             g = user.player.game
             player_model = user.player.player_model
@@ -193,6 +193,7 @@ def show_graph(request):
     context['single_slider_mode'] = 'checked' if g.single_slider_mode else 'unchecked'
 
     context['game_mode'] = 'single_slider_mode' if g.single_slider_mode else 'normal_mode'
+    context['duration'] =g.duration
 
     return render(request, template, context)
 
@@ -513,10 +514,6 @@ def get_previous_cost(request, username):
     previous_flows = dict()
     previous_costs = dict()
 
-    #TODO to simulate disconnection
-    if(random.random()<0.10):
-        player.is_a_bot =True
-        player.save()
 
     for idx, p_id in zip(path_idxs, path_ids):
         path = Path.objects.get(id=p_id)
@@ -768,16 +765,14 @@ def get_user_info(request, username):
 
 
 # TODO: Remove all the saves that aren't needed!
-
+@login_required
 def submit_distribution(request):
     data = json.loads(request.body)
     user = User.objects.get(username=data['username'])
     player = Player.objects.get(user=user)
-    if player.is_a_bot:
-      allocation , path_ids = ai_play_server(user)
-    else:
-        allocation = data['allocation']
-        path_ids = data['ids']
+
+    allocation = data['allocation']
+    path_ids = data['ids']
 
     response = dict()
     game = player.game
@@ -990,8 +985,12 @@ def waiting_room(request):
     response['Success']=True
     template = 'graph/user_wait.djhtml'
     response['players_to_go'] = len(PlayerModel.objects.filter(in_use=False))
-    if(len(PlayerModel.objects.filter(in_use=False))== 0) or int(cache.get("waiting_time"))<0:
-        return HttpResponseRedirect('/graph/accounts/profile/')
+    if not cache.get("waiting_time"):
+        cache.set("waiting_time", waiting_time)
+    if int(cache.get("waiting_time"))<0:
+         return HttpResponseRedirect('/graph/accounts/profile/')
+
+
 
     response['time_countdown'] = cache.get('waiting_time')
     response['username'] = user.username
@@ -1033,5 +1032,20 @@ def heartbeat(request):
     username = post_data['username']
     timestamp = post_data['timestamp']
     cache.set(username + '_ts', timestamp)
-    return JsonResponse(dict())
+    response =dict()
+    response['ts'] = cache.get(username + '_ts')
+    return JsonResponse(response)
 
+
+
+def check_for_connection_loss(request):
+    data = json.loads(request.body)
+    game_name = data['game']
+    change_player.apply_async((game_name,), countdown=1.0)
+    response = dict()
+    #for test purpose with basis_test.json
+    response['ts_1'] = cache.get("user_1_ts")
+    response['ts_2'] = cache.get("user_2_ts")
+    response['ai_1'] =  cache.get("user_1_ai")
+    response['ai_2'] =  cache.get("user_2_ai")
+    return JsonResponse(response)

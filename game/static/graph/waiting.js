@@ -16,7 +16,7 @@ $.ajax({
             console.log(json);
             document.getElementById("wait").innerHTML=json['countdown'];
             if(json['countdown']<0){
-            window.location.reload();
+            setTimeout(window.location.reload(),2000);
             }
         },
 

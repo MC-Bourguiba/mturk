@@ -5,6 +5,7 @@ from datetime import datetime
 
 from utils import *
 from models import *
+from ai import *
 
 import redis_lock
 from redis_lock import StrictRedis
@@ -43,6 +44,12 @@ def iterate_next_turn(game):
     update_cost(game)
 
     game.turns.add(game.current_turn)
+    for player in Player.objects.filter(is_a_bot = True):
+         user = player.user
+         allocation , path_ids = ai_play_server(user)
+         cache.set(get_hash(user.username) + 'allocation', allocation)
+         cache.set(get_hash(user.username) + 'path_ids', path_ids)
+
     next_turn = GameTurn(game_object=game)
     next_turn.iteration = game.current_turn.iteration + 1
     next_turn.save()

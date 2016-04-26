@@ -74,5 +74,6 @@ urlpatterns = patterns('',
                         url(r'^set_waiting_time/', views.set_waiting_time,
                            name='set_waiting_time'),
                        url(r'^heartbeat/$', views.heartbeat, name='heartbeat'),
+                       url(r'^check_connection/$', views.check_for_connection_loss, name='check_connection'),
                        # url(r'^get_duration/$', view.get_duration, name='get_duration'),
 )

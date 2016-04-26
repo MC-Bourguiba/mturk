@@ -175,6 +175,7 @@ graph_window.onload = function() {
 function post_temporary_distribution_loop() {
     setTimeout(post_temporary_distribution_loop, 1000); // Update every second.
     submit_distribution(true);
+    heartbeat_loop();
 
 
 }

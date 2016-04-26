@@ -40,11 +40,15 @@ def change_player(game_name):
             cache.set(player.user.username + '_ai', True)
             continue
 
-        timestamp = cache.get(player.user.username + '_ts')
+        timestamp = float(cache.get(player.user.username + '_ts'))
         current_ts = time.time()
         if current_ts - timestamp > player_timeout:
             cache.set(player.user.username + '_ai', True)
+            player.is_a_bot = True
+            player.save()
         else:
             cache.set(player.user.username + '_ai', False)
+            player.is_a_bot = False
+            player.save()
 
     change_player_res = change_player.apply_async((game_name,), countdown=1.0)
