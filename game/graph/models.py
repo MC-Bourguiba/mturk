@@ -145,6 +145,7 @@ class Game(models.Model):
     edge_highlight = models.BooleanField(default=True)
     duration = models.IntegerField(default=30)
     single_slider_mode = models.BooleanField(default=False)
+    currently_in_use = models.BooleanField(default=False)
     # thread_iteration = models.IntegerField(blank=True, null=True)
 
     def __unicode__(self):
