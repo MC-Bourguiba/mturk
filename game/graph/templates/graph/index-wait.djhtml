@@ -3,16 +3,7 @@
 
 {% block content %}
 
- <div class="cn">
-        <div class="inner">
-            <p>waiting for {{players_to_go}} player(s) to start the game</p>
-            <p> game started : {{started_game}} </p>
-        </div>
-        <div>Game starts in :</div>
-        <div  id = "timer"></div>
-        <span id ="wait"></span>
-        <span id ="time_countdown">{{first}}</span>
- </div>
+
 {% endblock %}
 
 
