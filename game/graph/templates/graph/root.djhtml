@@ -50,6 +50,8 @@
             </div>
 
             <a id="go-game-btn" class="btn btn-default" href="#" role="button">Go to game</a>
+            <a id="load-game-btn" class="btn btn-default" href="#" role="button">Load game</a>
+            <a id="assign-graph-to-game" class="btn btn-default" href="#" role="button">Assign graph to  game</a>
           </div>
       </div>
 
@@ -57,7 +59,11 @@
           <button class="btn btn-primary active" id="show-graphs-btn">Games</button>
           <div class="list-group" id="game-list-display">
               {% for game in games %}
+                  {% if game.currently_in_use %}
+                  <a href="#" class="list-group-item active">{{ game }}</a>
+                  {% else %}
                   <a href="#" class="list-group-item">{{ game }}</a>
+                  {% endif %}
               {% endfor %}
           </div>
       </div>

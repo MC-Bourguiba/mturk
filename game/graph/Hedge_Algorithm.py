@@ -11,7 +11,7 @@ def hedge_Algorithm(losses_vector,previous_distributions,iteration, path_ids):
     next_distributions = dict()
     normalization_const = 0
     for id in path_ids:
-        next_distributions[id]=exp_computation(lr,ub,float(losses_vector[id])*1000,float(previous_distributions[id]))
+        next_distributions[id]=exp_computation(lr,ub,float(losses_vector[id])*100,float(previous_distributions[id]))
         normalization_const= normalization_const+ next_distributions[id]
     for id in path_ids:
         next_distributions[id]= next_distributions[id]/normalization_const

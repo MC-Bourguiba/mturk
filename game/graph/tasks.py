@@ -13,7 +13,7 @@ from django.core.cache import cache
 import time
 
 
-player_timeout = 180
+player_timeout = 60
 
 
 @shared_task

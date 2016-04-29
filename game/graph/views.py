@@ -26,6 +26,7 @@ from tasks import *
 from game_functions import *
 from hedge_algorithm import *
 from ai import *
+from pm_pool import *
 import requests
 
 from django.contrib.auth import authenticate, login
@@ -125,6 +126,7 @@ def create_new_game(request):
 
 
 def index(request):
+    initiate_first_game()
     if request.user.is_authenticated():
 
         # redir = redirect("/graph/accounts/profile/")
@@ -145,7 +147,7 @@ def show_graph(request):
 
     context = dict()
 
-    g = Game.objects.all()[0]
+    g = Game.objects.get(currently_in_use= True)
 
     if 'game' in request.GET:
         g = Game.objects.get_or_create(name=request.GET.get('game'))[0]
@@ -155,7 +157,6 @@ def show_graph(request):
     if not user.player.superuser:
         template = 'graph/user.djhtml'
         if not(g.started):
-                #if len(PlayerModel.objects.filter(in_use=False))>0 and int(cache.get("waiting_time"))>=0:
             return HttpResponseRedirect ("/graph/waiting_room/")
         try:
             g = user.player.game
@@ -176,6 +177,7 @@ def show_graph(request):
         context['model_names'] = PlayerModel.objects.all().values_list('name', flat=True)
         context['graph_names'] = Graph.objects.all()
         context['games'] = Game.objects.all()
+
 
     # context['hidden'] = 'hidden'
     context['hidden'] = ''
@@ -386,11 +388,11 @@ def get_user_predictions(request, username):
 
 @login_required
 def get_user_costs(request, graph_name):
-    if not Game.objects.filter(graph__name=graph_name).count():
-        return JsonResponse({'started': False})
+    #if not Game.objects.filter(graph__name=graph_name).count():
+        #return JsonResponse({'started': False})
 
-    game = Game.objects.get(graph__name=graph_name)
-
+    #game = Game.objects.get(graph__name=graph_name)
+    game = Game.objects.get(currently_in_use = True)
     if not game.started:
         return JsonResponse({'started': game.started})
 
@@ -423,8 +425,7 @@ def get_user_costs(request, graph_name):
 
             for path in paths:
                 #TODO fix request
-                #flow = path_assignments.get(path=path).flow
-                flow = 0.25
+                flow = path_assignments.get(path=path).flow
                 current_path_cost = 0
                 for e in path.edges.all():
                     current_path_cost += e_costs.get(edge=e).cost
@@ -481,6 +482,22 @@ def assign_model_graph(request):
     response = dict()
     response['graph_name'] = data['graph_name']
     return JsonResponse(response)
+
+@login_required
+def assign_game_graph(request):
+    data = json.loads(request.body)
+    graph = Graph.objects.get(name=data['graph_name'])
+    game = Game.objects.get(name=data['game_name'])
+
+    game.graph = graph
+    game.save()
+
+    response = dict()
+    response['graph_name'] = game.graph.name
+    response['game_name'] = game.name
+
+    return JsonResponse(response)
+
 
 
 @login_required
@@ -845,7 +862,8 @@ def start_game(request):
 
     data = json.loads(request.body)
 
-    game = Game.objects.get(name=data['game'])
+    #game = Game.objects.get(name=data['game'])
+    game = Game.objects.get(currently_in_use = True)
 
     if(game.started):
         return JsonResponse(dict())
@@ -987,7 +1005,7 @@ def waiting_room(request):
     response['players_to_go'] = len(PlayerModel.objects.filter(in_use=False))
     if not cache.get("waiting_time"):
         cache.set("waiting_time", waiting_time)
-    if int(cache.get("waiting_time"))<0:
+    if int(cache.get("waiting_time"))<0  and user.player.game.started:
          return HttpResponseRedirect('/graph/accounts/profile/')
 
 
@@ -995,15 +1013,13 @@ def waiting_room(request):
     response['time_countdown'] = cache.get('waiting_time')
     response['username'] = user.username
     response['time_countdown'] = cache.get('waiting_time')
+    response['started_game'] = user.player.game.started
     return render(request,template,response)
 
 @login_required
 def waiting_countdown(request):
     val = int (cache.get("waiting_time"))
     val = val-1
-    if(val<=0):
-        for pm in PlayerModel.objects.filter(in_use=False):
-            pm.delete()
     cache.set("waiting_time",val)
     response = dict()
     response['ping']=val
@@ -1047,5 +1063,5 @@ def check_for_connection_loss(request):
     response['ts_1'] = cache.get("user_1_ts")
     response['ts_2'] = cache.get("user_2_ts")
     response['ai_1'] =  cache.get("user_1_ai")
-    response['ai_2'] =  cache.get("user_2_ai")
+    response['ai_2'] =  cache.get("user_3_ai")
     return JsonResponse(response)
