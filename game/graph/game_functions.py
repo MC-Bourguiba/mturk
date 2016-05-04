@@ -47,6 +47,7 @@ def iterate_next_turn(game):
     for player in Player.objects.filter(is_a_bot = True):
          user = player.user
          allocation , path_ids = ai_play_server(user)
+
          cache.set(get_hash(user.username) + 'allocation', allocation)
          cache.set(get_hash(user.username) + 'path_ids', path_ids)
 

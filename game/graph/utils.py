@@ -114,6 +114,7 @@ def computeEquilibrium(dimensions, gradientFunctions, precision):
     # precision is a scalar, specifies the desired precision.
     def entropicDescentUpdate(x, g, t):
         w = [xi*np.exp(-gi/(1+np.sqrt(t))/20) for (xi,gi) in zip(x, g)]
+
         return w / (sum(w))
     # initialize
     xs = [np.ones((di, 1))/di for di in dimensions]

@@ -67,4 +67,11 @@ def ai_play_server(user):
 
         return new_distrib,paths_ids
     else :
+        paths = Path.objects.filter(pk__in = paths_ids)
+        fa = PathFlowAssignment()
+        for path in paths:
+            fa = PathFlowAssignment(path=path,flow= 1.0)
+            fa.save()
+        fd = FlowDistribution.objects.get(turn= game.current_turn,player=user.player)
+        print fd.path_assignments
         return [1.0/len(paths_ids)]*len(paths_ids),paths_ids

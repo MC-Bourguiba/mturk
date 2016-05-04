@@ -125,8 +125,37 @@ $('#add-game-btn').click(function(evt) {
 
     var game_name = $("#game-input")[0].value;
 
+    //if (game_name != '') {
+      //  window.location.href = "/graph/accounts/profile?game=" + game_name;
+    //}
     if (game_name != '') {
-        window.location.href = "/graph/accounts/profile?game=" + game_name;
+     $.ajax({
+        url : '/graph/add_game/',
+        type : "POST", // http method
+        dataType: "json",
+        contentType: 'application/json', // JSON encoding
+
+        data : JSON.stringify({
+            'game_name' : game_name,
+        }),
+
+        // handle a successful response
+        success : function(json) {
+            // $('#post-text').val(''); // remove the value from the input
+            // console.log(json); // log the returned json to the console
+            console.log(json); // another sanity check
+            if(json['success']){
+            window.location.reload();
+            }
+
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+
     }
 });
 
@@ -339,12 +368,12 @@ function get_model_info(modelname) {
 
 
 function get_game_name() {
-    return current_game;
+    return document.getElementsByClassName("currently_in_use")[0].innerHTML;
 }
 
 
 function save_graph(nodes, links, name) {
-    var game_name = get_game_name();
+
 
     $.ajax({
         url : '/graph/create_graph/',
@@ -355,7 +384,7 @@ function save_graph(nodes, links, name) {
             'nodes' : nodes,
             'links' : links,
             'graph' : name,
-            'game' : game_name
+            'game' : get_game_name()
         }),
         // data : { the_post : $('#post-text').val() }, // data sent with the post request
 
@@ -445,14 +474,14 @@ $("#start-game").click(function(e) {
     e.preventDefault();
     $.ajax({
         url : '/graph/start_game/',
-        type : "POST", // http method
-        dataType: "json",
-        contentType: 'application/json', // JSON encoding
+        type : "GET", // http method
+        //dataType: "json",
+        //contentType: 'application/json', // JSON encoding
 
-        data : JSON.stringify({
-            'graph' : current_graph,
-            'game' : get_game_name()
-        }),
+       // data : JSON.stringify({
+         //   'graph' : current_graph,
+           // 'game' : get_game_name()
+        //}),
 
         // handle a successful response
         success : function(json) {
@@ -489,6 +518,9 @@ $("#stop-game").click(function(e) {
             // $('#post-text').val(''); // remove the value from the input
             // console.log(json); // log the returned json to the console
             console.log(json); // another sanity check
+            if(json['success']){
+            $('#set-countdown').click();
+            }
 
             // $("#model-info-graph").text(json['graph_name']);
         },
@@ -726,6 +758,50 @@ $("#assign-user-model").click(function(e) {
     });
 });
 
+$("#generate-pm").click(function(e) {
+    e.preventDefault();
+
+    $.ajax({
+        url : '/graph/generate-pm/',
+        type : "POST", // http method
+
+        data : JSON.stringify({
+           'graph' : current_graph,
+        }),
+
+        // handle a successful response
+        success : function(json) {
+            // console.log(json); // log the returned json to the console
+            console.log(json);
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+});
+$("#assign-pm-to-p").click(function(e) {
+    e.preventDefault();
+
+    $.ajax({
+        url : '/graph/assign_pm_to_player/',
+        type : "GET", // http method
+
+
+        // handle a successful response
+        success : function(json) {
+            // console.log(json); // log the returned json to the console
+            console.log(json);
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+});
+
 
 $("#assign-cost-btn").click(function(e) {
     e.preventDefault();
@@ -840,6 +916,31 @@ $("#assign-duration-btn").click(function(e) {
 });
 
 
+$("#get-graph-game").click(function(e) {
+    e.preventDefault();
+
+    $.ajax({
+        url : '/graph/get_game_graph/',
+        type : "POST",
+
+        data : JSON.stringify({
+
+            'game' : current_game
+        }),
+
+        // handle a successful response
+        success : function(json) {
+            // console.log(json); // log the returned json to the console
+            document.getElementById("graph-game").innerHTML=json['graph'];
+            console.log(json);
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+});
 
 function start_countdown(){
    $.ajax({
