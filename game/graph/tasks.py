@@ -13,7 +13,7 @@ from django.core.cache import cache
 import time
 
 
-player_timeout = 180
+player_timeout = 60
 
 
 @shared_task
@@ -51,4 +51,4 @@ def change_player(game_name):
             player.is_a_bot = False
             player.save()
 
-    change_player_res = change_player.apply_async((game_name,), countdown=1.0)
+    change_player_res = change_player.apply_async((game_name,), countdown=10.0)

@@ -26,6 +26,7 @@ from tasks import *
 from game_functions import *
 from hedge_algorithm import *
 from ai import *
+from pm_pool import *
 import requests
 
 from django.contrib.auth import authenticate, login
@@ -96,6 +97,7 @@ current_game = 'game'
 def create_account(request):
     if not Game.objects.filter(name=current_game).exists():
         game = Game(name=current_game)
+        game.currently_in_use = True
         game.save()
 
     if request.method == 'POST':
@@ -145,17 +147,20 @@ def show_graph(request):
 
     context = dict()
 
-    g = Game.objects.all()[0]
+    initiate_first_game()
+    g = Game.objects.get(currently_in_use= True)
+
 
     if 'game' in request.GET:
-        g = Game.objects.get_or_create(name=request.GET.get('game'))[0]
+        g = Game.objects.get_or_create(currently_in_use=True)[0]
+        initiate_first_game()
+
 
     user = User.objects.get(username=request.user.username)
 
     if not user.player.superuser:
         template = 'graph/user.djhtml'
         if not(g.started):
-                #if len(PlayerModel.objects.filter(in_use=False))>0 and int(cache.get("waiting_time"))>=0:
             return HttpResponseRedirect ("/graph/waiting_room/")
         try:
             g = user.player.game
@@ -173,9 +178,13 @@ def show_graph(request):
         # graphs = map(lambda g: g.name, Graph.objects.all())
         context['usernames'] = Player.objects.filter(superuser=False).values_list('user__username', flat=True)
         # context['usernames'] = User.objects.values_list('username', flat=True)
-        context['model_names'] = PlayerModel.objects.all().values_list('name', flat=True)
+        #try:
+           # context['model_names'] = PlayerModel.objects.filter(graph__name=g.graph.name)
+        #except:
+        context['model_names'] = PlayerModel.objects.all()
         context['graph_names'] = Graph.objects.all()
         context['games'] = Game.objects.all()
+
 
     # context['hidden'] = 'hidden'
     context['hidden'] = ''
@@ -389,8 +398,8 @@ def get_user_costs(request, graph_name):
     if not Game.objects.filter(graph__name=graph_name).count():
         return JsonResponse({'started': False})
 
-    game = Game.objects.get(graph__name=graph_name)
-
+    game = Game.objects.get(graph__name=graph_name,currently_in_use =True)
+    #game = Game.objects.get(currently_in_use = True)
     if not game.started:
         return JsonResponse({'started': game.started})
 
@@ -407,13 +416,15 @@ def get_user_costs(request, graph_name):
         cumulative_cost = 0
         #TODO fix normilzation const
         #
-        #normalization_const = player.player_model.normalization_const
-        normalization_const = 2.5
+        normalization_const = player.player_model.normalization_const
+        #normalization_const = 2.5
+
         for turn in game.turns.all().order_by('iteration'):
-            # if turn.iteration == 0:
-            #     continue
+            #if turn.iteration == 0 and player.is_a_bot:
+
 
             path_assignments = FlowDistribution.objects.get(turn=turn,player=player).path_assignments
+
             # path_assignments = turn.flow_distributions.get(username=username).path_assignments
             e_costs = turn.graph_cost.edge_costs
             current_cost = 0
@@ -423,8 +434,10 @@ def get_user_costs(request, graph_name):
 
             for path in paths:
                 #TODO fix request
-                #flow = path_assignments.get(path=path).flow
-                flow = 0.25
+                try:
+                    flow = path_assignments.get(path=path).flow
+                except:
+                    flow = player.player_model.flow/len(paths)
                 current_path_cost = 0
                 for e in path.edges.all():
                     current_path_cost += e_costs.get(edge=e).cost
@@ -482,6 +495,27 @@ def assign_model_graph(request):
     response['graph_name'] = data['graph_name']
     return JsonResponse(response)
 
+@login_required
+def assign_game_graph(request):
+    data = json.loads(request.body)
+    graph = Graph.objects.get(name=data['graph_name'])
+    game = Game.objects.get(name=data['game_name'])
+
+    game.graph = graph
+    initial_turn = GameTurn()
+    initial_turn.game = game
+    initial_turn.iteration = 0
+    initial_turn.save()
+    game.current_turn = initial_turn
+    game.save()
+
+    response = dict()
+    response['graph_name'] = game.graph.name
+    response['game_name'] = game.name
+
+    return JsonResponse(response)
+
+
 
 @login_required
 def add_model(request):
@@ -501,7 +535,28 @@ def add_model(request):
 
     return JsonResponse(response)
 
+@login_required
+def generate_pm(request):
+    data  = json.loads(request.body)
+    graph_name = data['graph']
+    generate_player_model(graph_name)
+    return JsonResponse(dict())
 
+@login_required
+def add_game(request):
+    data = json.loads(request.body)
+    response = dict()
+
+    if Game.objects.filter(name=data['game_name']).count() > 0:
+        response['success'] = False
+    else:
+        game = Game(name=data['game_name'])
+        game.save()
+        response['success'] = True
+
+    return JsonResponse(response)
+
+@login_required
 def get_previous_cost(request, username):
     user = User.objects.get(username=username)
     game = user.player.game
@@ -843,14 +898,16 @@ def current_state(request):
 
 def start_game(request):
 
-    data = json.loads(request.body)
+    #data = json.loads(request.body)
 
-    game = Game.objects.get(name=data['game'])
+    #game = Game.objects.get(name=data['game'])
+    game = Game.objects.get(currently_in_use = True)
 
     if(game.started):
         return JsonResponse(dict())
     else:
         logger.debug('Calculating equilibrium flows')
+        logger.debug(game.graph.name)
         updateEquilibriumFlows(game.graph.name)
         logger.debug('Finished calculating equilibrium flows')
 
@@ -870,6 +927,8 @@ def stop_game(request):
     game = Game.objects.get(name=data['game'])
     game.stopped = True
     game.save()
+    #generate_player_model()
+    switch_game()
 
     response = dict()
     response['success'] = True
@@ -987,23 +1046,22 @@ def waiting_room(request):
     response['players_to_go'] = len(PlayerModel.objects.filter(in_use=False))
     if not cache.get("waiting_time"):
         cache.set("waiting_time", waiting_time)
-    if int(cache.get("waiting_time"))<0:
+    if int(cache.get("waiting_time"))<0  or user.player.game.started:
          return HttpResponseRedirect('/graph/accounts/profile/')
+
 
 
 
     response['time_countdown'] = cache.get('waiting_time')
     response['username'] = user.username
     response['time_countdown'] = cache.get('waiting_time')
+    response['started_game'] = user.player.game.started
     return render(request,template,response)
 
 @login_required
 def waiting_countdown(request):
     val = int (cache.get("waiting_time"))
     val = val-1
-    if(val<=0):
-        for pm in PlayerModel.objects.filter(in_use=False):
-            pm.delete()
     cache.set("waiting_time",val)
     response = dict()
     response['ping']=val
@@ -1025,6 +1083,22 @@ def set_waiting_time(request):
 
 
 
+def get_game_graph(request):
+    data = json.loads(request.body)
+    game_name = data['game']
+    response = dict()
+    game = Game.objects.get(name=game_name)
+    response['game']=game.name
+    try:
+        graph= game.graph
+        response['graph'] =graph.name
+    except:
+        response['graph'] =""
+    return JsonResponse(response)
+
+def assign_player_model_to_player(request):
+    assign_user_to_player_model()
+    return JsonResponse(dict())
 
 
 def heartbeat(request):
@@ -1040,8 +1114,8 @@ def heartbeat(request):
 
 def check_for_connection_loss(request):
     data = json.loads(request.body)
-    game_name = data['game']
-    change_player.apply_async((game_name,), countdown=1.0)
+    game_name = Game.objects.get(currently_in_use = True).name
+    change_player.apply_async((game_name,), countdown=10.0)
     response = dict()
     #for test purpose with basis_test.json
     response['ts_1'] = cache.get("user_1_ts")

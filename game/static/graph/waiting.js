@@ -2,10 +2,12 @@
 
 $(document).ready(function() {
 setInterval(get_countdown ,1000);
-
+//start_heartbeat_loop();
 });
 
-
+function get_username() {
+    return $("#user")[0].value;
+}
 
 function get_countdown(){
 $.ajax({
@@ -25,5 +27,28 @@ $.ajax({
             console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
         }
     });
+
+}
+
+function heartbeat_loop() {
+    var ts = Date.now()/1000;
+    var username = get_username();
+
+    $.ajax({
+        url : "/graph/heartbeat/",
+        type : "POST",
+        data : {"username": username,
+                "timestamp": ts},
+
+        success : function(json) {
+            console.log(json);
+        }
+    });
+}
+
+function start_heartbeat_loop() {
+    setTimeout(start_heartbeat_loop, 1000); // Update every second.
+    heartbeat_loop();
+
 
 }

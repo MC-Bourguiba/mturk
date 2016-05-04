@@ -175,11 +175,18 @@ graph_window.onload = function() {
 function post_temporary_distribution_loop() {
     setTimeout(post_temporary_distribution_loop, 1000); // Update every second.
     submit_distribution(true);
-    heartbeat_loop();
+
 
 
 }
 
+function start_heartbeat_loop() {
+    setTimeout(start_heartbeat_loop, 10000); // Update every second.
+
+    heartbeat_loop();
+
+
+}
 
 function heartbeat_loop() {
     var ts = Date.now()/1000;
@@ -213,6 +220,7 @@ $(document).ready(function() {
     setTimeout(post_temporary_distribution_loop, 5000); // Some timing bug here! Should not have to wait 5s to post distribution!
     display = $('#time_countdown');
     // startTimer(duration, display);
+   setTimeout(start_heartbeat_loop, 5000);
 });
 
 

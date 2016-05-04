@@ -1,5 +1,6 @@
 var graph_name = "";
 var user_predictions = false;
+var current_game =""
 
 function merge_options(obj1,obj2){
     var obj3 = {};
@@ -89,6 +90,21 @@ $('#load-graph-btn').click(function(evt) {
     }
 });
 
+$('#load-game-btn').click(function(evt) {
+    evt.preventDefault();
+
+    $("#game-list-display").children().each(function(i) {
+        if ($(this).hasClass("active")) {
+            g_name = $(this).text();
+        }
+    });
+
+    if (g_name) {
+        current_game = g_name;
+    }
+});
+
+
 
 $('#show-predictions-btn').click(function(evt) {
     evt.preventDefault();
@@ -109,8 +125,37 @@ $('#add-game-btn').click(function(evt) {
 
     var game_name = $("#game-input")[0].value;
 
+    //if (game_name != '') {
+      //  window.location.href = "/graph/accounts/profile?game=" + game_name;
+    //}
     if (game_name != '') {
-        window.location.href = "/graph/accounts/profile?game=" + game_name;
+     $.ajax({
+        url : '/graph/add_game/',
+        type : "POST", // http method
+        dataType: "json",
+        contentType: 'application/json', // JSON encoding
+
+        data : JSON.stringify({
+            'game_name' : game_name,
+        }),
+
+        // handle a successful response
+        success : function(json) {
+            // $('#post-text').val(''); // remove the value from the input
+            // console.log(json); // log the returned json to the console
+            console.log(json); // another sanity check
+            if(json['success']){
+            window.location.reload();
+            }
+
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+
     }
 });
 
@@ -274,7 +319,8 @@ function update_user_cost(graph_name) {
 }
 
 function update_ui() {
-    setTimeout(update_ui, 10000); // Update every 10 seconds
+    dr = get_duration();
+    setTimeout(update_ui, dr*1000); // Update every 10 seconds
     if (graph_name) {
         update_user_cost(graph_name);
     }
@@ -322,12 +368,12 @@ function get_model_info(modelname) {
 
 
 function get_game_name() {
-    return $("#game_name")[0].value;
+    return document.getElementsByClassName("currently_in_use")[0].innerHTML;
 }
 
 
 function save_graph(nodes, links, name) {
-    var game_name = get_game_name();
+
 
     $.ajax({
         url : '/graph/create_graph/',
@@ -338,7 +384,7 @@ function save_graph(nodes, links, name) {
             'nodes' : nodes,
             'links' : links,
             'graph' : name,
-            'game' : game_name
+            'game' : get_game_name()
         }),
         // data : { the_post : $('#post-text').val() }, // data sent with the post request
 
@@ -419,19 +465,23 @@ $("#assign-graph").click(function(e) {
     assign_model_graph(current_modelname, current_graph);
 });
 
+$("#assign-graph-to-game").click(function(e) {
+    e.preventDefault();
+    assign_game_graph(current_game, current_graph);
+});
 
 $("#start-game").click(function(e) {
     e.preventDefault();
     $.ajax({
         url : '/graph/start_game/',
-        type : "POST", // http method
-        dataType: "json",
-        contentType: 'application/json', // JSON encoding
+        type : "GET", // http method
+        //dataType: "json",
+        //contentType: 'application/json', // JSON encoding
 
-        data : JSON.stringify({
-            'graph' : current_graph,
-            'game' : get_game_name()
-        }),
+       // data : JSON.stringify({
+         //   'graph' : current_graph,
+           // 'game' : get_game_name()
+        //}),
 
         // handle a successful response
         success : function(json) {
@@ -468,6 +518,9 @@ $("#stop-game").click(function(e) {
             // $('#post-text').val(''); // remove the value from the input
             // console.log(json); // log the returned json to the console
             console.log(json); // another sanity check
+            if(json['success']){
+            $('#set-countdown').click();
+            }
 
             // $("#model-info-graph").text(json['graph_name']);
         },
@@ -508,6 +561,31 @@ function assign_model_graph(modelname, graph_name) {
     });
 }
 
+function assign_game_graph(gamename, graph_name) {
+    $.ajax({
+        url : '/graph/assign_game_graph/',
+        type : "POST", // http method
+        dataType: "json",
+        contentType: 'application/json', // JSON encoding
+
+        data : JSON.stringify({
+            'game_name' : gamename,
+            'graph_name' : graph_name,
+        }),
+
+        // handle a successful response
+        success : function(json) {
+            // $('#post-text').val(''); // remove the value from the input
+            // console.log(json); // log the returned json to the console
+            console.log(json); // another sanity check
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+}
 
 function assign_model_node(modelname, graph_name, node_id, is_start) {
     $.ajax({
@@ -680,6 +758,50 @@ $("#assign-user-model").click(function(e) {
     });
 });
 
+$("#generate-pm").click(function(e) {
+    e.preventDefault();
+
+    $.ajax({
+        url : '/graph/generate-pm/',
+        type : "POST", // http method
+
+        data : JSON.stringify({
+           'graph' : current_graph,
+        }),
+
+        // handle a successful response
+        success : function(json) {
+            // console.log(json); // log the returned json to the console
+            console.log(json);
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+});
+$("#assign-pm-to-p").click(function(e) {
+    e.preventDefault();
+
+    $.ajax({
+        url : '/graph/assign_pm_to_player/',
+        type : "GET", // http method
+
+
+        // handle a successful response
+        success : function(json) {
+            // console.log(json); // log the returned json to the console
+            console.log(json);
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+});
+
 
 $("#assign-cost-btn").click(function(e) {
     e.preventDefault();
@@ -794,6 +916,31 @@ $("#assign-duration-btn").click(function(e) {
 });
 
 
+$("#get-graph-game").click(function(e) {
+    e.preventDefault();
+
+    $.ajax({
+        url : '/graph/get_game_graph/',
+        type : "POST",
+
+        data : JSON.stringify({
+
+            'game' : current_game
+        }),
+
+        // handle a successful response
+        success : function(json) {
+            // console.log(json); // log the returned json to the console
+            document.getElementById("graph-game").innerHTML=json['graph'];
+            console.log(json);
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+});
 
 function start_countdown(){
    $.ajax({
@@ -805,7 +952,7 @@ function start_countdown(){
             document.getElementById("wait").innerHTML=json['ping'];
             if(json['ping']<0){
             $("#start-game").click();
-            setTimeout(window.location.reload(),3000);
+            setTimeout(window.location.reload(),1000);
             }
         },
 
