@@ -16,19 +16,21 @@ logger = logging.getLogger(__name__)
 
 def create_new_player(user, game, superuser):
     success = False
-
-    pms = PlayerModel.objects.filter(in_use=False, graph__isnull=False)
+    graph = game.graph
+    pms = PlayerModel.objects.filter(graph=graph)
+    number_playr = pms.count()
     player = Player(user=user)
     player.save()
     # player.user = user
     player.game = game
 
     if pms:
-        pm = PlayerModel.objects.filter(in_use=False, graph__isnull=False)[:1].get()
+        pm = PlayerModel.objects.filter(graph=graph)[random.randint(0,number_playr )]
         pm.in_use = True
+        player.player_model = pm
+        player.save()
         flow_distribution = create_default_distribution(pm, game, player)
         player.flow_distribution = flow_distribution
-        player.player_model = pm
         flow_distribution.save()
         pm.save()
 
