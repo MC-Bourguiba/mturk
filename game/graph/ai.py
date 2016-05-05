@@ -4,7 +4,8 @@ from tasks import *
 from game_functions import *
 from hedge_algorithm import *
 
-
+import logging
+logger = logging.getLogger(__name__)
 
 
 from django.contrib.auth.models import User
@@ -16,13 +17,16 @@ current_game = 'game'
 def get_previous_cost_server_side(user,current_game):
     game = user.player.game
     iteration = game.current_turn.iteration
+    logger.debug("test user :  "+str(user))
     player = Player.objects.get(user__username=user.username)
+    logger.debug("test :  "+str(player.player_model))
     path_ids = list(Path.objects.filter(player_model=player.player_model).values_list('id', flat=True))
     path_idxs = range(len(path_ids))
     paths = dict()
 
     previous_flows = dict()
     previous_costs = dict()
+    logger.debug("test 2 "+str(path_ids))
 
     for idx, p_id in zip(path_idxs, path_ids):
         path = Path.objects.get(id=p_id)
@@ -67,11 +71,4 @@ def ai_play_server(user):
 
         return new_distrib,paths_ids
     else :
-        paths = Path.objects.filter(pk__in = paths_ids)
-        fa = PathFlowAssignment()
-        for path in paths:
-            fa = PathFlowAssignment(path=path,flow= 1.0)
-            fa.save()
-        fd = FlowDistribution.objects.get(turn= game.current_turn,player=user.player)
-        print fd.path_assignments
         return [1.0/len(paths_ids)]*len(paths_ids),paths_ids

@@ -106,7 +106,7 @@ def create_account(request):
 
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
-        logger.debug(form)
+        #logger.debug(form)
         if form.is_valid():
             new_user = form.save()
             game = Game.objects.get(name=current_game)
@@ -340,7 +340,7 @@ def estimate_best_eta_all_turns(game, player):
 
                 lr = LearningRate(player=player, turn=turn)
                 lr.learning_rate = best_eta
-                logger.debug('Saving learning rate for %s' % str(player))
+                #logger.debug('Saving learning rate for %s' % str(player))
                 lr.save()
             except:
                 pass
@@ -428,6 +428,7 @@ def get_user_costs(request, graph_name):
 
 
             path_assignments = FlowDistribution.objects.get(turn=turn,player=player).path_assignments
+
 
             # path_assignments = turn.flow_distributions.get(username=username).path_assignments
             e_costs = turn.graph_cost.edge_costs
@@ -850,7 +851,7 @@ def submit_distribution(request):
 @login_required
 def current_state(request):
     data = json.loads(request.body)
-    logger.debug(data)
+    #logger.debug(data)
     game = Game.objects.get(name=data['game'])
 
     time_key = game.pk + get_hash(str(game.current_turn.iteration))
@@ -910,6 +911,9 @@ def start_game(request):
     global current_game_started
     current_game_stopped = False
     current_game_started = True
+
+
+
     if(game.started):
         return JsonResponse(dict())
     else:

@@ -44,7 +44,7 @@ def iterate_next_turn(game):
     update_cost(game)
 
     game.turns.add(game.current_turn)
-    for player in Player.objects.filter(is_a_bot = True):
+    for player in Player.objects.filter(is_a_bot = True,superuser=False):
          user = player.user
          allocation , path_ids = ai_play_server(user)
 
@@ -68,6 +68,10 @@ def create_flow_distribution(game, player, allocation, path_ids, turn):
     #                      + 'create_flow_distribution'):
         # Do we really need this?
     # FlowDistribution.objects.filter(username=username, turn=turn).delete()
+    logger.debug("test create flow distribution player :"+ str(player))
+    logger.debug("test create flow distribution turn :"+ str(turn))
+
+    num_player_model = Player.objects.filter(player_model = player.player_model).count()
 
     flow_distribution, created = FlowDistribution.objects.get_or_create(turn=turn, player=player)
     flow_distribution.path_assignments.clear()
@@ -85,7 +89,7 @@ def create_flow_distribution(game, player, allocation, path_ids, turn):
         else:
             # if all the weights are non-positive, assign the uniform distribution
             assignment.flow = 1. / nb_paths * player.player_model.flow
-
+        assignment.flow/=num_player_model
         assignment.save()
         flow_distribution.path_assignments.add(assignment)
 
@@ -116,7 +120,7 @@ def calculate_maximum_flow(game):
 
 def create_default_distribution(player_model, game, player):
     path_ids = list(Path.objects.filter(player_model=player_model).values_list('id', flat=True))
-    return create_flow_distribution(game, player, [], path_ids, game.current_turn)
+    return create_flow_distribution(game, player, [1.0/len(path_ids)]*len(path_ids), path_ids, game.current_turn)
 
 
 def evalFunc(func, xVal):

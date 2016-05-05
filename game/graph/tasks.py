@@ -38,6 +38,9 @@ def change_player(game_name):
         # TODO: Switch to AI player here
         if not cache.get(player.user.username + '_ts'):
             cache.set(player.user.username + '_ai', True)
+            player.is_a_bot = True
+            player.save()
+
             continue
 
         timestamp = float(cache.get(player.user.username + '_ts'))
