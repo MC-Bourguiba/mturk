@@ -1,0 +1,11 @@
+
+
+<h2> Welcome to the routing game waiting room</h2>
+<p style=" margin-top: 50;">You have finished this round</p>
+<p> Please wait for the following round to start</p>
+<p> Thank you for your patience</p>
+<p style=" margin-top: 50;"> game started : {{started_game}} </p>
+
+<div>Game starts in :</div>
+<div  id = "timer"></div>
+<span id ="wait"></span>

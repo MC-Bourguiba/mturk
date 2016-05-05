@@ -200,6 +200,9 @@ function heartbeat_loop() {
 
         success : function(json) {
             console.log(json);
+            if(json['current_game_stopped']){
+            window.location.reload();
+            }
         }
     });
 }

@@ -27,15 +27,7 @@
 <div>
   <div style=" margin-top: 150;text-align: center;">
 
-        <h2> Welcome to the routing game waiting room</h2>
-        <p style=" margin-top: 50;"> We are currently waiting for other players to connect</p>
-        <p> Please do not close your browser</p>
-        <p> Thank you for your patience</p>
-        <p style=" margin-top: 50;"> game started : {{started_game}} </p>
-
-        <div>Game starts in :</div>
-        <div  id = "timer"></div>
-        <span id ="wait"></span>
+       {{html}}
 
   </div>
 </div>

@@ -16,8 +16,14 @@ $.ajax({
 
         success : function(json) {
             console.log(json);
+            if(json['started']){
+            window.location.reload();
+            }
+            if(json['countdown']>=0){
             document.getElementById("wait").innerHTML=json['countdown'];
-            if(json['countdown']<0){
+            }
+            else{
+            document.getElementById("wait").innerHTML=0;
             setTimeout(window.location.reload(),2000);
             }
         },
