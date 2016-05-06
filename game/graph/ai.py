@@ -59,6 +59,8 @@ def get_previous_cost_server_side(user,current_game):
 
 def ai_play_server(user):
     game = user.player.game
+    if user.player.superuser:
+        return
     previous_costs_and_flows = get_previous_cost_server_side(user,game.name)
     paths_ids= previous_costs_and_flows['path_ids']
 
