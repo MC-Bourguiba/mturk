@@ -28,10 +28,13 @@ from hedge_algorithm import *
 from ai import *
 from pm_pool import *
 import requests
+from django import forms
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+from django.utils.translation import ugettext, ugettext_lazy as _
+
 
 from django.contrib.auth.models import User
 
@@ -58,6 +61,60 @@ cache.set('waiting_time',waiting_time)
 cache.set('current_game_stopped ',False)
 use_intermediate_room = False
 use_end_template = False
+
+
+
+class CustomUserForm(UserCreationForm):
+     error_messages = {
+        'duplicate_username': _("A user with that username already exists."),
+        'password_mismatch': _("The two password fields didn't match."),
+        }
+     username = forms.RegexField(label=_("Username"), max_length=30,
+        regex=r'^[\w.@+]+$',
+        help_text=_("Required. 30 characters or fewer. Letters, digits and "
+                    "@/./+/_ only."),
+        error_messages={
+            'invalid': _("This value may contain only letters, numbers and "
+                         "@/./+/_ characters.")})
+     password1 = forms.CharField(label=_("Password"),
+        widget=forms.PasswordInput)
+     password2 = forms.CharField(label=_("Password confirmation"),
+        widget=forms.PasswordInput,
+        help_text=_("Enter the same password as above, for verification."))
+     class Meta:
+        model = User
+        fields = ("username",)
+
+     def clean_username(self):
+        # Since User.username is unique, this check is redundant,
+        # but it sets a nicer error message than the ORM. See #13147.
+        username = self.cleaned_data["username"]
+        try:
+            User._default_manager.get(username=username)
+        except User.DoesNotExist:
+            return username
+        raise forms.ValidationError(
+            self.error_messages['duplicate_username'],
+            code='duplicate_username',
+        )
+     def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError(
+                self.error_messages['password_mismatch'],
+                code='password_mismatch',
+            )
+        return password2
+
+     def save(self, commit=True):
+        user = super(UserCreationForm, self).save(commit=False)
+        user.set_password(self.cleaned_data["password1"])
+        if commit:
+            user.save()
+        return user
+
+
 def KL(x, y):
     return sum([x_i*np.log(x_i/y_i) for x_i, y_i in zip(x, y) if x_i > 0])
 
@@ -105,8 +162,9 @@ def create_account(request):
         game.save()
 
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        #logger.debug(form)
+        form = CustomUserForm(request.POST)
+        logger.debug(form)
+
         if form.is_valid():
             new_user = form.save()
             game = Game.objects.get(name=current_game)
@@ -118,7 +176,7 @@ def create_account(request):
                 # TODO: Return empty page here
                 # template = 'graph/user_wait.djhtml'
     else:
-        form = UserCreationForm()
+        form = CustomUserForm()
 
     return render(request, "graph/register.djhtml", {
         'form': form,
@@ -161,7 +219,7 @@ def show_graph(request):
 
 
     user = User.objects.get(username=request.user.username)
-
+    connected_users = len(Player.objects.filter(is_a_bot = False))-1
     if not user.player.superuser:
         template = 'graph/user.djhtml'
         if not(g.started) or no_more_games_left():
@@ -188,6 +246,8 @@ def show_graph(request):
         context['model_names'] = PlayerModel.objects.all()
         context['graph_names'] = Graph.objects.all()
         context['games'] = Game.objects.all()
+        context['connected'] = connected_users
+
 
 
     # context['hidden'] = 'hidden'
@@ -417,6 +477,7 @@ def get_user_costs(request, graph_name):
         username = player.user.username
         paths = Path.objects.filter(player_model=player.player_model)
         # path_assignments = player.flow_distribution.path_assignments
+        number_of_PM = len(Player.objects.filter(player_model = player.player_model))
         cumulative_cost = 0
         #TODO fix normilzation const
         #
@@ -447,7 +508,7 @@ def get_user_costs(request, graph_name):
                 for e in path.edges.all():
                     current_path_cost += e_costs.get(edge=e).cost
                 current_cost += (current_path_cost) * flow
-
+            current_cost *=number_of_PM
             cumulative_cost += current_cost
             current_costs[player.user.username].append(current_cost/normalization_const)
             cumulative_costs[player.user.username].append(cumulative_cost/normalization_const)
@@ -1128,7 +1189,7 @@ def assign_player_model_to_player(request):
     assign_user_to_player_model()
     return JsonResponse(dict())
 
-
+@login_required
 def heartbeat(request):
     post_data = request.POST
     username = post_data['username']
@@ -1147,6 +1208,7 @@ def check_for_connection_loss(request):
     change_player.apply_async((game_name,), countdown=10.0)
     response = dict()
     #for test purpose with basis_test.json
+    response['graph'] =  Game.objects.get(currently_in_use = True).graph.name
     response['ts_1'] = cache.get("user_1_ts")
     response['ts_2'] = cache.get("user_2_ts")
     response['ai_1'] =  cache.get("user_1_ai")

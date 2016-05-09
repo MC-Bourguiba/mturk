@@ -8,5 +8,4 @@
 
 
 {% block scripts %}
-<script src="{% static 'graph/waiting.js' %}"></script>
 {% endblock %}

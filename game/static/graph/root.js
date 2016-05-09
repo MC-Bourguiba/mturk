@@ -146,6 +146,8 @@ $('#add-game-btn').click(function(evt) {
             console.log(json); // another sanity check
             if(json['success']){
             window.location.reload();
+            check_connection();
+            load_graph(current_graph);
             }
 
         },
@@ -328,12 +330,14 @@ function update_ui() {
 
 
 $(document).ready(function() {
+
+    check_connection();
+    load_graph(current_graph);
+    update_ui()
+    check_connection_loss();
     if (graph_name) {
         update_user_cost(graph_name);
     }
-
-    update_ui()
-    check_connection_loss();
 });
 
 
@@ -395,6 +399,8 @@ function save_graph(nodes, links, name) {
             console.log("success"); // another sanity check
             current_graph = name;
             location.reload();
+            check_connection();
+            load_graph(current_graph);
         },
 
         // handle a non-successful response
@@ -520,6 +526,8 @@ $("#stop-game").click(function(e) {
             console.log(json); // another sanity check
             if(json['success']){
             $('#set-countdown').click();
+            check_connection();
+            load_graph(current_graph);
             }
 
             // $("#model-info-graph").text(json['graph_name']);
@@ -953,6 +961,8 @@ function start_countdown(){
             if(json['ping']<0){
             $("#start-game").click();
             setTimeout(window.location.reload(),1000);
+            check_connection();
+            load_graph(current_graph);
             }
         },
 
@@ -970,6 +980,8 @@ $('#start-countdown').click(function(evt) {
 
 $('#stop-countdown').click(function(evt) {
     window.location.reload();
+    check_connection();
+    load_graph(current_graph);
 });
 
 
@@ -1016,6 +1028,9 @@ function check_connection(){
 
         success : function(json) {
             console.log(json);
+            console.log(json['graph']);
+            current_graph= json['graph'];
+            load_graph(json['graph']);
         },
 
         // handle a non-successful response

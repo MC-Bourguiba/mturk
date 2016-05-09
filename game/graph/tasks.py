@@ -34,7 +34,7 @@ def game_force_next(game_name):
 def change_player(game_name):
     game = Game.objects.get(name=game_name)
 
-    for player in Player.objects.filter(game=game):
+    for player in Player.objects.filter(game=game,superuser = False):
         # TODO: Switch to AI player here
         if not cache.get(player.user.username + '_ts'):
             cache.set(player.user.username + '_ai', True)

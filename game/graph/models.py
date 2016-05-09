@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+
 class Graph(models.Model):
     name = models.TextField(primary_key=True)
     graph_ui = models.TextField()
