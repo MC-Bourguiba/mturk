@@ -1013,7 +1013,7 @@ function check_connection_loss() {
 function check_connection(){
     $.ajax({
         url : "/graph/check_connection/",
-        type : "POST",
+        type : "GET",
 
         data : JSON.stringify({
             'game' : get_game_name()
