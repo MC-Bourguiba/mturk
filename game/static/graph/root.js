@@ -1015,9 +1015,6 @@ function check_connection(){
         url : "/graph/check_connection/",
         type : "GET",
 
-        data : JSON.stringify({
-            'game' : get_game_name()
-        }),
 
         success : function(json) {
             console.log(json);
