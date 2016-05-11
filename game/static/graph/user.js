@@ -490,7 +490,7 @@ function update_previous_cost(username, iteration) {
                         continue;
                     }
 
-                    val = parseFloat(val);
+                    val = parseFloat(val)*parseInt(json['number_pm']);
                     previous_flow[key].push(val);
                 }
             }

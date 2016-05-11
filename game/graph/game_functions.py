@@ -37,19 +37,21 @@ def iterate_next_turn(game):
     update_cost(game)
 
     game.turns.add(game.current_turn)
-    for player in Player.objects.filter(is_a_bot = True,superuser=False):
-         user = player.user
-         allocation , path_ids = ai_play_server(user)
-
-         cache.set(get_hash(user.username) + 'allocation', allocation)
-         cache.set(get_hash(user.username) + 'path_ids', path_ids)
-
     next_turn = GameTurn(game_object=game)
     next_turn.iteration = game.current_turn.iteration + 1
     next_turn.save()
 
     game.current_turn = next_turn
     game.save()
+    for player in Player.objects.filter(is_a_bot = True,superuser=False):
+         user = player.user
+         allocation , path_ids = ai_play_server(user)
+         logger.debug("Allocation at turn "+ str(game.current_turn.iteration)+" by "+str(user))
+         logger.debug(allocation)
+
+         cache.set(get_hash(user.username) + 'allocation', allocation)
+         cache.set(get_hash(user.username) + 'path_ids', path_ids)
+
 
 
 # Lock to protect against race condition using Redis.
@@ -61,8 +63,8 @@ def create_flow_distribution(game, player, allocation, path_ids, turn):
     #                      + 'create_flow_distribution'):
         # Do we really need this?
     # FlowDistribution.objects.filter(username=username, turn=turn).delete()
-    logger.debug("test create flow distribution player :"+ str(player))
-    logger.debug("test create flow distribution turn :"+ str(turn))
+    #logger.debug("test create flow distribution player :"+ str(player))
+    # logger.debug("test create flow distribution turn :"+ str(turn))
 
     num_player_model = Player.objects.filter(player_model = player.player_model).count()
 

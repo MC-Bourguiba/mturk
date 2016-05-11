@@ -11,22 +11,21 @@ logger = logging.getLogger(__name__)
 from django.contrib.auth.models import User
 import random
 import math
+from views import *
 
-current_game = 'game'
-
-def get_previous_cost_server_side(user,current_game):
+def get_previous_cost_server_side(user):
     game = user.player.game
     iteration = game.current_turn.iteration
-    logger.debug("test user :  "+str(user))
+    #logger.debug("test user :  "+str(user))
     player = Player.objects.get(user__username=user.username)
-    logger.debug("test :  "+str(player.player_model))
+    #logger.debug("test :  "+str(player.player_model))
     path_ids = list(Path.objects.filter(player_model=player.player_model).values_list('id', flat=True))
     path_idxs = range(len(path_ids))
     paths = dict()
 
     previous_flows = dict()
     previous_costs = dict()
-    logger.debug("test 2 "+str(path_ids))
+    #logger.debug("test 2 "+str(path_ids))
 
     for idx, p_id in zip(path_idxs, path_ids):
         path = Path.objects.get(id=p_id)
@@ -61,9 +60,8 @@ def ai_play_server(user):
     game = user.player.game
     if user.player.superuser:
         return
-    previous_costs_and_flows = get_previous_cost_server_side(user,game.name)
+    previous_costs_and_flows = get_previous_cost_server_side(user)
     paths_ids= previous_costs_and_flows['path_ids']
-
     if(game.current_turn.iteration>0):
 
         previous_costs = {int(k):v[0] for k,v in previous_costs_and_flows['previous_costs'].iteritems()}

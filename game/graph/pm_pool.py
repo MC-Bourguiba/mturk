@@ -26,6 +26,10 @@ def assign_user_to_player_model():
         pm.save()
         player.save()
 
+    for pm in PlayerModel.objects.filter(graph=current_graph):
+        if Player.objects.filter(player_model = pm).count() == 0:
+           Path.objects.filter(player_model=pm).delete()
+           pm.delete()
 
     return
 

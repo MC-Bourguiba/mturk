@@ -39,6 +39,7 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 from django.contrib.auth.models import User
 
 from django.core.cache import cache
+from ai import *
 
 import simplejson as json
 
@@ -53,7 +54,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-epsilon = 1E-4
+epsilon = 1E-10
 current_game_stopped = False
 current_game_started = False
 waiting_time = 10
@@ -368,11 +369,12 @@ def get_bar_values(game, player, turn_iteration):
 
 
 def estimate_best_eta_for_turn(game, player, turn_iteration):
-    eta_grid = np.logspace(-3, 1.6, 400)
+    eta_grid = np.logspace(-3, 1.0, 4000)
     # eta_grid = np.linspace(-10, 10, 400)
     spe = SimplexProjectionExpSort(epsilon)
-    current_flows, current_costs, next_flows = get_bar_values(game, player, turn_iteration)
 
+
+    current_flows  , current_costs, next_flows = get_bar_values(game, player, turn_iteration)
     @np.vectorize
     def calculate_divergence(eta):
         x_predicted = spe.project(current_flows, current_costs, eta)
@@ -411,7 +413,7 @@ def estimate_best_eta_all_turns(game, player):
 def predict_user_flows_all_turns(game, player):
     predictions = dict()
     actual = dict()
-
+    number_of_pm = Player.objects.filter(player_model = player.player_model).count()
     path_ids = list(Path.objects.filter(player_model=player.player_model).values_list('id', flat=True))
 
     for p_id in path_ids:
@@ -434,7 +436,7 @@ def predict_user_flows_all_turns(game, player):
 
             i = 0
             for p_id, prediction, actual_flow in zip(path_ids, x_predicted, actual_flows):
-                predictions[p_id].append(prediction)
+                predictions[p_id].append(prediction/number_of_pm)
                 actual['actual_%s' % str(p_id)].append(actual_flow)
                 i += 1
 
@@ -447,8 +449,8 @@ def predict_user_flows_all_turns(game, player):
 
 @login_required
 def get_user_predictions(request, username):
-    #TODO hard coded ?
-    game = Game.objects.all()[0]
+
+    game = Game.objects.get(currently_in_use=True)
     player = Player.objects.get(user__username=username)
     flow_predictions, actual_flows = predict_user_flows_all_turns(game, player)
     response = dict()
@@ -508,10 +510,10 @@ def get_user_costs(request, graph_name):
                 for e in path.edges.all():
                     current_path_cost += e_costs.get(edge=e).cost
                 current_cost += (current_path_cost) * flow
-            current_cost *=number_of_PM
+
             cumulative_cost += current_cost
-            current_costs[player.user.username].append(current_cost/normalization_const)
-            cumulative_costs[player.user.username].append(cumulative_cost/normalization_const)
+            current_costs[player.user.username].append(current_cost/normalization_const*number_of_PM)
+            cumulative_costs[player.user.username].append(cumulative_cost/normalization_const*number_of_PM)
 
         etas = estimate_best_eta_all_turns(game, player)
         user_etas[player.user.username] = etas
@@ -630,6 +632,7 @@ def get_previous_cost(request, username):
     player = Player.objects.get(user__username=username)
     path_ids = list(Path.objects.filter(player_model=player.player_model).values_list('id', flat=True))
     path_idxs = range(len(path_ids))
+
     paths = dict()
 
     previous_flows = dict()
@@ -659,7 +662,7 @@ def get_previous_cost(request, username):
             previous_flows[idx].append(flow)
 
     response = dict()
-
+    response['number_pm'] = Player.objects.filter(player_model= player.player_model).count()
     response['path_ids'] = path_ids
     response['paths'] = paths
     response['previous_costs'] = previous_costs
@@ -901,6 +904,7 @@ def submit_distribution(request):
     response['ids'] = path_ids
 
     if not game.started:
+
         return JsonResponse(response)
 
     cache.set(get_hash(user.username) + 'allocation', allocation)
@@ -951,7 +955,7 @@ def current_state(request):
 
     max_flow_cache_key = get_hash(game.pk) + 'edge_max_flow'
     if not cache.get(max_flow_cache_key):
-        logger.debug('max flow CACHE FAILLEDDD')
+       # logger.debug('max flow CACHE FAILLEDDD')
         edge_max_flow = calculate_maximum_flow(game)
         cache.set(max_flow_cache_key, edge_max_flow)
 
@@ -1002,6 +1006,7 @@ def stop_game(request):
     use_intermediate_room = True
     data = json.loads(request.body)
     game = Game.objects.get(name=data['game'])
+    dump_data_fixture('graph-' + str(game.graph.name)+'-'+str(datetime.now()) + '.json')
     game.stopped = True
     game.save()
     #generate_player_model()
@@ -1057,7 +1062,7 @@ def reset_game(game):
 
 
 def start_edge_highlight(request):
-    game = Game.objects.all()[0]
+    game = Game.object.get(currently_in_use=True)
 
     if not game.edge_highlight:
         game.edge_highlight = True
@@ -1070,7 +1075,7 @@ def start_edge_highlight(request):
 
 
 def stop_edge_highlight(request):
-    game = Game.objects.all()[0]
+    game = Game.object.get(currently_in_use=True)
 
     if game.edge_highlight:
         game.edge_highlight = False
@@ -1083,7 +1088,7 @@ def stop_edge_highlight(request):
 
 
 def save_data(request):
-    dump_data_fixture('graph-' + str(datetime.now()) + '.json')
+    dump_data_fixture('graph-' + str(Game.objects.get(currently_in_use=True).graph.name)+'-'+str(datetime.now()) + '.json')
     return JsonResponse(dict())
 
 
@@ -1203,7 +1208,6 @@ def heartbeat(request):
 
 
 def check_for_connection_loss(request):
-    data = json.loads(request.body)
     game_name = Game.objects.get(currently_in_use = True).name
     change_player.apply_async((game_name,), countdown=10.0)
     response = dict()
