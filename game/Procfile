@@ -1,1 +1,1 @@
-web: gunicorn game.wsgi:application -c gunicorn_config.py --pid pid/gunicorn.pid ;
+web: gunicorn wsgi.py:application -c gunicorn_config.py --pid pid/gunicorn.pid ;
