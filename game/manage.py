@@ -3,8 +3,9 @@ import os
 import sys
 
 if __name__ == "__main__":
-    os.environ["DJANGO_SETTINGS_MODULE"]= "game.settings"
     sys.path.append('app/game/game')
+    os.environ["DJANGO_SETTINGS_MODULE"]= "game.settings"
+
     print sys.path
     from django.core.management import execute_from_command_line
 
