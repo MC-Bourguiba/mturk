@@ -192,6 +192,16 @@ APPEND_SLASH = True
 import urlparse
 
 redis_url = urlparse.urlparse(os.environ.get('REDIS_URL'))
+
+
+# CELERY SETTINGS
+BROKER_URL = "{0}:{1}".format(redis_url.hostname, redis_url.port)
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+SILKY_PYTHON_PROFILER = True
+
+
 CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
@@ -213,12 +223,6 @@ CACHES = {
     },
 }
 
-# CELERY SETTINGS
-BROKER_URL = "{0}:{1}".format(redis_url.hostname, redis_url.port)
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-SILKY_PYTHON_PROFILER = True
 
 
 try:
