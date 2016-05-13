@@ -5,16 +5,14 @@ import os
 from celery import Celery
 import urlparse
 
-redis_url = urlparse.urlparse(os.environ.get('REDIS_URL'))
+REDIS_URL = os.environ.get('REDISTOGO_URL', 'redis://localhost')
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'game.settings')
 
 from django.conf import settings
 
 
-app = Celery('proj',
-             broker="{0}:{1}".format(redis_url.hostname, redis_url.port)+'/0',
-             backend=redis_url.hostname)
+app = Celery('proj',broker=REDIS_URL)
 
 
 # Using a string here means the worker will not have to

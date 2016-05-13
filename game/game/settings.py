@@ -190,12 +190,13 @@ APPEND_SLASH = True
 
 
 import urlparse
+redis_url = urlparse.urlparse(os.environ.get('REDISTOGO_URL', 'redis://localhost:6959'))
 
-redis_url = urlparse.urlparse(os.environ.get('REDIS_URL'))
+REDIS_URL = os.environ.get('REDISTOGO_URL', 'redis://localhost')
 
 
 # CELERY SETTINGS
-BROKER_URL = "{0}:{1}".format(redis_url.hostname, redis_url.port)
+BROKER_URL = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -205,7 +206,7 @@ SILKY_PYTHON_PROFILER = True
 CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
-        "LOCATION": "{0}:{1}".format(redis_url.hostname, redis_url.port),
+        "LOCATION": '%s:%s' % (redis_url.hostname, redis_url.port),
          "OPTIONS": {
              "PASSWORD": redis_url.password,
              "DB": 0,
