@@ -5,12 +5,14 @@ from datetime import datetime
 from .models import *
 from .utils import *
 from .game_functions import *
+import os
 
 from celery import shared_task
 
 from django.core.cache import cache
 
 import time
+REDIS_URL = os.environ.get('REDISTOGO_URL', 'redis://localhost')
 
 
 player_timeout = 60
