@@ -187,17 +187,19 @@ APPEND_SLASH = True
 
 
 
-# CELERY SETTINGS
-BROKER_URL = 'redis://localhost:6379/0'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
 
 
+import urlparse
+
+redis_url = urlparse.urlparse(os.environ.get('REDIS_URL'))
 CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
-        'LOCATION': 'localhost:6379',
+        "LOCATION": "{0}:{1}".format(redis_url.hostname, redis_url.port),
+         "OPTIONS": {
+             "PASSWORD": redis_url.password,
+             "DB": 0,
+         }
         # 'OPTIONS': {
         #     'DB': 1,
         #     'PASSWORD': 'yadayada',
@@ -211,7 +213,11 @@ CACHES = {
     },
 }
 
-
+# CELERY SETTINGS
+BROKER_URL = "{0}:{1}".format(redis_url.hostname, redis_url.port)
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 SILKY_PYTHON_PROFILER = True
 
 
