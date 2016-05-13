@@ -1,3 +1,3 @@
 command = 'python'
-bind = '0.0.0.0:8000'
+bind = '127.0.0.1:8008'
 workers = 3
