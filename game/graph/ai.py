@@ -1,7 +1,8 @@
 from utils import *
 from models import *
 from tasks import *
-from game_functions import *
+from hedge_algorithm import *
+
 
 
 import logging
