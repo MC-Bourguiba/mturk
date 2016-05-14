@@ -8,6 +8,7 @@ celery==3.1.18
 certifi==14.5.14
 CherryPy==5.1.0
 decorator==3.4.0
+dj-database-url==0.4.1
 Django==1.7.7
 django-bootstrap-form==3.1
 django-bootstrap3==5.1.1
@@ -33,7 +34,7 @@ ipdb==0.8
 ipython==2.4.0
 ipython-genutils==0.1.0
 Jinja2==2.7.3
-kombu==3.0.30
+kombu==3.0.26
 lxml==3.4.2
 Markdown==2.6
 MarkupSafe==0.23
