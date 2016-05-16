@@ -5,7 +5,8 @@ import os
 from celery import Celery
 import urlparse
 
-REDIS_URL = os.environ.get('REDISTOGO_URL', 'redis://localhost')
+REDIS_URL = os.environ.get('REDISCLOUD_URL')
+
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'game.settings')
 
