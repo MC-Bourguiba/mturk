@@ -200,7 +200,7 @@ redis_url = urlparse.urlparse(os.environ.get('REDISCLOUD_URL'))
 
 
 # CELERY SETTINGS
-BROKER_URL = REDIS_URL
+BROKER_URL = os.environ.get('REDISCLOUD_URL')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
