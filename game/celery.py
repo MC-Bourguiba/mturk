@@ -13,10 +13,10 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'game.settings')
 from django.conf import settings
 
 
-#app = Celery('proj',broker=REDIS_URL)
-app = Celery('proj',
-             broker='redis://localhost:6379/0',
-             backend='redis://localhost')
+app = Celery('proj',broker=REDIS_URL)
+#app = Celery('proj',
+ #            broker='redis://localhost:6379/0',
+  #           backend='redis://localhost')
 
 
 

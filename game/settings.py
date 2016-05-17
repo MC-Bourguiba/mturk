@@ -194,10 +194,10 @@ APPEND_SLASH = True
 
 import urlparse
 #redis_url = urlparse.urlparse(os.environ.get('REDISTOGO_URL', 'redis://localhost:6959'))
-#redis_url = urlparse.urlparse(os.environ.get('REDISCLOUD_URL'))
+
 
 #REDIS_URL = os.environ.get('REDISTOGO_URL', 'redis://localhost')
-
+redis_url = urlparse.urlparse(os.environ.get('REDISCLOUD_URL'))
 
 # CELERY SETTINGS
 BROKER_URL = os.environ.get('REDISCLOUD_URL')
