@@ -58,7 +58,6 @@ current_game_stopped = False
 current_game_started = False
 waiting_time = 10
 cache.set('waiting_time',waiting_time)
-cache.set('current_game_stopped ',False)
 use_intermediate_room = False
 use_end_template = False
 
