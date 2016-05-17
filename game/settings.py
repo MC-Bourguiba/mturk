@@ -67,7 +67,7 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-DATABASES['default'] =  dj_database_url.config()
+#DATABASES['default'] =  dj_database_url.config()
 ROOT_URLCONF = 'game.urls'
 
 WSGI_APPLICATION = 'game.wsgi.application'
@@ -194,7 +194,7 @@ APPEND_SLASH = True
 
 import urlparse
 #redis_url = urlparse.urlparse(os.environ.get('REDISTOGO_URL', 'redis://localhost:6959'))
-redis_url = urlparse.urlparse(os.environ.get('REDISCLOUD_URL'))
+#redis_url = urlparse.urlparse(os.environ.get('REDISCLOUD_URL'))
 
 #REDIS_URL = os.environ.get('REDISTOGO_URL', 'redis://localhost')
 
@@ -206,6 +206,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 SILKY_PYTHON_PROFILER = True
 
+"""
 
 CACHES = {
     'default': {
@@ -227,6 +228,9 @@ CACHES = {
         # },
     },
 }
+"""
+
+
 
 
 
