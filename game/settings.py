@@ -67,7 +67,7 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-#DATABASES['default'] =  dj_database_url.config()
+DATABASES['default'] =  dj_database_url.config()
 ROOT_URLCONF = 'game.urls'
 
 WSGI_APPLICATION = 'game.wsgi.application'
@@ -206,7 +206,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 SILKY_PYTHON_PROFILER = True
 
-"""
+
 
 CACHES = {
     'default': {
@@ -228,7 +228,7 @@ CACHES = {
         # },
     },
 }
-"""
+
 
 
 
