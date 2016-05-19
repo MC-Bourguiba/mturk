@@ -74,3 +74,4 @@ tornado==4.1
 traitlets==4.0.0
 websocket==0.2.1
 Werkzeug==0.10.1
+django-sslify>=0.2.7
