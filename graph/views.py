@@ -688,8 +688,9 @@ def get_user_graph_cost(request,username,graph_name):
         if username in used_pm.historic_player:
             pm_to_use = used_pm
     for us in User.objects.all():
-        if us.username in pm_to_use.historic_player:
-            user_with_same_pm+=user_with_same_pm
+        pl = Player.objects.get(user=us)
+        if pl.name in pm_to_use.historic_player:
+            user_with_same_pm=user_with_same_pm+1
     player = Player.objects.get(user__username=username)
     path_ids = list(Path.objects.filter(player_model=pm_to_use).values_list('id', flat=True))
     path_idxs = range(len(path_ids))
