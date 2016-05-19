@@ -187,7 +187,7 @@ def create_new_game(request):
     response = dict()
     return JsonResponse(response)
 
-
+@xframe_options_exempt
 def index(request):
     if request.user.is_authenticated():
 
@@ -204,6 +204,7 @@ def index(request):
 
 
 @login_required
+@xframe_options_exempt
 def show_graph(request):
     template = 'graph/root.djhtml'
 
