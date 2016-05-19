@@ -7,12 +7,13 @@ from django.db.models.fields.files import FieldFile
 from django.views.generic import FormView
 from django.views.generic.base import TemplateView
 from django.contrib import messages
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 from .forms import UserForm, NumberForm
 from models import User
 
 
-
+@xframe_options_exempt
 def reset(request):
     if 'user_id' in request.session:
         for user in User.objects.all():
@@ -23,7 +24,7 @@ def reset(request):
 
     return HttpResponseRedirect('/id_counter')
 
-
+@xframe_options_exempt
 def logout(request):
     if 'user_id' in request.session:
         user = User.objects.get(user_id=request.session['user_id'])
@@ -32,7 +33,7 @@ def logout(request):
     del request.session['user_id']
     return HttpResponseRedirect('/id_counter')
 
-
+@xframe_options_exempt
 def login(request):
 
     if request.method == 'POST':
@@ -54,7 +55,7 @@ def login(request):
 
     return render(request, template, context)
 
-
+@xframe_options_exempt
 def game(request):
     print request
 

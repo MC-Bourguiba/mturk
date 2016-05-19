@@ -155,6 +155,8 @@ def dump_data_fixture(filename):
 
 current_game = 'game'
 
+
+@xframe_options_exempt
 def create_account(request):
     if not Game.objects.filter(name=current_game).exists():
         game = Game(name=current_game)
