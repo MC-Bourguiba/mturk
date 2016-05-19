@@ -56,6 +56,7 @@
              <div id="graph-game"></div>
              <a id="assign-user-model" class="btn btn-default" href="#" role="button">Assign model to user</a>
              <a id="assign-pm-to-p" class="btn btn-default" href="#" role="button">Assign players model to players randomly</a>
+             <a id="clear-path" class="btn btn-default" href="#" role="button">clear paths cache</a>
              <a id="generate-pm" class="btn btn-default" href="#" role="button">generate PM for selected graph</a>
 
           </div>

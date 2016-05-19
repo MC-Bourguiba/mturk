@@ -717,7 +717,7 @@ def get_user_graph_cost(request,username,graph_name):
             previous_flows[idx].append(flow)
 
     response = dict()
-    response['number_pm'] = Player.objects.filter(player_model= pm_to_use).count()
+    response['number_of_iterations'] = game.turns.filter(iteration__gte=iteration-1).count()
     response['path_ids'] = path_ids
     response['paths'] = paths
     response['previous_costs'] = previous_costs
@@ -822,6 +822,13 @@ def get_paths(request, username):
     response['path_ids'] = path_ids
     response['paths'] = paths
     return JsonResponse(response)
+
+@login_required
+def clean_paths_cache(request):
+      for user in User.objects.all():
+        cache.delete(get_hash(user.username) + 'allocation')
+        cache.delete(get_hash(user.username) + 'path_ids')
+      return JsonResponse(dict())
 
 
 def save_model_node(request, model_name, graph_name, node_ui_id, is_start):

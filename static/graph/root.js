@@ -44,7 +44,21 @@ $('#turn-off-edge').click(function(evt) {
     });
 });
 
+$('#clear-path').click(function(evt) {
+    $.ajax({
+        url : "/graph/clear_path_cache/",
+        type : "GET",
 
+        success : function(json) {
+            console.log(json);
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+});
 
 $('#save-data-btn').click(function(evt) {
     $.ajax({
