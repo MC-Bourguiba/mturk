@@ -154,7 +154,7 @@ def dump_data_fixture(filename):
 
 
 current_game = 'game'
-@xframe_options_exempt
+
 def create_account(request):
     if not Game.objects.filter(name=current_game).exists():
         game = Game(name=current_game)
@@ -187,7 +187,7 @@ def create_new_game(request):
     response = dict()
     return JsonResponse(response)
 
-@xframe_options_exempt
+
 def index(request):
     if request.user.is_authenticated():
 
@@ -202,7 +202,7 @@ def index(request):
     else:
         return HttpResponseRedirect("/graph/accounts/login")
 
-@xframe_options_exempt
+
 @login_required
 def show_graph(request):
     template = 'graph/root.djhtml'
