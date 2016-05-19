@@ -463,20 +463,26 @@ def get_user_costs(request, graph_name):
     if not Game.objects.filter(graph__name=graph_name).count():
         return JsonResponse({'started': False})
 
-    game = Game.objects.get(graph__name=graph_name,currently_in_use =True)
+    game = Game.objects.get(graph__name=graph_name)
+
     #game = Game.objects.get(currently_in_use = True)
     if not game.started:
         return JsonResponse({'started': game.started})
-
+    #for user in User.objects.all():
+        ##player.game =game
+        #player.save()
     players = Player.objects.filter(game=game,superuser=False)
 
     current_costs = dict()
     cumulative_costs = dict()
     user_etas = dict()
+    logger.debug(str(players)+" smells like teen spirit")
 
     for player in players:
+
         username = player.user.username
         paths = Path.objects.filter(player_model=player.player_model)
+
         # path_assignments = player.flow_distribution.path_assignments
         number_of_PM = len(Player.objects.filter(player_model = player.player_model))
         cumulative_cost = 0
@@ -484,7 +490,7 @@ def get_user_costs(request, graph_name):
         #
         normalization_const = player.player_model.normalization_const
         #normalization_const = 2.5
-
+        logger.debug("#################")
         for turn in game.turns.all().order_by('iteration'):
             #if turn.iteration == 0 and player.is_a_bot:
 
@@ -515,6 +521,8 @@ def get_user_costs(request, graph_name):
             cumulative_costs[player.user.username].append(cumulative_cost/normalization_const*number_of_PM)
 
         etas = estimate_best_eta_all_turns(game, player)
+        logger.debug("#################")
+        #logger.debug(etas)
         user_etas[player.user.username] = etas
 
     user_etas['x'] = list(range(1, len(user_etas[user_etas.keys()[0]]) + 1))
@@ -668,6 +676,53 @@ def get_previous_cost(request, username):
     response['previous_flows'] = previous_flows
     return JsonResponse(response)
 
+def get_user_graph_cost(request,username,graph_name):
+    user = User.objects.get(username=username)
+    game = Game.objects.get(graph__name=graph_name)
+    iteration =  0
+    used_pms = PlayerModel.objects.filter(graph__name=graph_name)
+    for used_pm in used_pms:
+        if username in used_pm.historic_player:
+            pm_to_use = used_pm
+    player = Player.objects.get(user__username=username)
+    path_ids = list(Path.objects.filter(player_model=pm_to_use).values_list('id', flat=True))
+    path_idxs = range(len(path_ids))
+
+    paths = dict()
+
+    previous_flows = dict()
+    previous_costs = dict()
+
+
+    for idx, p_id in zip(path_idxs, path_ids):
+        path = Path.objects.get(id=p_id)
+        paths[idx] = list(path.edges.values_list('edge_id', flat=True))
+
+        # for turn in game.turns.all():
+        for turn in game.turns.filter(iteration__gte=iteration-1):
+            # cache_key_t_cost = str(turn.iteration) + game.name + "get_previous_cost" + username + "t_cost"
+            # cache_key_flow_ = str(turn.iteration) + game.name + "get_previous_cost" + username + "flow"
+            # if cache.get(cache_key_t_cost):
+            e_costs = turn.graph_cost.edge_costs
+            t_cost = 0
+            flow_distribution = FlowDistribution.objects.get(turn=turn, player =player )
+            flow = flow_distribution.path_assignments.get(path=path).flow
+            for e in path.edges.all():
+                t_cost += e_costs.get(edge=e).cost
+            if idx not in previous_costs:
+                previous_costs[idx] = []
+            previous_costs[idx].append(t_cost)
+            if idx not in previous_flows:
+                previous_flows[idx] = []
+            previous_flows[idx].append(flow)
+
+    response = dict()
+    response['number_pm'] = Player.objects.filter(player_model= pm_to_use).count()
+    response['path_ids'] = path_ids
+    response['paths'] = paths
+    response['previous_costs'] = previous_costs
+    response['previous_flows'] = previous_flows
+    return JsonResponse(response)
 
 def get_paths(request, username):
     user = User.objects.get(username=username)
@@ -678,6 +733,7 @@ def get_paths(request, username):
     path_ids = list(Path.objects.filter(player_model=player.player_model).values_list('id', flat=True))
     path_idxs = range(len(path_ids))
     paths = dict()
+
 
     previous_cost = []
     previous_turn = None
@@ -695,12 +751,15 @@ def get_paths(request, username):
     if cache.get(path_ids_key):
         prev_alloc = cache.get(allocation_key)
         prev_path_ids = cache.get(path_ids_key)
+        logger.debug(prev_path_ids)
+        logger.debug(prev_alloc)
 
 
     for idx, p_id in zip(path_idxs, path_ids):
         path = Path.objects.get(id=p_id)
+        logger.debug(str(path))
         paths[idx] = list(path.edges.values_list('edge_id', flat=True))
-
+        logger.debug(paths[idx])
         # if FlowDistribution.objects.filter(username=username, turn=current_turn).exists():
         # # if current_turn.flow_distributions.filter(username=username).exists():
         #     fd = FlowDistribution.objects.get(turn=current_turn, username=username)
@@ -710,7 +769,13 @@ def get_paths(request, username):
         #     flow.append(0.5)
 
         if prev_alloc:
+            logger.debug(prev_path_ids)
+            logger.debug(path_ids)
+            logger.debug("")
+            logger.debug(prev_alloc[prev_path_ids.index(p_id)])
+
             weights.append(prev_alloc[prev_path_ids.index(p_id)])
+
         else:
             weights.append(0.5)
 
@@ -1008,6 +1073,9 @@ def stop_game(request):
     dump_data_fixture('graph-' + str(game.graph.name)+'-'+str(datetime.now()) + '.json')
     game.stopped = True
     game.save()
+    for user in User.objects.all():
+        cache.delete(get_hash(user.username) + 'allocation')
+        cache.delete(get_hash(user.username) + 'path_ids')
     #generate_player_model()
     switch_game()
 
@@ -1208,8 +1276,7 @@ def heartbeat(request):
 
 def check_for_connection_loss(request):
     game_name = Game.objects.get(currently_in_use = True).name
-    if not (no_more_games_left()):
-        change_player.apply_async((game_name,), countdown=10.0)
+    change_player.apply_async((game_name,), countdown=10.0)
     response = dict()
     #for test purpose with basis_test.json
     response['graph'] =  Game.objects.get(currently_in_use = True).graph.name

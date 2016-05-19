@@ -211,6 +211,7 @@ def calculate_graph_cost(edge_flow, graph):
 
 
 def update_cost(game):
+    logger.debug(game.name)
     edge_flow = calculate_edge_flow(game.current_turn, game)
     graph_cost = calculate_graph_cost(edge_flow, game.graph)
     # graph_cost = GraphCost(graph=game.graph)

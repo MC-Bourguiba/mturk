@@ -29,7 +29,7 @@ class PlayerModel(models.Model):
     flow = models.FloatField(null=True, blank=True)
     in_use = models.BooleanField(default=False)
     normalization_const = models.FloatField(null=True, blank=True)
-
+    historic_player= models.TextField(default='')
     def get_player(self):
         if hasattr(self, 'player'):
             return self.player
