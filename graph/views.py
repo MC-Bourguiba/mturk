@@ -681,9 +681,15 @@ def get_user_graph_cost(request,username,graph_name):
     game = Game.objects.get(graph__name=graph_name)
     iteration =  0
     used_pms = PlayerModel.objects.filter(graph__name=graph_name)
+    user_with_same_pm = 0
+
+
     for used_pm in used_pms:
         if username in used_pm.historic_player:
             pm_to_use = used_pm
+    for us in User.objects.all():
+        if user.username in pm_to_use.historic_player:
+            user_with_same_pm+=user_with_same_pm
     player = Player.objects.get(user__username=username)
     path_ids = list(Path.objects.filter(player_model=pm_to_use).values_list('id', flat=True))
     path_idxs = range(len(path_ids))
@@ -718,6 +724,7 @@ def get_user_graph_cost(request,username,graph_name):
 
     response = dict()
     response['number_of_iterations'] = game.turns.filter(iteration__gte=iteration-1).count()
+    response['users_with_same_pm'] = user_with_same_pm
     response['path_ids'] = path_ids
     response['paths'] = paths
     response['previous_costs'] = previous_costs
