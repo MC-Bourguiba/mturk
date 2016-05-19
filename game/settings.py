@@ -61,7 +61,7 @@ MIDDLEWARE_CLASSES = (
     # 'silk.middleware.SilkyMiddleware',
 )
 
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+X_FRAME_OPTIONS = 'DENY'
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 DATABASES = {
     'default': {
