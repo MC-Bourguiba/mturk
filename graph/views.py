@@ -1326,6 +1326,13 @@ def heartbeat(request):
     response =dict()
     response['ts'] = cache.get(username + '_ts')
     response['current_game_stopped'] = current_game_stopped
+
+
+
+    response['worker_id']= request.GET.get("workerId", "")
+    response['assignment_id']= request.GET.get("assignmentId", "")
+    response['amazon_host']= AMAZON_HOST
+    response['hit_id']= request.GET.get("hitId", "")
     return JsonResponse(response)
 
 
