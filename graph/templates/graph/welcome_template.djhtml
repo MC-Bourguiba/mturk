@@ -27,7 +27,8 @@
 function turkGetParam( name ) {
     var regexS = "[\?&]"+name+"=([^&#]*)";
     var regex = new RegExp( regexS );
-    var tmpURL = fullurl;
+    var tmpURL = document.URL;
+
     var results = regex.exec( tmpURL );
     if( results == null ) {
         return "";
@@ -40,5 +41,6 @@ function turkGetParam( name ) {
 var assign = turkGetParam('assignmentId');
 var hit = turkGetParam('hitId');
 var worker = turkGetParam('workerId');
+var test_url = document.URL;
 </script>
 {% endblock %}
