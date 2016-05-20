@@ -15,7 +15,7 @@
 
 
 <h4>Thanks for working on this task!</h4>
-<form id="mturk_form" method="post" action=""https://workersandbox.mturk.com/mturk/externalSubmit"">
+<form id="mturk_form" method="post" action="https://workersandbox.mturk.com/mturk/externalSubmit">
     <input type="hidden" id="workerId" id="user_id" />
     <input type="hidden" name="assignmentId" value="{{assignmentId}}" />
     <input type="hidden" id="hitId" name="hitId"/>
