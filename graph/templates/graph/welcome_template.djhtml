@@ -21,3 +21,23 @@
 <input type="hidden" id="hitId" value="{{ hit_id }}" name="hitId"/>
 <input type="submit">
 </form>
+
+{% block scripts %}
+<script>
+    var regexS = "[\?&]"+name+"=([^&#]*)";
+    var regex = new RegExp( regexS );
+    var tmpURL = fullurl;
+    var results = regex.exec( tmpURL );
+    if( results == null ) {
+        return "";
+    } else {
+        return results[1];
+    }
+}
+
+// ASSIGNS THE URL PARAMETERS TO JAVASCRIPT VARIABLES
+var assign = turkGetParam('assignmentId');
+var hit = turkGetParam('hitId');
+var worker = turkGetParam('workerId');
+</script>
+{% endblock %}
