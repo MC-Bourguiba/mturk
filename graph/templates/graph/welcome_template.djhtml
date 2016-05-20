@@ -15,7 +15,7 @@
 <form action="{{ amazon_host }}" method="POST">
 <textarea rows="4" cols="50" name="user-input">
 </textarea>
-<input type="hidden" id="assignmentId" value="{{ assignment_id }}" name="assignmentId"/>
+<input type="hidden" id="assignmentId" value=assign name="assignmentId"/>
 <br/>
 <input type="hidden" id="workerId" value="{{ worker_id }}" name="workerId"/>
 <input type="hidden" id="hitId" value="{{ hit_id }}" name="hitId"/>
