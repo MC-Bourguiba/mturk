@@ -12,16 +12,14 @@
 <div  id = "timer"></div>
 <span id ="wait"></span>
 
-
-
-<h4>Thanks for working on this task!</h4>
-<form id="mturk_form" method="post" action="https://workersandbox.mturk.com/mturk/externalSubmit">
-    <input type="hidden" id="workerId" id="user_id" />
-    <input type="hidden" name="assignmentId" value="{{assignmentId}}" />
-    <input type="hidden" id="hitId" name="hitId"/>
-    <textarea name="feedback" rows=10 cols=60 placeholder="Enter any feedback you have about the task here"></textarea>
-    <br /><br />
-    <button class="btn btn-success" type="submit" value="Submit">Finish and Submit HIT</button>
+<form action="{{ amazon_host }}" method="POST">
+<textarea rows="4" cols="50" name="user-input">
+</textarea>
+<input type="hidden" id="assignmentId"  name="assignmentId"/>
+<br/>
+<input type="hidden" id="workerId"  name="workerId"/>
+<input type="hidden" id="hitId" name="hitId"/>
+<input type="submit">
 </form>
 
 {% block scripts %}
