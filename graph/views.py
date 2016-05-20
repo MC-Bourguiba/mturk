@@ -144,7 +144,7 @@ class SimplexProjectionExpSort():
             j += 1
         return np.maximum(0, -epsilon+(1+epsilon*(d-j))*y/S)
 
-@xframe_options_exempt
+
 def dump_data_fixture(filename):
     buf = StringIO()
     management.call_command('dumpdata', stdout=buf)
@@ -156,7 +156,7 @@ def dump_data_fixture(filename):
 current_game = 'game'
 
 
-@xframe_options_exempt
+
 def create_account(request):
     if not Game.objects.filter(name=current_game).exists():
         game = Game(name=current_game)
@@ -184,12 +184,12 @@ def create_account(request):
         'form': form,
     })
 
-@xframe_options_exempt
+
 def create_new_game(request):
     response = dict()
     return JsonResponse(response)
 
-@xframe_options_exempt
+
 def index(request):
     if request.user.is_authenticated():
 
@@ -206,7 +206,7 @@ def index(request):
 
 
 @login_required
-@xframe_options_exempt
+
 def show_graph(request):
     template = 'graph/root.djhtml'
 
@@ -273,14 +273,14 @@ def show_graph(request):
 
     return render(request, template, context)
 
-@xframe_options_exempt
+
 @login_required
 def editor(request):
     template = 'graph/editor.djhtml'
     context = dict()
     return render(request, template, context)
 
-@xframe_options_exempt
+
 @login_required
 def create_graph(request):
     request_dict = json.loads(request.body)
@@ -299,7 +299,7 @@ def create_graph(request):
     to_json = dict()
     return JsonResponse(to_json)
 
-@xframe_options_exempt
+  
 @login_required
 def load_graph(request):
     g_name = request.GET.dict()['name']
@@ -312,7 +312,7 @@ def load_graph(request):
     response['last_node_id'] = last_node_id
     return JsonResponse(response)
 
-@xframe_options_exempt
+
 @login_required
 def get_model_info(request, modelname):
     player_model = PlayerModel.objects.get(name=modelname)
@@ -449,7 +449,7 @@ def predict_user_flows_all_turns(game, player):
     return predictions, actual
 
 
-@xframe_options_exempt
+  
 @login_required
 def get_user_predictions(request, username):
 
@@ -462,7 +462,7 @@ def get_user_predictions(request, username):
     return JsonResponse(response)
 
 
-@xframe_options_exempt
+  
 @login_required
 def get_user_costs(request, graph_name):
     if not Game.objects.filter(graph__name=graph_name).count():
@@ -540,7 +540,7 @@ def get_user_costs(request, graph_name):
     return JsonResponse(response)
 
 
-@xframe_options_exempt
+  
 @login_required
 def assign_game(request):
     data = json.loads(request.body)
@@ -556,7 +556,7 @@ def assign_game(request):
     return JsonResponse(dict())
 
 
-@xframe_options_exempt
+  
 @login_required
 def assign_model_node(request):
     data = json.loads(request.body)
@@ -578,7 +578,7 @@ def assign_model_graph(request):
     return JsonResponse(response)
 
 
-@xframe_options_exempt
+  
 @login_required
 def assign_game_graph(request):
     data = json.loads(request.body)
@@ -600,7 +600,7 @@ def assign_game_graph(request):
     return JsonResponse(response)
 
 
-@xframe_options_exempt
+  
 @login_required
 def add_model(request):
     data = json.loads(request.body)
@@ -619,7 +619,7 @@ def add_model(request):
 
     return JsonResponse(response)
 
-@xframe_options_exempt
+  
 @login_required
 def generate_pm(request):
     data  = json.loads(request.body)
@@ -628,7 +628,7 @@ def generate_pm(request):
     return JsonResponse(dict())
 
 
-@xframe_options_exempt
+  
 @login_required
 def add_game(request):
     data = json.loads(request.body)
@@ -644,7 +644,7 @@ def add_game(request):
     return JsonResponse(response)
 
 
-@xframe_options_exempt
+  
 @login_required
 def get_previous_cost(request, username):
     user = User.objects.get(username=username)
@@ -691,7 +691,7 @@ def get_previous_cost(request, username):
     return JsonResponse(response)
 
 
-@xframe_options_exempt
+  
 def get_user_graph_cost(request,username,graph_name):
     user = User.objects.get(username=username)
     game = Game.objects.get(graph__name=graph_name)
@@ -749,7 +749,7 @@ def get_user_graph_cost(request,username,graph_name):
     return JsonResponse(response)
 
 
-@xframe_options_exempt
+  
 def get_paths(request, username):
     user = User.objects.get(username=username)
     # iteration = request.GET.dict()['iteration']
@@ -849,7 +849,7 @@ def get_paths(request, username):
     response['paths'] = paths
     return JsonResponse(response)
 
-@xframe_options_exempt
+  
 @login_required
 def clean_paths_cache(request):
       for user in User.objects.all():
@@ -857,7 +857,7 @@ def clean_paths_cache(request):
         cache.delete(get_hash(user.username) + 'path_ids')
       return JsonResponse(dict())
 
-@xframe_options_exempt
+  
 def save_model_node(request, model_name, graph_name, node_ui_id, is_start):
     player_model = PlayerModel.objects.get(name=model_name)
     node = Node.objects.get(graph__name=graph_name, ui_id=node_ui_id)
@@ -880,7 +880,7 @@ def save_model_node(request, model_name, graph_name, node_ui_id, is_start):
     response['node_ui_id'] = node_ui_id
     return JsonResponse(response)
 
-@xframe_options_exempt
+  
 @login_required
 def user_model_info(request, username):
     user = User.objects.get(username=username)
@@ -900,7 +900,7 @@ def user_model_info(request, username):
     response['html'] = html
     return JsonResponse(response)
 
-@xframe_options_exempt
+  
 @login_required
 def assign_user_model(request):
     data = json.loads(request.body)
@@ -927,7 +927,7 @@ def assign_user_model(request):
     response = dict()
     return JsonResponse(response)
 
-@xframe_options_exempt
+  
 @login_required
 def assign_model_flow(request):
     data = json.loads(request.body)
@@ -940,7 +940,7 @@ def assign_model_flow(request):
     response = dict()
     return JsonResponse(response)
 
-@xframe_options_exempt
+  
 @login_required
 def get_edge_cost(request, edge_id):
     edge = Edge.objects.get(edge_id=edge_id)
@@ -952,7 +952,7 @@ def get_edge_cost(request, edge_id):
 
     return JsonResponse(response)
 
-@xframe_options_exempt
+  
 @login_required
 def assign_edge_cost(request):
     data = json.loads(request.body)
@@ -964,7 +964,7 @@ def assign_edge_cost(request):
     response = dict()
     return JsonResponse(response)
 
-@xframe_options_exempt
+  
 @login_required
 def assign_all_edge_cost(request):
     data = json.loads(request.body)
@@ -976,7 +976,7 @@ def assign_all_edge_cost(request):
     response = dict()
     return JsonResponse(response)
 
-@xframe_options_exempt
+  
 def get_user_info(request, username):
     user = User.objects.get(username=username)
 
@@ -987,7 +987,7 @@ def get_user_info(request, username):
 
 
 # TODO: Remove all the saves that aren't needed!
-@xframe_options_exempt
+  
 @login_required
 def submit_distribution(request):
     data = json.loads(request.body)
@@ -1012,7 +1012,7 @@ def submit_distribution(request):
     return JsonResponse(response)
 
 
-@xframe_options_exempt
+  
 @login_required
 def current_state(request):
     data = json.loads(request.body)
@@ -1065,7 +1065,7 @@ def current_state(request):
 
     return JsonResponse(response)
 
-@xframe_options_exempt
+  
 def start_game(request):
 
     #data = json.loads(request.body)
@@ -1096,7 +1096,7 @@ def start_game(request):
         game_force_next.apply_async((game.name,), countdown=game.duration)
         return JsonResponse(dict())
 
-@xframe_options_exempt
+  
 def stop_game(request):
     global current_game_stopped
     global current_game_started
@@ -1163,7 +1163,7 @@ def reset_game(game):
     game.started = False
     game.save()
 
-@xframe_options_exempt
+  
 def start_edge_highlight(request):
     game = Game.object.get(currently_in_use=True)
 
@@ -1176,7 +1176,7 @@ def start_edge_highlight(request):
     response['success'] = True
     return JsonResponse(response)
 
-@xframe_options_exempt
+  
 def stop_edge_highlight(request):
     game = Game.object.get(currently_in_use=True)
 
@@ -1189,12 +1189,12 @@ def stop_edge_highlight(request):
     response['success'] = True
     return JsonResponse(response)
 
-@xframe_options_exempt
+  
 def save_data(request):
     dump_data_fixture('graph-' + str(Game.objects.get(currently_in_use=True).graph.name)+'-'+str(datetime.now()) + '.json')
     return JsonResponse(dict())
 
-@xframe_options_exempt
+  
 def assign_duration(request):
     data = json.loads(request.body)
     duration = data['duration']
@@ -1211,7 +1211,7 @@ def assign_duration(request):
 
     return JsonResponse(dict())
 
-@xframe_options_exempt
+  
 def set_game_mode(request):
     data = json.loads(request.body)
     single_slider_mode = data['single_slider']
@@ -1224,7 +1224,7 @@ def set_game_mode(request):
 
     return JsonResponse(dict())
 
-@xframe_options_exempt
+  
 @login_required
 def waiting_room(request):
     user = User.objects.get(username=request.user.username)
@@ -1254,7 +1254,7 @@ def waiting_room(request):
     response['html']= html
     return render(request,template,response)
 
-@xframe_options_exempt
+  
 @login_required
 def waiting_countdown(request):
     val = int (cache.get("waiting_time"))
@@ -1264,7 +1264,7 @@ def waiting_countdown(request):
     response['ping']=val
     return JsonResponse(response)
 
-@xframe_options_exempt
+  
 @login_required
 def get_countdown(request):
     global current_game_started
@@ -1273,7 +1273,7 @@ def get_countdown(request):
     response ['started'] = current_game_started
     return JsonResponse(response)
 
-@xframe_options_exempt
+  
 def set_waiting_time(request):
     cache.set('waiting_time',waiting_time)
     response = dict()
@@ -1283,7 +1283,7 @@ def set_waiting_time(request):
 
 
 
-@xframe_options_exempt
+  
 def get_game_graph(request):
     data = json.loads(request.body)
     game_name = data['game']
@@ -1297,12 +1297,12 @@ def get_game_graph(request):
         response['graph'] =""
     return JsonResponse(response)
 
-@xframe_options_exempt
+  
 def assign_player_model_to_player(request):
     assign_user_to_player_model()
     return JsonResponse(dict())
 
-@xframe_options_exempt
+  
 @login_required
 def heartbeat(request):
     post_data = request.POST
@@ -1315,7 +1315,7 @@ def heartbeat(request):
     return JsonResponse(response)
 
 
-@xframe_options_exempt
+  
 def check_for_connection_loss(request):
     game_name = Game.objects.get(currently_in_use = True).name
     change_player.apply_async((game_name,), countdown=10.0)
