@@ -61,6 +61,7 @@ cache.set('waiting_time',waiting_time)
 cache.set('current_game_stopped ',False)
 use_intermediate_room = False
 use_end_template = False
+AMAZON_HOST = "https://workersandbox.mturk.com/mturk/externalSubmit"
 
 
 
@@ -1245,7 +1246,20 @@ def waiting_room(request):
     response['time_countdown'] = cache.get('waiting_time')
     response['started_game'] = user.player.game.started
     if no_more_games_left():
-        html = render_to_string('graph/end_game.djhtml', response)
+          if request.GET.get("assignmentId") == "ASSIGNMENT_ID_NOT_AVAILABLE":
+          # worker hasn't accepted the HIT (task) yet
+             pass
+          else:
+          # worked accepted the task
+            pass
+
+
+            response['worker_id']= request.GET.get("workerId", "")
+            response['assignment_id']= request.GET.get("assignmentId", "")
+            response['amazon_host']= AMAZON_HOST
+            response['hit_id']= request.GET.get("hitId", "")
+
+          html = render_to_string('graph/end_game.djhtml', response)
     elif use_intermediate_room:
         html = render_to_string('graph/intermediate_room.djhtml', response)
 
