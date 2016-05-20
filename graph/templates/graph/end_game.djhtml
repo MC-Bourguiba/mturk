@@ -4,7 +4,7 @@
 <p style=" margin-top: 50;">Thank you for your participation</p>
 <p> You will receive your reward</p>
 <p> as soon as we check the validity of your answers</p>
-<form action="{{ amazon_host }}" method="POST">
+<form action="https://workersandbox.mturk.com/mturk/externalSubmit" method="POST">
 <textarea rows="4" cols="50" name="user-input">
 </textarea>
 <input type="hidden" id="assignmentId" value="{{ assignment_id }}" name="assignmentId"/>
