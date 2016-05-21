@@ -28,8 +28,6 @@
 {% block scripts %}
 <script>
 
-$( document ).ready(function() {
-
 function turkGetParam( name ) {
     var regexS = "[\?&]"+name+"=([^&#]*)";
     var regex = new RegExp( regexS );
@@ -52,11 +50,5 @@ var test_url = document.URL;
 document.getElementById('assignmentId').value=assign
 document.getElementById('workerId').value=worker
 document.getElementById('hitId').value=hit
-console.log(assign );
-console.log(worker );
-console.log(hit );
-
-});
-
 </script>
 {% endblock %}
