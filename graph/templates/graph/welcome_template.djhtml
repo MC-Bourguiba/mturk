@@ -22,9 +22,9 @@
     <input type="hidden" id="hitId" name="hitId"/>
     <textarea name="feedback" rows=10 cols=60 placeholder="Enter any feedback you have about the task here"></textarea>
     <br /><br />
-    <button class="btn btn-success" type="submit" value="Submit">Finish and Submit HIT</button>
-</form>
 
+</form>
+<button class="btn btn-success" type="submit" value="Submit">Finish and Submit HIT</button>
 {% block scripts %}
 <script>
 
