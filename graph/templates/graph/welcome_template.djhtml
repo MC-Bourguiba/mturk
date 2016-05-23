@@ -26,6 +26,10 @@
 </form>
 
 
+<form method="post" action="https://workersandbox.mturk.com/mturk/externalSubmit">
+<input type="Submit" value="submit" />
+</form>
+
 {% block scripts %}
 <script>
 
