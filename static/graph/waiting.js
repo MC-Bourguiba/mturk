@@ -56,7 +56,6 @@ $.ajax({
             }
             else{
             document.getElementById("wait").innerHTML=0;
-            setTimeout(window.location.reload(),2000);
             }
         },
 
