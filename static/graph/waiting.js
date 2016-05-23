@@ -54,6 +54,9 @@ $.ajax({
             if(json['countdown']>=0){
             document.getElementById("wait").innerHTML=json['countdown'];
             }
+            if(json['game_left']){
+            console.log(json);
+            }
             else{
             document.getElementById("wait").innerHTML=0;
             setTimeout(window.location.reload(),2000);
