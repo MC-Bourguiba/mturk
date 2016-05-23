@@ -11,10 +11,7 @@
 
 <form  method="post" action="https://workersandbox.mturk.com/mturk/externalSubmit">
 
-    <input type="hidden" id="assignmentId"  name="assignmentId"/>
 
-    <input type="hidden" id="workerId"  name="workerId"/>
-    <input type="hidden" id="hitId" name="hitId"/>
     <textarea name="feedback" rows=10 cols=60 placeholder="Enter any feedback you have about the task here"></textarea>
     <br /><br />
 <input type="Submit" value="submit" />
@@ -22,7 +19,10 @@
 
 
 <form method="post" action="https://workersandbox.mturk.com/mturk/externalSubmit">
+    <input type="hidden" id="assignmentId"  name="assignmentId"/>
 
+    <input type="hidden" id="workerId"  name="workerId"/>
+    <input type="hidden" id="hitId" name="hitId"/>
     <textarea name="feedback" rows=10 cols=60 placeholder="Enter any feedback you have about the task here"></textarea>
     <br /><br />
 <input type="Submit" value="submit2" />
