@@ -18,7 +18,7 @@
 
     <input type="hidden" id="workerId"  name="workerId"/>
     <input type="hidden" id="hitId" name="hitId"/>
-    <textarea name="feedback" rows=10 cols=60 placeholder="Enter any feedback you have about the task here"></textarea>
+    <textarea name="feedback" rows=10 cols=60 placeholder="Enter any feedback you have about the task here. Please enter your username used during the game "></textarea>
     <br /><br />
 <input type="Submit" value="submit to Mturk" />
 </form>
