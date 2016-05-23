@@ -10,11 +10,6 @@
 
 <div type="hidden">
 <form type ="hidden" method="post" action="https://workersandbox.mturk.com/mturk/externalSubmit">
-
-
-    <textarea name="feedback" rows=10 cols=60 placeholder="Enter any feedback you have about the task here"></textarea>
-    <br /><br />
-<input type="Submit" value="submit" />
 </form>
 </div>
 
