@@ -1251,7 +1251,7 @@ def waiting_room(request):
         html = render_to_string('graph/intermediate_room.djhtml', response)
 
     else:
-        
+
         html = render_to_string('graph/welcome_template.djhtml', response)
     response['html']= html
     return render(request,template,response)
