@@ -5,13 +5,7 @@
 <p> You will receive your reward</p>
 <p> as soon as we check the validity of your answers</p>
 <h4>Thanks for working on this task!</h4>
-<form  method="post" action="https://workersandbox.mturk.com/mturk/externalSubmit">
 
-
-    <textarea name="feedback" rows=10 cols=60 placeholder="Enter any feedback you have about the task here"></textarea>
-    <br /><br />
-<input type="Submit" value="submit" />
-</form>
 
 
 <form method="post" action="https://workersandbox.mturk.com/mturk/externalSubmit">
@@ -22,7 +16,7 @@
     <input type="hidden" id="hitId" name="hitId"/>
     <textarea name="feedback" rows=10 cols=60 placeholder="Enter any feedback you have about the task here"></textarea>
     <br /><br />
-<input type="Submit" value="submit2" />
+<input type="Submit" value="submit" />
 </form>
 
 {% block scripts %}
