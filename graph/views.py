@@ -1244,7 +1244,7 @@ def waiting_room(request):
     response['username'] = user.username
     response['time_countdown'] = cache.get('waiting_time')
     response['started_game'] = user.player.game.started
-    response['game_left'] = no_more_games_left()
+
     if no_more_games_left():
         html = render_to_string('graph/end_game.djhtml', response)
     elif use_intermediate_room:
@@ -1273,6 +1273,7 @@ def get_countdown(request):
     response= dict()
     response['countdown'] =cache.get('waiting_time')
     response ['started'] = current_game_started
+    response['game_left'] = no_more_games_left()
     return JsonResponse(response)
 
   
@@ -1314,13 +1315,6 @@ def heartbeat(request):
     response =dict()
     response['ts'] = cache.get(username + '_ts')
     response['current_game_stopped'] = current_game_stopped
-
-
-
-    response['worker_id']= request.GET.get("workerId", "")
-    response['assignment_id']= request.GET.get("assignmentId", "")
-    response['amazon_host']= AMAZON_HOST
-    response['hit_id']= request.GET.get("hitId", "")
     return JsonResponse(response)
 
 
