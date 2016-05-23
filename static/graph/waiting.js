@@ -47,7 +47,7 @@ $.ajax({
         type : "GET",
 
         success : function(json) {
-            console.log(json);
+
             if(json['started']){
             window.location.reload();
             }
@@ -56,6 +56,7 @@ $.ajax({
             }
             else{
             document.getElementById("wait").innerHTML=0;
+            onsole.log(json);
             }
         },
 
