@@ -1232,7 +1232,6 @@ def waiting_room(request):
     response = dict()
     response['Success']=True
     template = 'graph/user_wait.djhtml'
-    response['players_to_go'] = len(PlayerModel.objects.filter(in_use=False))
     if not cache.get("waiting_time"):
         cache.set("waiting_time", waiting_time)
     if (int(cache.get("waiting_time"))<0  or user.player.game.started) and not(no_more_games_left()):
@@ -1246,24 +1245,12 @@ def waiting_room(request):
     response['time_countdown'] = cache.get('waiting_time')
     response['started_game'] = user.player.game.started
     if no_more_games_left():
-          if request.GET.get("assignmentId") == "ASSIGNMENT_ID_NOT_AVAILABLE":
-          # worker hasn't accepted the HIT (task) yet
-             pass
-          else:
-          # worked accepted the task
-            pass
-
-
-            response['worker_id']= request.GET.get("workerId", "")
-            response['assignment_id']= request.GET.get("assignmentId", "")
-            response['amazon_host']= AMAZON_HOST
-            response['hit_id']= request.GET.get("hitId", "")
-
-          html = render_to_string('graph/end_game.djhtml', response)
+        html = render_to_string('graph/end_game.djhtml', response)
     elif use_intermediate_room:
         html = render_to_string('graph/intermediate_room.djhtml', response)
 
     else:
+        cache.set("waiting_time", 100)
         html = render_to_string('graph/welcome_template.djhtml', response)
     response['html']= html
     return render(request,template,response)
