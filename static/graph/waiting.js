@@ -55,7 +55,7 @@ $.ajax({
             document.getElementById("wait").innerHTML=json['countdown'];
             }
             if(json['game_left']){
-            console.log("test")
+            console.log("test");
             }
             else{
             document.getElementById("wait").innerHTML=0;
