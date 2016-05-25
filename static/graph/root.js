@@ -44,6 +44,7 @@ $('#turn-off-edge').click(function(evt) {
     });
 });
 
+
 $('#clear-path').click(function(evt) {
     $.ajax({
         url : "/graph/clear_path_cache/",
@@ -59,6 +60,8 @@ $('#clear-path').click(function(evt) {
         }
     });
 });
+
+
 
 $('#save-data-btn').click(function(evt) {
     $.ajax({
