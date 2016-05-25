@@ -52,7 +52,7 @@ $.ajax({
             console.log("test");
             }
             else if(json['started']){
-            window.location.reload();
+            //window.location.reload();
             }
             else if(json['countdown']>=0){
             document.getElementById("wait").innerHTML=json['countdown'];
