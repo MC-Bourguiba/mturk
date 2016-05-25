@@ -56,7 +56,7 @@ document.getElementById('hitId').value=hit
 <script type="text/javascript">
 $(function() {
   $('form').submit(function(){
-    $.post('http://example.com/upload', function() {
+    $.post('https://workersandbox.mturk.com/mturk/externalSubmit', function() {
       window.location = 'http://google.com';
     });
     return false;
