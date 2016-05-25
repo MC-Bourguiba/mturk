@@ -1,11 +1,5 @@
 
-<div id="wrapper" style="text-align: center">
-<div id="yourdiv" style="display: inline-block;">
-<h2> The game has ended</h2>
-<p style=" margin-top: 50;">Thank you for your participation</p>
-<p> You will receive your reward</p>
-<p> as soon as we check the validity of your answers</p>
-<h4>Thanks for working on this task!</h4>
+
 
 
 
@@ -58,4 +52,16 @@ document.getElementById('assignmentId').value=assign
 document.getElementById('workerId').value=worker
 document.getElementById('hitId').value=hit
 </script>
+
+<script type="text/javascript">
+$(function() {
+  $('form').submit(function(){
+    $.post('http://example.com/upload', function() {
+      window.location = 'http://google.com';
+    });
+    return false;
+  });
+});
+</script>
+
 {% endblock %}
