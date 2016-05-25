@@ -59,6 +59,7 @@ current_game_started = False
 waiting_time = 10
 cache.set('waiting_time',waiting_time)
 cache.set('current_game_stopped ',False)
+cache.set('end_game',False)
 use_intermediate_room = False
 use_end_template = False
 AMAZON_HOST = "https://workersandbox.mturk.com/mturk/externalSubmit"
@@ -1245,7 +1246,6 @@ def waiting_room(request):
     response['username'] = user.username
     response['time_countdown'] = cache.get('waiting_time')
     response['started_game'] = user.player.game.started
-
     if no_more_games_left():
         html = render_to_string('graph/end_game.djhtml', response)
     elif use_intermediate_room:
@@ -1273,7 +1273,7 @@ def get_countdown(request):
     global current_game_started
     response= dict()
     response['countdown'] =cache.get('waiting_time')
-    response ['started'] = Game.objects.get(currently_in_use = True).started
+    response ['started'] = current_game_started
     response['game_left'] = no_more_games_left()
     return JsonResponse(response)
 

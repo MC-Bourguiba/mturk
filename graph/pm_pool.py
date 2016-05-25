@@ -50,13 +50,6 @@ def initiate_first_game():
 def switch_game():
     try:
         current_game = Game.objects.get(currently_in_use = True)
-        #EdgeCost.objects.all().delete()
-        #for turn in GameTurn.objects.filter(game=current_game):
-        #    turn.delete()
-        #FlowDistribution.objects.all().delete()
-        #GraphCost.objects.all().delete()
-        #PathFlowAssignment.objects.all().delete()
-        #cache.clear()
         next_game = Game.objects.filter(currently_in_use=False,started = False,stopped= False)[0]
         current_game.currently_in_use = False
         if not(current_game.stopped):
