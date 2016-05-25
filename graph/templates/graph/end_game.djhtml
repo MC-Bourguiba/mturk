@@ -61,6 +61,4 @@ document.getElementById('assignmentId').value=assign
 document.getElementById('workerId').value=worker
 document.getElementById('hitId').value=hit
 </script>
-
-
 {% endblock %}
