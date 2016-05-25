@@ -1102,6 +1102,7 @@ def stop_game(request):
     global current_game_stopped
     global current_game_started
     global use_intermediate_room
+
     current_game_stopped = True
     current_game_started = False
     use_intermediate_room = True
@@ -1272,7 +1273,7 @@ def get_countdown(request):
     global current_game_started
     response= dict()
     response['countdown'] =cache.get('waiting_time')
-    response ['started'] = current_game_started
+    response ['started'] = Game.objects.get(currently_in_use = True).started
     response['game_left'] = no_more_games_left()
     return JsonResponse(response)
 

@@ -48,7 +48,10 @@ $.ajax({
 
         success : function(json) {
             console.log(json);
-            if(json['started']){
+            if(json['game_left']){
+            console.log("test");
+            }
+            else if(json['started']){
             window.location.reload();
             }
             else if(json['countdown']>=0){
