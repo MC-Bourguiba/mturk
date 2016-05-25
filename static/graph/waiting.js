@@ -52,6 +52,7 @@ $.ajax({
             console.log("test");
             }
             else if(json['started']){
+            console.log("game has started");
             //window.location.reload();
             }
             else if(json['countdown']>=0){
