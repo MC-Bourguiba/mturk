@@ -1,6 +1,5 @@
 
-<div id="wrapper" style="text-align: center">
-<div id="yourdiv" style="display: inline-block;">
+
 <h2> The game has ended</h2>
 <p style=" margin-top: 50;">Thank you for your participation</p>
 <p> You will receive your reward</p>
@@ -33,8 +32,7 @@
     <br /><br />
 <input type="Submit" value="submit to Mturk" />
 </form>
-</div>
-</div>
+
 {% block scripts %}
 <script>
 
