@@ -51,10 +51,10 @@ $.ajax({
             if(json['started']){
             window.location.reload();
             }
-            if(json['countdown']>=0){
+            else if(json['countdown']>=0){
             document.getElementById("wait").innerHTML=json['countdown'];
             }
-            if(json['game_left']){
+            else if(json['game_left']){
             console.log("test");
             }
             else{
