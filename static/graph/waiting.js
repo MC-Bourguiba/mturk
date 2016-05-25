@@ -51,15 +51,17 @@ $.ajax({
             if(json['game_left']){
             console.log("test");
             }
-            else if(json['started']){
-            console.log("game has started");
-            //window.location.reload();
-            }
             else if(json['countdown']>=0){
             console.log("countdown");
             document.getElementById("wait").innerHTML=json['countdown'];
             }
-            else if(json['game_left']){
+
+            else if(json['started']){
+            console.log("game has started");
+            window.location.reload();
+            }
+            else if
+            (json['game_left']){
             console.log("test");
             }
             else{
