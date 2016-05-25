@@ -1108,7 +1108,7 @@ def stop_game(request):
     current_game_started = False
     use_intermediate_room = True
     data = json.loads(request.body)
-    game = Game.objects.get(name=data['game'])
+    game = Game.objects.get(currently_in_use = True)
     dump_data_fixture('graph-' + str(game.graph.name)+'-'+str(datetime.now()) + '.json')
     game.stopped = True
     game.save()

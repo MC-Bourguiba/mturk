@@ -62,15 +62,5 @@ document.getElementById('workerId').value=worker
 document.getElementById('hitId').value=hit
 </script>
 
-<script type="text/javascript">
-$(function() {
-  $('form').submit(function(){
-    $.post('https://workersandbox.mturk.com/mturk/externalSubmit', function() {
-      window.location = 'http://google.com';
-    });
-    return false;
-  });
-});
-</script>
 
 {% endblock %}
