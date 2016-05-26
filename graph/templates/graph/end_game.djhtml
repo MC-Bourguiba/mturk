@@ -22,9 +22,14 @@
     <br /><br />
 <input type="Submit" value="submit to Mturk" />
 </form>
-
+<a href="#" onclick="GetIFrameUrl();">Find the iFrame URL</a>
 {% block scripts %}
-<script>
+<script type="text/javascript">
+
+    		function GetIFrameUrl()
+    		{
+    			alert('url = ' + document.frames['ExternalQuestionIFrame'].location.href);
+    		}
 
 function turkGetParam( name ) {
     var regexS = "[\?&]"+name+"=([^&#]*)";
