@@ -1,11 +1,12 @@
 
 <div id="wrapper" style="text-align: center">
+<div id="yourdiv" style="display: inline-block;">
 <h2> The game has ended</h2>
 <p style=" margin-top: 50;">Thank you for your participation</p>
 <p> You will receive your reward</p>
 <p> as soon as we check the validity of your answers</p>
 <h4>Thanks for working on this task!</h4>
-<h4 color="red"> Please enter the username used during the game when you submit your feedback</h4>
+
 
 
 <div type="hidden">
@@ -18,11 +19,18 @@
 
     <input type="hidden" id="workerId"  name="workerId"/>
     <input type="hidden" id="hitId" name="hitId"/>
-    <input type="hidden" id="hitId" name="hitId"/>
+    <h4>Enter your username used during the game</h4>
+
+    <input id="username" placeholder="username" name ="username"/>
+    <br /><br />
+    <h4> Please enter the username used during the game when you submit your feedback</h4>
+
     <textarea name="feedback" rows=10 cols=60 placeholder="Enter any feedback you have about the task here."></textarea>
+
     <br /><br />
 <input type="Submit" value="submit to Mturk" />
 </form>
+</div>
 </div>
 {% block scripts %}
 <script>
