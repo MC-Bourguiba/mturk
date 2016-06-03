@@ -9,10 +9,9 @@ from ai import *
 
 import redis_lock
 from redis_lock import StrictRedis
-
 import logging
 logger = logging.getLogger(__name__)
-
+max_turn = 15
 
 def create_new_player(user, game, superuser):
     success = False
@@ -35,6 +34,7 @@ def create_new_player(user, game, superuser):
 
 
 def iterate_next_turn(game):
+    global max_iteration
     update_cost(game)
 
     game.turns.add(game.current_turn)
@@ -44,7 +44,12 @@ def iterate_next_turn(game):
 
     game.current_turn = next_turn
     game.save()
-    for player in Player.objects.filter(is_a_bot = True,superuser=False):
+    if game.current_turn.iteration>max_iteration:
+        from graph.views import stop_game_server
+        stop_game_server(game)
+        from graph.tasks import waiting_countdown_server
+        waiting_countdown_server()
+    for player in Player.objects.filter(is_a_bot = True,superuser=False,game=game):
          user = player.user
          allocation , path_ids = ai_play_server(user)
          logger.debug("Allocation at turn "+ str(game.current_turn.iteration)+" by "+str(user))

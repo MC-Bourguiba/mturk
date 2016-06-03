@@ -47,6 +47,7 @@ $.ajax({
         type : "GET",
 
         success : function(json) {
+            console.log(json)
             if(json['game_left']){
             console.log("no game left");
             }

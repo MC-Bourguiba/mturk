@@ -1,5 +1,4 @@
 from models import *
-from game_functions import *
 import random
 
 def assign_user_to_player_model():
@@ -22,6 +21,7 @@ def assign_user_to_player_model():
         pm.in_use= True
         pm.historic_player=str(pm.historic_player)+str(player)
         player.save()
+        from game_functions import create_default_distribution
         flow_distribution = create_default_distribution(pm, game, player)
         player.flow_distribution = flow_distribution
         flow_distribution.save()
@@ -63,10 +63,6 @@ def switch_game():
         initial_turn.save()
         next_game.current_turn = initial_turn
         next_game.save()
-        #for old_player in Player.objects.filter(game = current_game,superuser= False):
-            #new_player = Player(old_player.user)
-
-        assign_user_to_player_model()
     except :
         print 'error occurred'
     return
