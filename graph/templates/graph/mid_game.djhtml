@@ -1,0 +1,10 @@
+
+
+<h2> Welcome to the routing game waiting room</h2>
+<p style=" margin-top: 50;">a game is being currently played</p>
+<p> Please wait for the game to end</p>
+<p> Thank you for your patience</p>
+
+<div>Game ends approximatively in : {{ time_countdown }} min</div>
+<div  id = "timer"></div>
+<span id ="wait"></span>
