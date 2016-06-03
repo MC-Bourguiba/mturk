@@ -57,6 +57,7 @@ epsilon = 1E-10
 current_game_stopped = False
 current_game_started = False
 waiting_time = 10
+max_iteration = 15
 cache.set('waiting_time',waiting_time)
 cache.set('current_game_stopped ',False)
 cache.set('end_game',False)
@@ -227,7 +228,7 @@ def show_graph(request):
     connected_users = len(Player.objects.filter(is_a_bot = False))-1
     if not user.player.superuser:
         template = 'graph/user.djhtml'
-        if not(g.started) or no_more_games_left():
+        if not(g.started) or no_more_games_left() or user.player.game==None:
             return HttpResponseRedirect ("/graph/waiting_room/")
         try:
             g = user.player.game
@@ -1232,8 +1233,21 @@ def set_game_mode(request):
 def waiting_room(request):
     user = User.objects.get(username=request.user.username)
     response = dict()
+    global max_iteration
     response['Success']=True
     template = 'graph/user_wait.djhtml'
+    game = Game.objects.get(currently_in_use = True)
+    if user.player.game == None:
+        response['username'] = user.username
+        response['mid_game'] = True
+        response['game_finished'] = game.stopped
+        response['time_countdown'] = (max_iteration-game.current_turn.iteration)*game.duration/60
+        html = render_to_string('graph/mid_game.djhtml', response)
+        response['html']= html
+        if no_more_games_left():
+           html = render_to_string('graph/end_game.djhtml', response)
+           response['html']= html
+        return render(request,template,response)
     if not cache.get("waiting_time"):
         cache.set("waiting_time", waiting_time)
     if (int(cache.get("waiting_time"))<0  or user.player.game.started) and not(no_more_games_left()):
@@ -1272,8 +1286,12 @@ def waiting_countdown(request):
 def get_countdown(request):
     global current_game_started
     response= dict()
+    user = User.objects.get(username=request.user.username)
+    game = Game.objects.get(currently_in_use=True)
+    if user.player.game == None:
+        response ['mid_game'] = True
     response['countdown'] =cache.get('waiting_time')
-    response ['started'] = current_game_started
+    response ['started'] = game.started
     response['game_left'] = no_more_games_left()
     return JsonResponse(response)
 

@@ -20,7 +20,8 @@ def create_new_player(user, game, superuser):
     player = Player(user=user)
     player.save()
     # player.user = user
-    player.game = game
+    if not(game.started):
+        player.game = game
 
 
 

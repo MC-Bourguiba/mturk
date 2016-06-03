@@ -47,22 +47,19 @@ $.ajax({
         type : "GET",
 
         success : function(json) {
-            console.log(json);
             if(json['game_left']){
-            console.log("test");
+            console.log("no game left");
             }
-            else if(json['countdown']>=0){
-            console.log("countdown");
-            document.getElementById("wait").innerHTML=json['countdown'];
+            else if (json['mid_game']){
+            console.log("mid_game");
             }
-
             else if(json['started']){
             console.log("game has started");
             window.location.reload();
             }
-            else if
-            (json['game_left']){
-            console.log("test");
+            else if(json['countdown']>=0){
+            console.log("countdown");
+            document.getElementById("wait").innerHTML=json['countdown'];
             }
             else{
             document.getElementById("wait").innerHTML=0;
