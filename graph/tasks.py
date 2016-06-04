@@ -62,10 +62,6 @@ def change_player(game_name):
 @shared_task
 def waiting_countdown_server():
     game = Game.objects.get(currently_in_use=True)
-
-    if not (cache.get("waiting_time")) and not(game.started):
-        from graph.views import set_waiting_time_server
-        set_waiting_time_server()
     val = int (cache.get("waiting_time"))
     val = val-1
     cache.set("waiting_time",val)
@@ -73,7 +69,23 @@ def waiting_countdown_server():
     if (cache.get("waiting_time")==0):
         from graph.views import start_game_server
         start_game_server()
+        check_iteration()
+        return
     if(cache.get("waiting_time")>0):
         waiting_countdown_server.apply_async((), countdown=1.0)
     response['ping']=val
     return response
+
+@shared_task
+def check_iteration():
+    game = Game.objects.get(currently_in_use=True)
+    if game.current_turn.iteration > max_turn:
+        from graph.views import stop_game_server,set_waiting_time_server
+        stop_game_server(game)
+        set_waiting_time_server()
+        waiting_countdown_server()
+        return
+    else:
+        check_iteration.apply_async((), countdown=5.0)
+
+    return

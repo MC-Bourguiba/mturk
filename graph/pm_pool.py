@@ -1,7 +1,10 @@
 from models import *
 import random
+import logging
+logger = logging.getLogger(__name__)
 
 def assign_user_to_player_model():
+
     game = Game.objects.get(currently_in_use = True)
     players = Player.objects.filter(superuser = False)
     current_graph = game.graph
@@ -49,9 +52,15 @@ def initiate_first_game():
 
 def switch_game():
     try:
+        logger.debug("do you even switch brooooooooooooooooo ? ")
         current_game = Game.objects.get(currently_in_use = True)
+        logger.debug('this is the current game'+str(current_game))
         next_game = Game.objects.filter(currently_in_use=False,started = False,stopped= False)[0]
+        logger.debug('this is the next gamme'+str(next_game))
+        logger.debug('is next game in use ? '+str(next_game.currently_in_use))
         current_game.currently_in_use = False
+        current_game.save()
+        logger.debug('is current game in use after save? '+str(current_game.currently_in_use))
         if not(current_game.stopped):
             current_game.stopped = True
         current_game.save()
@@ -63,6 +72,7 @@ def switch_game():
         initial_turn.save()
         next_game.current_turn = initial_turn
         next_game.save()
+        logger.debug('is next game in use after save? '+str(next_game.currently_in_use))
     except :
         print 'error occurred'
     return
