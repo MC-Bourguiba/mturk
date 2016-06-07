@@ -181,7 +181,7 @@ function post_temporary_distribution_loop() {
 }
 
 function start_heartbeat_loop() {
-    setTimeout(start_heartbeat_loop, 10000); // Update every second.
+    setTimeout(start_heartbeat_loop, 5000); // Update every second.
 
     heartbeat_loop();
 
