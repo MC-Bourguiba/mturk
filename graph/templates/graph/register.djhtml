@@ -6,10 +6,6 @@
   <form action="" method="post">
     {{ form|bootstrap }} {% csrf_token %}
     <input type="submit" class="btn btn-primary" value="Create account" />
-    <label for="superuser_checkbox">
-        <input type="checkbox" name="superuser" class="checkboxinput" id="superuser_checkbox" value=true />
-        Superuser?
-    </label>
   </form>
 </div>
 {% endblock %}
