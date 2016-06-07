@@ -79,7 +79,7 @@ def waiting_countdown_server():
 @shared_task
 def check_iteration():
     game = Game.objects.get(currently_in_use=True)
-    if game.current_turn.iteration > max_turn:
+    if game.current_turn.iteration > 25:
         from graph.views import stop_game_server,set_waiting_time_server
         stop_game_server(game)
         set_waiting_time_server()
