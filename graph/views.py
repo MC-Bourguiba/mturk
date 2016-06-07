@@ -229,6 +229,7 @@ def show_graph(request):
             context['username'] = user.username
             context['start'] = player_model.start_node.ui_id
             context['destination'] = player_model.destination_node.ui_id
+            context['turn_left'] = 25-g.current_turn.iteration
             context['flow'] = player_model.flow
             context['is_bot'] =user.player.is_a_bot
         except:
@@ -1095,6 +1096,9 @@ def start_game_server():
 
         game.save()
         response['success']=True
+        for user in User.objects.all():
+            cache.delete(get_hash(user.username) + 'allocation')
+            cache.delete(get_hash(user.username) + 'path_ids')
         from tasks import game_force_next
         game_force_next.apply_async((game.name,), countdown=game.duration)
         return response
