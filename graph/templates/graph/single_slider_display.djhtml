@@ -9,7 +9,7 @@
           <tr>
               <!-- <th>Path</th> -->
               <th>Previous cost</th>
-              <th>Cumulative cost</th>
+
               <th>Explore index</th>
              <!-- <th>Current Flows</th> -->
              <!-- <th>Previous index</th> -->
@@ -18,7 +18,7 @@
        <tbody >
            <tr>
                <td><p id="previous_cost_table"> {{previous_cost|floatformat:3}}</p></td>
-               <td><p id="cumulative_cost_table"> {{cumulative_cost|floatformat:3}}</p></td>
+
                <td>
                    <div style="float:left" id="ex" data-slider-min="0"
                        data-slider-max="200" data-slider-step="1" data-slider-value=0.5>
@@ -67,7 +67,7 @@
                 <tr>
                     <td><a id="{{ id }}" href='#'>Path {{ i }} </a></td>
                     <td><p id="previous_cost_table_{{ i }}"> {{previous_cost|floatformat:3}}</p></td>
-                    <td><p id="cumulative_cost_table_{{ i }}"> {{cumulative_cost|floatformat:3}}</p></td>
+
                     <div style="pointer-events: none">
                     <td class="unclickable-row"">
                         <div style="float:left;" >
