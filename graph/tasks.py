@@ -15,7 +15,7 @@ import time
 REDIS_URL = os.environ.get('REDISTOGO_URL', 'redis://localhost')
 
 
-player_timeout = 60
+player_timeout = 10
 
 
 @shared_task
@@ -56,7 +56,7 @@ def change_player(game_name):
             player.is_a_bot = False
             player.save()
 
-    change_player_res = change_player.apply_async((game_name,), countdown=10.0)
+
 
 
 @shared_task

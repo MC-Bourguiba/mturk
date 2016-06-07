@@ -1070,6 +1070,8 @@ def start_game(request):
 def start_game_server():
     global current_game_stopped
     current_game_stopped = False
+    from tasks import check_iteration
+    check_iteration()
     cache.set('current_game_stopped',False)
     if Player.objects.filter(player_model__isnull=True,superuser=False).count()>0:
         assign_user_to_player_model()
@@ -1323,7 +1325,7 @@ def set_waiting_time_server():
     if(Game.objects.filter(started=True).count()==0):
         cache.set('waiting_time',30)
     else:
-        cache.set('waiting_time',10)
+        cache.set('waiting_time',20)
     response = dict()
     response['Success'] = True
     response['countdown'] = int (cache.get("waiting_time"))
