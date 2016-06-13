@@ -987,7 +987,7 @@ function start_countdown(){
 
 
 $('#start-countdown').click(function(evt) {
-    setInterval(start_countdown ,1000);
+ start_countdown();
 });
 
 $('#stop-countdown').click(function(evt) {

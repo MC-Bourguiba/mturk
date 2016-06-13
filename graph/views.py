@@ -70,12 +70,12 @@ class CustomUserForm(UserCreationForm):
         'password_mismatch': _("The two password fields didn't match."),
         }
      username = forms.RegexField(label=_("Username"), max_length=30,
-        regex=r'^[\w.@+]+$',
+        regex=r'^[\w]+$',
         help_text=_("Required. 30 characters or fewer. Letters, digits and "
-                    "@/./+/_ only."),
+                    "_ only."),
         error_messages={
             'invalid': _("This value may contain only letters, numbers and "
-                         "@/./+/_ characters.")})
+                         "_ characters.")})
      password1 = forms.CharField(label=_("Password"),
         widget=forms.PasswordInput)
      password2 = forms.CharField(label=_("Password confirmation"),
@@ -158,14 +158,12 @@ current_game = 'game'
 
 
 def create_account(request):
-    if not Game.objects.filter(name=current_game).exists():
-        game = Game(name=current_game)
-        game.currently_in_use = True
-        game.save()
+    if Game.objects.filter(currently_in_use=True).count()==0:
+        initiate_first_game()
 
     if request.method == 'POST':
         form = CustomUserForm(request.POST)
-        logger.debug(form)
+        #logger.debug(form)
 
         if form.is_valid():
             new_user = form.save()
@@ -209,12 +207,12 @@ def index(request):
 
 def show_graph(request):
     template = 'graph/root.djhtml'
-
     context = dict()
 
-    g = Game.objects.get(currently_in_use= True)
-
-
+    if not(no_more_games_left()):
+        g = Game.objects.filter(currently_in_use= True)[0]
+    else:
+        g = Game.objects.all()[0]
 
     user = User.objects.get(username=request.user.username)
     connected_users = len(Player.objects.filter(is_a_bot = False))-1
@@ -229,19 +227,12 @@ def show_graph(request):
             context['username'] = user.username
             context['start'] = player_model.start_node.ui_id
             context['destination'] = player_model.destination_node.ui_id
-            context['turn_left'] = 25-g.current_turn.iteration
             context['flow'] = player_model.flow
             context['is_bot'] =user.player.is_a_bot
         except:
             template = 'graph/user_wait.djhtml'
     else:
-        #graphs = [g.graph] if g.graph else []
-        # graphs = map(lambda g: g.name, Graph.objects.all())
         context['usernames'] = Player.objects.filter(superuser=False).values_list('user__username', flat=True)
-        # context['usernames'] = User.objects.values_list('username', flat=True)
-        #try:
-           # context['model_names'] = PlayerModel.objects.filter(graph__name=g.graph.name)
-        #except:
         context['model_names'] = PlayerModel.objects.all()
         context['graph_names'] = Graph.objects.all()
         context['games'] = Game.objects.all()
@@ -249,13 +240,9 @@ def show_graph(request):
 
 
 
-    # context['hidden'] = 'hidden'
+
     context['hidden'] = ''
     context['game_name'] = g.name
-
-    # if not g.started:
-    #     template = 'graph/user_wait.djhtml'
-
     try:
         if len(PlayerModel.objects.filter(in_use=False, graph__isnull=False).all()) == 0:
             context['hidden'] = ''
@@ -263,7 +250,6 @@ def show_graph(request):
         pass
 
     context['single_slider_mode'] = 'checked' if g.single_slider_mode else 'unchecked'
-
     context['game_mode'] = 'single_slider_mode' if g.single_slider_mode else 'normal_mode'
     context['duration'] =g.duration
 
@@ -336,8 +322,8 @@ def get_bar_values(game, player, turn_iteration):
     turn = GameTurn.objects.get(game=game, iteration=turn_iteration)
     next_turn = GameTurn.objects.get(game=game, iteration=turn_iteration+1)
 
-    fd = FlowDistribution.objects.get(player=player, turn=turn)
-    fd_next = FlowDistribution.objects.get(player=player, turn=next_turn)
+    fd = FlowDistribution.objects.get(player=player, turn=turn,game=game)
+    fd_next = FlowDistribution.objects.get(player=player, turn=next_turn,game=game)
 
     e_costs = turn.graph_cost.edge_costs
 
@@ -390,17 +376,17 @@ def estimate_best_eta_all_turns(game, player):
     best_etas = []
 
     for turn in GameTurn.objects.filter(game=game):
-        if LearningRate.objects.filter(player=player, turn=turn).exists():
-            lr = LearningRate.objects.get(player=player, turn=turn)
+        if LearningRate.objects.filter(player=player, turn=turn,game=game).exists():
+            lr = LearningRate.objects.get(player=player, turn=turn,game=game)
             best_etas.append(lr.learning_rate)
         else:
             try:
                 best_eta = estimate_best_eta_for_turn(game, player, turn.iteration)
                 best_etas.append(best_eta)
 
-                lr = LearningRate(player=player, turn=turn)
+                lr = LearningRate(player=player, turn=turn,game=game)
                 lr.learning_rate = best_eta
-                #logger.debug('Saving learning rate for %s' % str(player))
+               # logger.debug('Saving learning rate for %s' % str(player))
                 lr.save()
             except:
                 pass
@@ -426,7 +412,7 @@ def predict_user_flows_all_turns(game, player):
                                     GameTurn.objects.filter(game=game)[1:]):
         counter += 1
         try:
-            learning_rate = LearningRate.objects.get(player=player, turn=prev_turn).learning_rate
+            learning_rate = LearningRate.objects.get(player=player, turn=prev_turn,game=game).learning_rate
             current_flows, current_costs, actual_flows = get_bar_values(game, player, curr_turn.iteration)
 
             spe = SimplexProjectionExpSort(epsilon)
@@ -477,7 +463,6 @@ def get_user_costs(request, graph_name):
     current_costs = dict()
     cumulative_costs = dict()
     user_etas = dict()
-    logger.debug(str(players)+" smells like teen spirit")
 
     for player in players:
 
@@ -491,12 +476,12 @@ def get_user_costs(request, graph_name):
         #
         normalization_const = player.player_model.normalization_const
         #normalization_const = 2.5
-        logger.debug("#################")
+        #logger.debug("#################")
         for turn in game.turns.all().order_by('iteration'):
             #if turn.iteration == 0 and player.is_a_bot:
 
 
-            path_assignments = FlowDistribution.objects.get(turn=turn,player=player).path_assignments
+            path_assignments = FlowDistribution.objects.get(turn=turn,player=player,game=game).path_assignments
 
 
             # path_assignments = turn.flow_distributions.get(username=username).path_assignments
@@ -522,7 +507,7 @@ def get_user_costs(request, graph_name):
             cumulative_costs[player.user.username].append(cumulative_cost/normalization_const*number_of_PM)
 
         etas = estimate_best_eta_all_turns(game, player)
-        logger.debug("#################")
+        #logger.debug("#################")
         #logger.debug(etas)
         user_etas[player.user.username] = etas
 
@@ -541,7 +526,7 @@ def get_user_costs(request, graph_name):
 def assign_game(request):
     data = json.loads(request.body)
 
-    logger.debug('Data:' + str(data))
+    #logger.debug('Data:' + str(data))
 
     game = Game.objects.get(name=data['game'])
     user = User.objects.get(username=data['username'])
@@ -660,14 +645,11 @@ def get_previous_cost(request, username):
         path = Path.objects.get(id=p_id)
         paths[idx] = list(path.edges.values_list('edge_id', flat=True))
 
-        # for turn in game.turns.all():
         for turn in game.turns.filter(iteration__gte=iteration-1):
-            # cache_key_t_cost = str(turn.iteration) + game.name + "get_previous_cost" + username + "t_cost"
-            # cache_key_flow_ = str(turn.iteration) + game.name + "get_previous_cost" + username + "flow"
-            # if cache.get(cache_key_t_cost):
+
             e_costs = turn.graph_cost.edge_costs
             t_cost = 0
-            flow_distribution = FlowDistribution.objects.get(turn=turn, player=player)
+            flow_distribution = FlowDistribution.objects.get(turn=turn, player=player,game=game)
             flow = flow_distribution.path_assignments.get(path=path).flow
             for e in path.edges.all():
                 t_cost += e_costs.get(edge=e).cost
@@ -724,7 +706,7 @@ def get_user_graph_cost(request,username,graph_name):
             # if cache.get(cache_key_t_cost):
             e_costs = turn.graph_cost.edge_costs
             t_cost = 0
-            flow_distribution = FlowDistribution.objects.get(turn=turn, player =player )
+            flow_distribution = FlowDistribution.objects.get(turn=turn, player =player,game=game )
             flow = flow_distribution.path_assignments.get(path=path).flow
             for e in path.edges.all():
                 t_cost += e_costs.get(edge=e).cost
@@ -773,15 +755,15 @@ def get_paths(request, username):
     if cache.get(path_ids_key):
         prev_alloc = cache.get(allocation_key)
         prev_path_ids = cache.get(path_ids_key)
-        logger.debug(prev_path_ids)
-        logger.debug(prev_alloc)
+        #logger.debug(prev_path_ids)
+        #logger.debug(prev_alloc)
 
 
     for idx, p_id in zip(path_idxs, path_ids):
         path = Path.objects.get(id=p_id)
-        logger.debug(str(path))
+        #logger.debug(str(path))
         paths[idx] = list(path.edges.values_list('edge_id', flat=True))
-        logger.debug(paths[idx])
+        #logger.debug(paths[idx])
         # if FlowDistribution.objects.filter(username=username, turn=current_turn).exists():
         # # if current_turn.flow_distributions.filter(username=username).exists():
         #     fd = FlowDistribution.objects.get(turn=current_turn, username=username)
@@ -791,10 +773,10 @@ def get_paths(request, username):
         #     flow.append(0.5)
 
         if prev_alloc:
-            logger.debug(prev_path_ids)
-            logger.debug(path_ids)
-            logger.debug("")
-            logger.debug(prev_alloc[prev_path_ids.index(p_id)])
+            #logger.debug(prev_path_ids)
+            #logger.debug(path_ids)
+            #logger.debug("")
+            #logger.debug(prev_alloc[prev_path_ids.index(p_id)])
 
             weights.append(prev_alloc[prev_path_ids.index(p_id)])
 
@@ -982,10 +964,11 @@ def get_user_info(request, username):
     return JsonResponse(response)
 
 
-# TODO: Remove all the saves that aren't needed!
+
   
 @login_required
 def submit_distribution(request):
+
     data = json.loads(request.body)
     user = User.objects.get(username=data['username'])
     player = Player.objects.get(user=user)
@@ -994,11 +977,11 @@ def submit_distribution(request):
     path_ids = data['ids']
 
     response = dict()
-    game = player.game
+    game = Game.objects.get(currently_in_use=True)
     response['all'] = allocation
     response['ids'] = path_ids
 
-    if not game.started:
+    if not game.started or game.stopped:
 
         return JsonResponse(response)
 
@@ -1069,22 +1052,24 @@ def start_game(request):
 
 
 def start_game_server():
-    global current_game_stopped
-    current_game_stopped = False
-    from tasks import check_iteration
-    check_iteration()
-    cache.set('current_game_stopped',False)
-    if Player.objects.filter(player_model__isnull=True,superuser=False).count()>0:
-        assign_user_to_player_model()
-    for user in User.objects.all():
-        cache.delete(get_hash(user.username) + 'allocation')
-        cache.delete(get_hash(user.username) + 'path_ids')
     game = Game.objects.get(currently_in_use = True)
+    if game.started:
+        return dict()
+
+
     response = dict()
 
     if(game.started):
         return response
     else:
+        global current_game_stopped
+        current_game_stopped = False
+        cache.set('current_game_stopped',False)
+        if Player.objects.filter(player_model__isnull=True,superuser=False).count()>0:
+            assign_user_to_player_model()
+        for user in User.objects.all():
+            cache.delete(get_hash(user.username) + 'allocation')
+            cache.delete(get_hash(user.username) + 'path_ids')
         logger.debug('Calculating equilibrium flows')
         logger.debug(game.graph.name)
         updateEquilibriumFlows(game.graph.name)
@@ -1113,89 +1098,20 @@ def stop_game(request):
 
 def stop_game_server(game):
 
-    global current_game_stopped
     cache.set('current_game_stopped',True)
-    current_game_stopped = True
-    #dump_data_fixture('graph-' + str(game.graph.name)+'-'+str(datetime.now()) + '.json')
-    game.stopped = True
-    game.save()
     for user in User.objects.all():
         cache.delete(get_hash(user.username) + 'allocation')
         cache.delete(get_hash(user.username) + 'path_ids')
+
+
+    response = dict()
     switch_game()
     assign_user_to_player_model()
-    response = dict()
-    response['success'] = game.stopped
     response['use_intermediate'] = use_intermediate_room
     response['use_end'] = no_more_games_left()
 
-    return response
-
-# TODO: Fix this later!
-def reset_game(game):
-
-    users, pms = [], []
-
-    for player in Player.objects.all():
-        users.append(player.user)
-        pms.append(player.player_model)
-
-    EdgeCost.objects.all().delete()
-    GameTurn.objects.filter(game=game).delete()
-    FlowDistribution.objects.all().delete()
-    GraphCost.objects.all().delete()
-    PathFlowAssignment.objects.all().delete()
-    cache.clear()
-
-    initial_turn = GameTurn()
-    initial_turn.game = game
-    initial_turn.iteration = 0
-    initial_turn.save()
-    game.current_turn = initial_turn
-    game.save()
-
-    # Randomize here
-    random.shuffle(pms)
-
-    for user, pm in zip(users, pms):
-        player = Player(user=user)
-        player.game = game
-        player.player_model = pm
-        flow_distribution = create_default_distribution(player.player_model, game,
-                                                        player.user.username, player)
-        player.flow_distribution = flow_distribution
-        flow_distribution.save()
-        player.save()
-
-    game.stopped = True
-    game.started = False
-    game.save()
-
-  
-def start_edge_highlight(request):
-    game = Game.object.get(currently_in_use=True)
-
-    if not game.edge_highlight:
-        game.edge_highlight = True
-        game.save()
-        reset_game(game)
-
-    response = dict()
-    response['success'] = True
     return JsonResponse(response)
 
-  
-def stop_edge_highlight(request):
-    game = Game.object.get(currently_in_use=True)
-
-    if game.edge_highlight:
-        game.edge_highlight = False
-        game.save()
-        reset_game(game)
-
-    response = dict()
-    response['success'] = True
-    return JsonResponse(response)
 
   
 def save_data(request):
@@ -1245,7 +1161,16 @@ def waiting_room(request):
     global max_iteration
     response['Success']=True
     template = 'graph/user_wait.djhtml'
-    game = Game.objects.get(currently_in_use = True)
+    try:
+        game = Game.objects.get(currently_in_use = True)
+    except:
+        response['time_countdown'] = cache.get('waiting_time')
+        response['username'] = user.username
+        response['started_game'] = False
+        html = render_to_string('graph/intermediate_room.djhtml', response)
+        response['html']= html
+        return render(request,template,response)
+
     if user.player.game == None:
 
         if no_more_games_left():
@@ -1255,7 +1180,6 @@ def waiting_room(request):
         elif not(game.started):
             response['time_countdown'] = cache.get('waiting_time')
             response['username'] = user.username
-            response['time_countdown'] = cache.get('waiting_time')
             response['started_game'] = game.started
             html = render_to_string('graph/intermediate_room.djhtml', response)
             response['html']= html
@@ -1295,17 +1219,13 @@ def waiting_room(request):
   
 @login_required
 def waiting_countdown(request):
-    val = int (cache.get("waiting_time"))
-    val = val-1
-    cache.set("waiting_time",val)
-    response = dict()
-    response['ping']=val
+    waiting_countdown_server()
+    response=dict()
     return JsonResponse(response)
 
   
 @login_required
 def get_countdown(request):
-    global current_game_started
     response= dict()
     user = User.objects.get(username=request.user.username)
     game = Game.objects.get(currently_in_use=True)
@@ -1357,34 +1277,37 @@ def assign_player_model_to_player(request):
   
 @login_required
 def heartbeat(request):
+
     post_data = request.POST
-    global current_game_stopped
     username = post_data['username']
     game = Game.objects.get(currently_in_use=True)
     timestamp = post_data['timestamp']
     cache.set(username + '_ts', timestamp)
     response =dict()
     response['ts'] = cache.get(username + '_ts')
-    test = not(game.started) or cache.get('current_game_stopped') or game.stopped
     response['current_game_stopped'] = (not(game.started) and not(game.stopped)) or no_more_games_left()
     return JsonResponse(response)
 
 
+
   
 def check_for_connection_loss(request):
+
     game_name = Game.objects.get(currently_in_use = True).name
     change_player.apply_async((game_name,), countdown=10.0)
     response = dict()
-    #for test purpose with basis_test.json
     response['graph'] =  Game.objects.get(currently_in_use = True).graph.name
-    response['ts_1'] = cache.get("user_1_ts")
-    response['ts_2'] = cache.get("user_2_ts")
-    response['ai_1'] =  cache.get("user_1_ai")
-    response['ai_2'] =  cache.get("user_2_ai")
+    response['ping']=cache.get('waiting_time')
     return JsonResponse(response)
-
 
 def no_more_games_left():
     initial_number_of_games = len(Game.objects.all())
     used_games = len(Game.objects.filter(stopped=True))
     return initial_number_of_games==used_games
+
+def waiting_countdown(request):
+    waiting_countdown_server()
+    return
+
+def last_game():
+    return Game.objects.filter(started=True).count()==Game.objects.all().count()

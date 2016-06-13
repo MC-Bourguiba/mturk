@@ -199,8 +199,8 @@ function heartbeat_loop() {
                 "timestamp": ts},
 
         success : function(json) {
-            console.log(json);
             if(json['current_game_stopped']){
+            console.log('game_stopped');
             window.location.reload();
             }
         }

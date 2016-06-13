@@ -37,7 +37,7 @@ def get_previous_cost_server_side(user):
 
             e_costs = turn.graph_cost.edge_costs
             t_cost = 0
-            flow_distribution = FlowDistribution.objects.get(turn=turn, player=player)
+            flow_distribution = FlowDistribution.objects.get(turn=turn, player=player,game=game)
             flow = flow_distribution.path_assignments.get(path=path).flow
             for e in path.edges.all():
                 t_cost += e_costs.get(edge=e).cost

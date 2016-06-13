@@ -126,8 +126,8 @@ def computeEquilibrium(dimensions, gradientFunctions, precision):
     t = 0
     # while(delta > precision and t < 10000):
     while(delta > precision and t < 2500):
-        logger.debug('iteration %d' % t)
-        logger.debug('delta %f' % delta)
+        #logger.debug('iteration %d' % t)
+        #logger.debug('delta %f' % delta)
         xs_plus = [entropicDescentUpdate(x, g, t) for (x, g) in zip(xs, gs)]
         gs_plus = gradientFunctions(xs_plus)
         c_plus = cost(xs_plus, gs_plus)
@@ -136,10 +136,7 @@ def computeEquilibrium(dimensions, gradientFunctions, precision):
         xs = xs_plus
         gs = gs_plus
         t += 1
-        # if(t % 100 == 0):
-        #     logger.debug(t)
 
-    # logger.debug("converged after {} iterations".format(t))
     costs = [np.dot(x.T, g) for (g, x) in zip(gs, xs)]
     return costs
 

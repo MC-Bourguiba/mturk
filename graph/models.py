@@ -105,21 +105,26 @@ class FlowDistribution(models.Model):
                                               related_name='flow_distribution')
     player = models.ForeignKey('Player')
     turn = models.ForeignKey('GameTurn', blank=True, null=True)
+    game= models.ForeignKey('Game', blank=True, null=True)
 
     def __unicode__(self):
-        return 'user: ' + str(self.player) + ' turn: ' + str(self.turn.iteration)
+        return 'user: ' + str(self.player) + ' turn: ' + str(self.turn.iteration) + ' game: ' + str(self.game)
 
     class Meta:
-        unique_together = ['player', 'turn']
+        unique_together = ['player', 'turn','game']
 
 
 class LearningRate(models.Model):
     player = models.ForeignKey('Player')
     turn = models.ForeignKey('GameTurn', blank=True, null=True)
-    learning_rate = models.FloatField(blank=True, null=True)
 
+    learning_rate = models.FloatField(blank=True, null=True)
+    game= models.ForeignKey('Game', blank=True, null=True)
+
+    class Meta:
+        unique_together = ['player', 'turn','game']
     def __unicode__(self):
-        return 'user: ' + str(self.player) + ' turn: ' + str(self.turn.iteration) + ' ' + str(self.learning_rate)
+        return 'user: ' + str(self.player) + ' turn: ' + str(self.turn.iteration) + ' ' + str(self.learning_rate)+ ' game: ' + str(self.game)
 
 
 class EdgeCost(models.Model):

@@ -18,18 +18,26 @@ def assign_user_to_player_model():
 
 
     for player in players:
-        player.game = game
-        player.player_model = random.choice(pm_to_use)
-        pm = player.player_model
-        pm.in_use= True
-        pm.historic_player=str(pm.historic_player)+str(player)
-        player.save()
-        from game_functions import create_default_distribution
-        flow_distribution = create_default_distribution(pm, game, player)
-        player.flow_distribution = flow_distribution
-        flow_distribution.save()
-        pm.save()
-        player.save()
+            if not(player.player_model==None):
+                if player.player_model.graph==current_graph:
+                    pass
+
+            player.game = game
+            player.player_model = random.choice(pm_to_use)
+            pm = player.player_model
+            pm.in_use= True
+            pm.historic_player=str(pm.historic_player)+str(player)
+            player.save()
+            from game_functions import create_default_distribution
+            flow_distribution = create_default_distribution(pm, game, player)
+            player.flow_distribution = flow_distribution
+            flow_distribution.save()
+            pm.save()
+            player.save()
+
+    if (Player.objects.filter(player_model__isnull=True,superuser=False).count()>0 )or( len(players)!=Player.objects.filter(player_model__graph=current_graph,superuser=False).count()) :
+         assign_user_to_player_model()
+
 
     for pm in PlayerModel.objects.filter(graph=current_graph):
         if Player.objects.filter(player_model = pm).count() == 0:
@@ -52,30 +60,31 @@ def initiate_first_game():
 
 def switch_game():
     try:
-        logger.debug("do you even switch brooooooooooooooooo ? ")
+        logger.debug("do even switch broooo ???")
         current_game = Game.objects.get(currently_in_use = True)
-        logger.debug('this is the current game'+str(current_game))
-        next_game = Game.objects.filter(currently_in_use=False,started = False,stopped= False)[0]
-        logger.debug('this is the next gamme'+str(next_game))
-        logger.debug('is next game in use ? '+str(next_game.currently_in_use))
         current_game.currently_in_use = False
         current_game.save()
-        logger.debug('is current game in use after save? '+str(current_game.currently_in_use))
-        if not(current_game.stopped):
-            current_game.stopped = True
+        current_game.stopped = True
         current_game.save()
+        next_game = Game.objects.filter(currently_in_use=False,started = False,stopped= False)[0]
         next_game.currently_in_use = True
         next_game.save()
-        initial_turn = GameTurn()
+        initial_turn = GameTurn(game_object=next_game)
         initial_turn.game = next_game
         initial_turn.iteration = 0
         initial_turn.save()
         next_game.current_turn = initial_turn
         next_game.save()
-        logger.debug('is next game in use after save? '+str(next_game.currently_in_use))
     except :
         print 'error occurred'
+        logger.debug('error occurred')
     return
+
+
+
+
+
+
 
 def generate_player_model(graph_name):
     graph = Graph.objects.get(name=graph_name)

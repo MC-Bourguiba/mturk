@@ -38,7 +38,6 @@ def iterate_next_turn(game):
 
 
     update_cost(game)
-
     game.turns.add(game.current_turn)
     next_turn = GameTurn(game_object=game)
     next_turn.iteration = game.current_turn.iteration + 1
@@ -52,13 +51,12 @@ def iterate_next_turn(game):
     for player in Player.objects.filter(is_a_bot = True,superuser=False,game=game):
          user = player.user
          allocation , path_ids = ai_play_server(user)
-         logger.debug("Allocation at turn "+ str(game.current_turn.iteration)+" by "+str(user))
-         logger.debug(allocation)
+         ##logger.debug(allocation)
 
          cache.set(get_hash(user.username) + 'allocation', allocation)
          cache.set(get_hash(user.username) + 'path_ids', path_ids)
-
-
+    logger.debug('##########iteration : '+str(game.current_turn.iteration)+'#############')
+    saving_learning_rate(game)
 
 # Lock to protect against race condition using Redis.
 # TODO: Make this cleaner?
@@ -74,7 +72,7 @@ def create_flow_distribution(game, player, allocation, path_ids, turn):
 
     num_player_model = Player.objects.filter(player_model = player.player_model).count()
 
-    flow_distribution, created = FlowDistribution.objects.get_or_create(turn=turn, player=player)
+    flow_distribution, created = FlowDistribution.objects.get_or_create(turn=turn, player=player,game=game)
     flow_distribution.path_assignments.clear()
 
     total_weight = float(sum(allocation))
@@ -148,8 +146,7 @@ def calculate_edge_flow(current_turn, game, use_cache=True):
         if use_cache and cache.get(get_hash(player.user.username) + 'allocation'):
             allocation = cache.get(get_hash(player.user.username) + 'allocation')
             path_ids = cache.get(get_hash(player.user.username) + 'path_ids')
-            if player.user.username == 'u1':
-                logger.debug('Getting allocation from cache:' + str(allocation))
+
 
         else:
             flow_distribution = None
@@ -158,14 +155,12 @@ def calculate_edge_flow(current_turn, game, use_cache=True):
             if current_turn.iteration == 0:
                 # If we are at the start, just use the default flow_distribution
                 # Must have been instiated!!!
-                flow_distribution = FlowDistribution.objects.get(turn=current_turn,
-                                                                 player=player)
+                flow_distribution = FlowDistribution.objects.get(turn=current_turn,game=game, player=player)
             else:
                 prev_iteration = current_turn.iteration - 1
 
                 # This should not fail!!!
-                flow_distribution = FlowDistribution.objects.get(turn__iteration=prev_iteration,
-                                                                 player=player)
+                flow_distribution = FlowDistribution.objects.get(turn__iteration=prev_iteration,game=game,player=player)
 
             for pfa in flow_distribution.path_assignments.all():
                 path_ids.append(pfa.path.id)
@@ -228,3 +223,11 @@ def update_cost(game):
 
     costs_cache_key = get_hash(game.pk) + 'iteration %d' % game.current_turn.iteration
     cache.set(costs_cache_key, get_current_edge_costs(game))
+
+
+def saving_learning_rate(game):
+    players = Player.objects.filter(game=game,superuser=False)
+    for player in players:
+        from views import estimate_best_eta_all_turns
+        estimate_best_eta_all_turns(game,player)
+    return

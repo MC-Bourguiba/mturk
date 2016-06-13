@@ -12,7 +12,6 @@ from celery import shared_task
 from django.core.cache import cache
 
 import time
-REDIS_URL = os.environ.get('REDISTOGO_URL', 'redis://localhost')
 
 
 player_timeout = 10
@@ -24,11 +23,27 @@ def game_force_next(game_name):
 
     if game.stopped:
         return
-    
+
     iterate_next_turn(game)
 
     game.game_loop_time = datetime.now()
     game.save()
+    if game.current_turn.iteration == 2 and game.started and not(game.stopped):
+            from graph.pm_pool import switch_game,assign_user_to_player_model
+            from graph.views import  set_waiting_time_server, last_game
+            if not(last_game()):
+                switch_game()
+                assign_user_to_player_model()
+                logger.debug('cleaning cache')
+                for user in User.objects.all():
+                    cache.delete(get_hash(user.username) + 'allocation')
+                    cache.delete(get_hash(user.username) + 'path_ids')
+                set_waiting_time_server()
+                waiting_countdown_server()
+            else:
+                game.stopped=True
+                game.save()
+                return
     async_res = game_force_next.apply_async((game_name,), countdown=game.duration)
 
 
@@ -69,23 +84,9 @@ def waiting_countdown_server():
     if (cache.get("waiting_time")==0):
         from graph.views import start_game_server
         start_game_server()
-        check_iteration()
         return
     if(cache.get("waiting_time")>0):
         waiting_countdown_server.apply_async((), countdown=1.0)
     response['ping']=val
     return response
 
-@shared_task
-def check_iteration():
-    game = Game.objects.get(currently_in_use=True)
-    if game.current_turn.iteration > 25:
-        from graph.views import stop_game_server,set_waiting_time_server
-        stop_game_server(game)
-        set_waiting_time_server()
-        waiting_countdown_server()
-        return
-    else:
-        check_iteration.apply_async((), countdown=5.0)
-
-    return
