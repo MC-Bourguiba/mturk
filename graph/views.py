@@ -215,7 +215,7 @@ def show_graph(request):
         g = Game.objects.all()[0]
 
     user = User.objects.get(username=request.user.username)
-    connected_users = len(Player.objects.filter(is_a_bot = False))-1
+    connected_users = len(Player.objects.filter(is_a_bot = False))
     if not user.player.superuser:
         template = 'graph/user.djhtml'
         if not(g.started) or no_more_games_left() or user.player.game==None:
@@ -634,11 +634,13 @@ def get_previous_cost(request, username):
     player = Player.objects.get(user__username=username)
     path_ids = list(Path.objects.filter(player_model=player.player_model).values_list('id', flat=True))
     path_idxs = range(len(path_ids))
-
+    total_cost = dict()
     paths = dict()
 
     previous_flows = dict()
     previous_costs = dict()
+    previous_turn_flows = dict()
+    previous_turn_costs = dict()
 
 
     for idx, p_id in zip(path_idxs, path_ids):
@@ -660,12 +662,36 @@ def get_previous_cost(request, username):
                 previous_flows[idx] = []
             previous_flows[idx].append(flow)
 
+
+    for turn in game.turns.filter(iteration__gte=-1):
+        for idx, p_id in zip(path_idxs, path_ids):
+            path = Path.objects.get(id=p_id)
+            paths[idx] = list(path.edges.values_list('edge_id', flat=True))
+
+            e_costs = turn.graph_cost.edge_costs
+            t_cost = 0
+            flow_distribution = FlowDistribution.objects.get(turn=turn, player=player,game=game)
+            flow = flow_distribution.path_assignments.get(path=path).flow
+            for e in path.edges.all():
+                t_cost += e_costs.get(edge=e).cost
+            if idx not in previous_turn_costs:
+                previous_turn_costs[idx] = []
+            previous_turn_costs[idx].append(t_cost)
+            if idx not in previous_turn_flows:
+                previous_turn_flows[idx] = []
+            previous_turn_flows[idx].append(flow)
+            total_cost_value=t_cost*flow*Player.objects.filter(player_model= player.player_model).count()/player.player_model.normalization_const
+            if turn.iteration not in total_cost:
+                total_cost[turn.iteration]=0
+            total_cost[turn.iteration]+=total_cost_value
+
     response = dict()
     response['number_pm'] = Player.objects.filter(player_model= player.player_model).count()
     response['path_ids'] = path_ids
     response['paths'] = paths
     response['previous_costs'] = previous_costs
     response['previous_flows'] = previous_flows
+    response['total_cost']=total_cost
     return JsonResponse(response)
 
 
@@ -971,7 +997,6 @@ def submit_distribution(request):
 
     data = json.loads(request.body)
     user = User.objects.get(username=data['username'])
-    player = Player.objects.get(user=user)
 
     allocation = data['allocation']
     path_ids = data['ids']
@@ -981,7 +1006,7 @@ def submit_distribution(request):
     response['all'] = allocation
     response['ids'] = path_ids
 
-    if not game.started or game.stopped:
+    if (not game.started )or game.stopped:
 
         return JsonResponse(response)
 
@@ -1022,7 +1047,7 @@ def current_state(request):
     response = dict()
     response['iteration'] = game.current_turn.iteration
     response['secs'] = secs_left
-
+    response['turn_left'] = 25-game.current_turn.iteration
     edge_costs = dict()
 
     costs_cache_key = get_hash(game.pk) + 'iteration %d' % game.current_turn.iteration
@@ -1152,10 +1177,11 @@ def set_game_mode(request):
 @login_required
 def waiting_room(request):
     if not(cache.get('start_wait')):
+        cache.set('start_wait',True)
         from tasks import waiting_countdown_server
         set_waiting_time_server()
         waiting_countdown_server()
-        cache.set('start_wait',True)
+
     user = User.objects.get(username=request.user.username)
     response = dict()
     global max_iteration
@@ -1304,10 +1330,6 @@ def no_more_games_left():
     initial_number_of_games = len(Game.objects.all())
     used_games = len(Game.objects.filter(stopped=True))
     return initial_number_of_games==used_games
-
-def waiting_countdown(request):
-    waiting_countdown_server()
-    return
 
 def last_game():
     return Game.objects.filter(started=True).count()==Game.objects.all().count()
