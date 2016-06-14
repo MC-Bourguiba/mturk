@@ -50,7 +50,7 @@ def assign_user_to_player_model():
 
 def initiate_first_game():
     if(len(Game.objects.filter(currently_in_use = True))==0):
-        game = Game(name='game_1')
+        game = Game(name='game')
         game.currently_in_use = True
         game.save()
         return

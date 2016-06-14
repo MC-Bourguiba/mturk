@@ -28,7 +28,7 @@ def game_force_next(game_name):
 
     game.game_loop_time = datetime.now()
     game.save()
-    if game.current_turn.iteration == 10 and game.started and not(game.stopped):
+    if game.current_turn.iteration == 25 and game.started and not(game.stopped):
             from graph.pm_pool import switch_game,assign_user_to_player_model
             from graph.views import  set_waiting_time_server, last_game
             if not(last_game()):
@@ -82,6 +82,9 @@ def waiting_countdown_server():
     cache.set("waiting_time",val)
     response = dict()
     if (cache.get("waiting_time")<=0):
+        for user in User.objects.all():
+                    cache.delete(get_hash(user.username) + 'allocation')
+                    cache.delete(get_hash(user.username) + 'path_ids')
         from graph.views import start_game_server
         start_game_server()
         return
