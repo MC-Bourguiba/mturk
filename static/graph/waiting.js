@@ -37,7 +37,7 @@ setInterval(get_countdown ,1000);
 setInterval(heartbeat_loop,1000);
 setTimeout(function(){
    window.location.reload(1);
-    }, 10000);
+    }, 20000);
 });
 
 function get_username() {
