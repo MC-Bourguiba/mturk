@@ -39,6 +39,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
 function turkGetParam( name ) {
     var regexS = "[\?&]"+name+"=([^&#]*)";
     var regex = new RegExp( regexS );
@@ -61,6 +62,7 @@ var test_url = document.URL;
 document.getElementById('assignmentId').value=assign
 document.getElementById('workerId').value=worker
 document.getElementById('hitId').value=hit
+</script>
 <script src="{% static 'graph/waiting.js' %}"></script>
 <script src="{% static 'graph/common.js' %}"></script>
 {% endblock %}

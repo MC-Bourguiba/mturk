@@ -466,25 +466,23 @@ def get_user_costs(request, graph_name):
 
     for player in players:
 
+
         username = player.user.username
         paths = Path.objects.filter(player_model=player.player_model)
 
-        # path_assignments = player.flow_distribution.path_assignments
+
         number_of_PM = len(Player.objects.filter(player_model = player.player_model))
         cumulative_cost = 0
-        #TODO fix normilzation const
-        #
         normalization_const = player.player_model.normalization_const
-        #normalization_const = 2.5
-        #logger.debug("#################")
+
         for turn in game.turns.all().order_by('iteration'):
-            #if turn.iteration == 0 and player.is_a_bot:
+
 
 
             path_assignments = FlowDistribution.objects.get(turn=turn,player=player,game=game).path_assignments
 
 
-            # path_assignments = turn.flow_distributions.get(username=username).path_assignments
+
             e_costs = turn.graph_cost.edge_costs
             current_cost = 0
             if player.user.username not in current_costs:
@@ -507,8 +505,6 @@ def get_user_costs(request, graph_name):
             cumulative_costs[player.user.username].append(cumulative_cost/normalization_const*number_of_PM)
 
         etas = estimate_best_eta_all_turns(game, player)
-        #logger.debug("#################")
-        #logger.debug(etas)
         user_etas[player.user.username] = etas
 
     user_etas['x'] = list(range(1, len(user_etas[user_etas.keys()[0]]) + 1))
@@ -1059,7 +1055,7 @@ def current_state(request):
 
     max_flow_cache_key = get_hash(game.pk) + 'edge_max_flow'
     if not cache.get(max_flow_cache_key):
-       # logger.debug('max flow CACHE FAILLEDDD')
+
         edge_max_flow = calculate_maximum_flow(game)
         cache.set(max_flow_cache_key, edge_max_flow)
 
@@ -1273,7 +1269,7 @@ def set_waiting_time_server():
     global waiting_time
     global intermediate_waiting_time
     if(Game.objects.filter(started=True).count()==0):
-        cache.set('waiting_time',30)
+        cache.set('waiting_time',120)
     else:
         cache.set('waiting_time',20)
     response = dict()
