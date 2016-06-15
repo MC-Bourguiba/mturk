@@ -31,6 +31,9 @@
        {{html}}
 
   </div>
+    <input type="hidden" id="assignmentId"  name="assignmentId"/>
+    <input type="hidden" id="workerId"  name="workerId"/>
+    <input type="hidden" id="hitId" name="hitId"/>
 </div>
 
 
