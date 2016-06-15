@@ -64,7 +64,7 @@ var test_url = document.URL;
 document.getElementById('assignmentId').value=assign;
 document.getElementById('workerId').value=worker ;
 document.getElementById('hitId').value=hit ;
-
+console.log("mturk_2");
 });
 </script>
 {% endblock %}
