@@ -169,7 +169,7 @@ def create_account(request):
             new_user = form.save()
             game = Game.objects.get(name=current_game)
 
-            if create_new_player(new_user, game, 'superuser' in request.POST.dict()):
+            if create_new_player(new_user, game, 'superuser' in request.POST.dict(),'assignmentId' in request.POST.dict(),'workerId' in request.POST.dict(),'hitId' in request.POST.dict()):
                 return HttpResponseRedirect('/graph/index')
             else:
                 pass

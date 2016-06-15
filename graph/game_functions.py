@@ -14,10 +14,10 @@ logger = logging.getLogger(__name__)
 max_turn = 2
 import time
 
-def create_new_player(user, game, superuser):
+def create_new_player(user, game, superuser,assignmentId,workerId,hitId):
     success = False
     graph = game.graph
-    player = Player(user=user)
+    player = Player(user=user,assignmentId=assignmentId,workerId=workerId,hitId=hitId)
     player.save()
     # player.user = user
     if not(game.started):
