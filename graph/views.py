@@ -200,7 +200,7 @@ def index(request):
         return HttpResponseRedirect("/graph/accounts/profile/")
 
     else:
-        return HttpResponseRedirect("/graph/accounts/login")
+        return HttpResponseRedirect("/graph/create_account/")
 
 
 @login_required
