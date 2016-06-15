@@ -64,6 +64,8 @@ document.getElementById('assignmentId').value=assign;
 document.getElementById('workerId').value=worker ;
 document.getElementById('hitId').value=hit ;
 console.log("mturk_1");
+console.log("worker");
+console.log(worker);
 
 });
 </script>
