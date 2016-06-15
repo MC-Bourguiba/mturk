@@ -224,6 +224,7 @@ $(document).ready(function() {
     display = $('#time_countdown');
     // startTimer(duration, display);
    setTimeout(start_heartbeat_loop, 5000);
+
 });
 
 
