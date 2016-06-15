@@ -48,6 +48,9 @@
 
     <a id="show-edge-btn" class="btn btn-default " href="#" role="button">Show edge costs</a>
     <a id="clear-edge-btn" class="btn btn-default " href="#" role="button">Clear edge costs</a>
+    <input type="hidden" id="assignmentId"  name="assignmentId"/>
+    <input type="hidden" id="workerId"  name="workerId"/>
+    <input type="hidden" id="hitId" name="hitId"/>
 
   </div>
 {% endblock %}
@@ -89,7 +92,28 @@
 
 {% block scripts %}
   <script>
-  var is_admin = false;
+ function turkGetParam( name ) {
+    var regexS = "[\?&]"+name+"=([^&#]*)";
+    var regex = new RegExp( regexS );
+    var tmpURL = document.URL;
+
+    var results = regex.exec( tmpURL );
+    if( results == null ) {
+        return "";
+    } else {
+        return results[1];
+    }
+}
+
+// ASSIGNS THE URL PARAMETERS TO JAVASCRIPT VARIABLES
+var assign = turkGetParam('assignmentId');
+var hit = turkGetParam('hitId');
+var worker = turkGetParam('workerId');
+var test_url = document.URL;
+
+document.getElementById('assignmentId').value=assign
+document.getElementById('workerId').value=worker
+document.getElementById('hitId').value=hit
   </script>
 
   </script><script src="{% static 'graph/user.js' %}"></script>
