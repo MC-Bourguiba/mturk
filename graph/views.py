@@ -1228,6 +1228,9 @@ def waiting_room(request):
     response['time_countdown'] = cache.get('waiting_time')
     response['started_game'] = user.player.game.started
     if no_more_games_left():
+        response['assignmentId']=user.player.assignmentId
+        response['workerId']=user.player.workerId
+        response['hitId']=user.player.hitId
         html = render_to_string('graph/end_game.djhtml', response)
     elif use_intermediate_room:
         html = render_to_string('graph/intermediate_room.djhtml', response)
