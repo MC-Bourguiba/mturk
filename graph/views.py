@@ -171,7 +171,7 @@ def create_account(request):
             game = Game.objects.get(name=current_game)
 
             if create_new_player(new_user, game, 'superuser' in request.POST.dict(), request.POST['assignmentId'],request.POST['workerId'],  request.POST['hitId']):
-                return HttpResponseRedirect('/graph/index')
+                return HttpResponseRedirect('/accounts/login/')
             else:
                 pass
                 # TODO: Return empty page here
