@@ -3,6 +3,7 @@
 
 {% block tabcontent %}
 <div role="tabpanel" class="tab-pane active" id="login">
+  <h3 style="text-align:center;color:#B93A32">Please make sure to accept the hit and to create an account before doing anything else in order to get paid</h3>
   <form action="" method="post">
     {{ form|bootstrap }} {% csrf_token %}
     <input type="hidden" id="assignmentId"  name="assignmentId"/>
@@ -11,6 +12,156 @@
     <input type="submit" class="btn btn-primary" value="Create account" />
 
   </form>
+
+</div>
+
+<h2>I. Introduction</h2>
+
+<p>
+The game simulates a routing network, in which different players use the same network to send traffic.
+This can model drivers commuting on a road network, or Internet Service Providers sending traffic on the internet.
+</p>
+
+<p>
+As a player, you will have a given source and a given destination on the network.
+You are tasked with sending traffic between these two nodes, so as to minimize the latency of your traffic.
+A certain number of routes is available to connect your source and your destination.
+The game is played in rounds, and at each round, you will choose how much traffic to allocate to each route.
+At the end of the round, you will observe the latency of each route, and you can use this information to change the allocation on future rounds.
+</p>
+
+<p>
+An important fact is that the decision of other players may affect the latency of your own routes:
+Routes that have more traffic will be more congested, thus have more latency. However, you will not directly observe the decisions of other players,
+you only observe the latency of your routes.
+</p>
+
+<p>
+The goal of the experiment is two-fold:
+</p>
+<p>
+(i) We will evaluate the capacity of humans to reach an equilibrium in a distributed environment (that is, without observing the decisions of other players). An equilibrium is a situation in which each player is no longer able to reduce his/her latency, assuming all other players do not change their decisions.
+</p>
+<p>
+(ii) We will study the decision-making process of the players, and develop a mathematical model of it, in order to understand how humans adapt their decisions to a changing environment.
+</p>
+
+
+<h2>II. Phases of the experiment</h2>
+
+<p>
+The experiment will be organized in two phases.
+</p>
+<p>
+1) In the first phase, each player will play a separate game. The task is successfully completed if the player reaches an equilibrium at the end of the game. Upon successful completion, the player is offered the possibility to participate in phase 2,
+and will be asked to provide a valid email address to be contacted with further details.
+</p>
+<p>
+2) In the second phase, all the successful players of phase 1 will be invited to participate, simultaneously, in a series of games. Each game will have all players
+</p>
+
+<h2>III. Playing the game</h2>
+
+<p>
+1) Please make sure to accept the hit by pressing ...
+<br></br>
+<img style=" text-align: center;
+    style="
+    height: auto;
+    width: auto;
+    max-width: 300px;
+    max-height: 300px; src="../../../static/media/hit.png">
+</p>
+</p>
+
+<p>
+2) You need to register a new account with a username and a password.
+<p >
+<br></br>
+<img style=" text-align: center;
+    style="
+    height: auto;
+    width: auto;
+    max-width: 300px;
+    max-height: 300px; src="../../../static/media/register.png">
+</p>
+</p>
+<br></br>
+<p>
+3) Once you are logged-in, you will reach a waiting room, which will indicate how much time is left until the next game starts.
+<p >
+<br></br>
+<img style=" text-align: center;
+    style="
+    height: auto;
+    width: auto;
+    max-width: 300px;
+    max-height: 300px; src="../../../static/media/waiting.png">
+</p>
+</p>
+<br></br>
+<p>
+4) Once the game starts, you will see an interface that looks similar to the screenshot below.
+<p>
+<p >
+<br></br>
+<img style=" text-align: center;
+    style="
+    height: auto;
+    width: auto;
+    max-width: 300px;
+    max-height: 300px; src="../../../static/media/game.png">
+</p>
+</p>
+<br></br>
+
+<p>
+The graph on the left shows the network.
+</p>
+
+<p>
+The rows of the table correspond to the different routes that are available to you. When you click one route, it will be highlighted on the graph.
+</p>
+
+<p>
+You can allocate your traffic by moving the sliders in the table. The proportion of traffic on each route corresponds to the value of its slider divided by the sum of all sliders (in other words, the slider values are normalized).
+</p>
+
+<p>
+The timer at the top of the page shows how much time is left until the end of the round, and how many rounds are left until the end of the game.
+</p>
+<p>
+At the end of the round, the latencies of each route are computed by our server (given the decision of each player), and this information is displayed in the table, and on the graphs.
+</p>
+<p>
+The graphs show the history of your decisions (your allocations), and the history of the latencies of each route.
+</p>
+<p>
+5) When the game ends, you will see an interface similar to the following, where you can send us feedback, and submit the HIT for review.
+<br></br>
+<img style=" text-align: center;
+    style="
+    height: auto;
+    width: auto;
+    max-width: 300px;
+    max-height: 300px; src="../../../static/media/feedback.png">
+</p>
+<h2>IV. Terms of Use</h2>
+<p>
+We will keep your decisions during the game in our database
+</p>
+<p>
+We will ask you for your email if you want to take part in our next experiments
+</p>
+<p>
+Your email will not be shared with any other third party
+</p>
+<p>
+Once the research is over we will delete all the database
+</p>
+<a href="#0" class="cd-top cd-is-visible">Top</a>
+
+  </div>
 </div>
 {% endblock %}
 
@@ -19,6 +170,15 @@
 window.onload=function () {
     $('#register-tab').addClass('active');
 };
+</script>
+<script>
+$(document).ready(function() {
+    var f = document.getElementById('paid');
+    setInterval(function() {
+        f.style.display = (f.style.display == 'none' ? '' : 'none');
+    }, 2000);
+
+});
 </script>
 <script>
 $( document ).ready(function() {

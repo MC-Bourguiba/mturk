@@ -12,6 +12,8 @@
           rel="stylesheet" media="screen">
     <link href="{% static 'bootstrap/css/jumbotron.css' %}" rel="stylesheet">
     <link href="{% static 'graph/app.css' %}" rel="stylesheet">
+    <link href="{% static 'graph/css/reset.css' %}" rel="stylesheet">
+    <link href="{% static 'graph/css/style.css' %}" rel="stylesheet">
     <link href="{% static 'slider/bootstrap-slider.css' %}" rel="stylesheet">
     <link href="{% static 'bootstrap-switch/bootstrap-switch.css' %}" rel="stylesheet">
     <link href="{% static 'c3/c3.css' %}" rel="stylesheet">
@@ -49,6 +51,8 @@
   <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
   <script src="{% static 'slider/bootstrap-slider.js' %}"></script>
   <script src="{% static 'graph/ui.js' %}"></script>
+  <script src="{% static 'graph/js/main.js' %}"></script>
+  <script src="{% static 'graph/js/modernizr.js' %}"></script>
   <script src="{% static 'bootstrap-switch/bootstrap-switch.js' %}"></script>
   <script src="{% static 'graph/common.js' %}"></script>
   {% block scripts %}
