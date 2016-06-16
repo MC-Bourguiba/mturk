@@ -81,7 +81,7 @@ class CustomUserForm(UserCreationForm):
      password2 = forms.CharField(label=_("Password confirmation"),
         widget=forms.PasswordInput,
         help_text=_("Enter the same password as above, for verification."))
-     accept = forms.BooleanField(label=_("I accept terms of use"), help_text=_("you must accept the terms of use in order to participate in the experiment "),initial=False, required=True)
+     accept = forms.BooleanField(label=_("I accept terms of use"), help_text=_("you must accept the terms of use in order to participate in the experiment (at the bottom of this page)."),initial=False, required=True)
      class Meta:
         model = User
         fields = ("username",)
