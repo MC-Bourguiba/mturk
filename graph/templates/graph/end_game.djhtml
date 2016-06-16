@@ -18,8 +18,8 @@
 <form method="post" action="https://workersandbox.mturk.com/mturk/externalSubmit">
     <input type="hidden" id="assignmentId"  name="assignmentId" value="{{ assignmentId}}"/>
 
-    <input type="hidden" id="workerId"  name="workerId" value="{{ workerId}}"/}>
-    <input type="hidden" id="hitId" name="hitId" value="{{ hitId}}"/>
+    <input type="hidden" id="workerId"  name="workerId" value="{{ workerId}}"/>
+    <input type="hidden" id="hitId" name="hitId" value={{ hitId}}/>
     {% if approve %}
     <h4> If you want to be part of our next experience please enter your email </h4>
     <input type="email"  id="email" name="email" placeholder = "email"/>
@@ -38,33 +38,4 @@
 </div>
 </div>
 {% block scripts %}
-<script>
-
-
-$( document ).ready(function() {
-function turkGetParam( name ) {
-    var regexS = "[\?&]"+name+"=([^&#]*)";
-    var regex = new RegExp( regexS );
-    var tmpURL = document.URL;
-
-    var results = regex.exec( tmpURL );
-    if( results == null ) {
-        return "";
-    } else {
-        return results[1];
-    }
-}
-
-// ASSIGNS THE URL PARAMETERS TO JAVASCRIPT VARIABLES
-var assign = turkGetParam('assignmentId');
-var hit = turkGetParam('hitId');
-var worker = turkGetParam('workerId');
-var test_url = document.URL;
-
-document.getElementById('assignmentId').value=assign;
-document.getElementById('workerId').value=worker ;
-document.getElementById('hitId').value=hit ;
-console.log("mturk_2");
-});
-</script>
 {% endblock %}
