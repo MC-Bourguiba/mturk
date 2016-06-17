@@ -256,7 +256,7 @@ CONFIG_DEFAULTS = {
 
 }
 def show_toolbar(request):
-    return True
+    return request.user.is_staff
 
 DEBUG_TOOLBAR_CONFIG = {
     # ...
