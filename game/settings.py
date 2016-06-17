@@ -14,7 +14,7 @@ import dj_database_url
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
-STATIC_ROOT = os.path.join(PROJECT_PATH, 'static')
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -260,7 +260,7 @@ def show_toolbar(request):
 
 DEBUG_TOOLBAR_CONFIG = {
     # ...
-    'SHOW_TOOLBAR_CALLBACK': 'project.settings.show_toolbar',
+    'SHOW_TOOLBAR_CALLBACK': 'game.settings.show_toolbar',
 }
 
 
