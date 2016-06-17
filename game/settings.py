@@ -255,6 +255,10 @@ CONFIG_DEFAULTS = {
     'SHOW_COLLAPSED': True,
 
 }
+DEBUG_TOOLBAR_CONFIG = {
+    # ...
+    'SHOW_TOOLBAR_CALLBACK': True,
+}
 
 
 
