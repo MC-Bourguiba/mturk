@@ -37,7 +37,7 @@ ipdb==0.8
 ipython==2.4.0
 ipython-genutils==0.1.0
 Jinja2==2.7.3
-kombu==3.0.26
+kombu==3.0.30
 lxml==3.4.2
 Markdown==2.6
 MarkupSafe==0.23
