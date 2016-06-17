@@ -1,7 +1,7 @@
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.conf.urls import patterns, url, include
 from django.contrib.auth.views import login, logout
-
+from django.conf import settings
 
 from graph import views
 
@@ -84,3 +84,9 @@ urlpatterns = patterns('',
                        url(r'^check_connection/$', views.check_for_connection_loss, name='check_connection'),
                        # url(r'^get_duration/$', view.get_duration, name='get_duration'),
 )
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += patterns('',
+        url(r'^debug/', include(debug_toolbar.urls)),
+    )

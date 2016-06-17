@@ -14,6 +14,7 @@ import dj_database_url
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
+STATIC_ROOT = os.path.join(PROJECT_PATH, 'static')
 
 
 # Quick-start development settings - unsuitable for production
@@ -46,6 +47,8 @@ INSTALLED_APPS = (
     'graph',
     'silk',
     'django_shell_ipynb',
+    'debug_toolbar',
+     'debug_panel',
     # 'bootstrap3',
 )
 
@@ -56,6 +59,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'debug_panel.middleware.DebugPanelMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 'silk.middleware.SilkyMiddleware',
@@ -67,6 +71,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'CONN_MAX_AGE': 600,
     }
 }
 DATABASES['default'] =  dj_database_url.config()
@@ -108,7 +113,12 @@ STATICFILES_DIRS = (
 
 
 APPEND_SLASH = True
-
+TEMPLATE_LOADERS = (
+    ('django.template.loaders.cached.Loader', (
+        'django.template.loaders.filesystem.Loader',
+        'django.template.loaders.app_directories.Loader',
+    )),
+)
 
 
 
@@ -229,10 +239,22 @@ CACHES = {
         #     }
         # },
     },
+    'debug-panel': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp/debug-panel-cache',
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000
+        }
+    },
 }
 
 
+CONFIG_DEFAULTS = {
+    # Toolbar options
+    'RESULTS_CACHE_SIZE': 1000,
+    'SHOW_COLLAPSED': True,
 
+}
 
 
 

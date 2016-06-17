@@ -6,6 +6,7 @@ admin.autodiscover()
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 
+
 urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'game.views.home', name='home'),
@@ -19,6 +20,7 @@ urlpatterns = patterns('',
     # url(r'^admin/', include(admin.site.urls)),
     # url(r'^admin/', include(admin.site.urls)),
 )
+
 
 urlpatterns += patterns('', url(r'^silk/', include('silk.urls', namespace='silk')))
 
