@@ -4,7 +4,7 @@ from datetime import datetime
 
 from .models import *
 from .utils import *
-from .game_functions import *
+
 import os
 
 from celery import shared_task
@@ -23,7 +23,7 @@ def game_force_next(game_name):
 
     if game.stopped:
         return
-    
+    from .game_functions import iterate_next_turn
     iterate_next_turn(game)
 
     game.game_loop_time = datetime.now()
