@@ -626,7 +626,7 @@ def add_game(request):
 @login_required
 def get_previous_cost(request, username):
     import time
-    t1  = int(round(time.time() * 1000))
+
     user = User.objects.get(username=username)
     game = user.player.game
     iteration = int(request.GET.dict()['iteration'])
@@ -641,7 +641,7 @@ def get_previous_cost(request, username):
     previous_costs = dict()
     previous_turn_flows = dict()
     previous_turn_costs = dict()
-
+    number_pm = Player.objects.filter(player_model= player.player_model).count()
 
     for idx, p_id in zip(path_idxs, path_ids):
         path = Path.objects.get(id=p_id)
@@ -650,7 +650,9 @@ def get_previous_cost(request, username):
 
         for turn in game.turns.filter(iteration__gte=iteration-1):
             cache_key_t_cost = str(turn.iteration) + game.name + "get_previous_cost" + username + "t_cost"+str(idx)
-            cache_key_flow = str(turn.iteration) + game.name + "get_previous_cost" + username + "flow"+str(idx)
+            cache_key_flow = str(turn.iteration) + game.name + "get_previous_flow" + username + "flow"+str(idx)
+            cache_key_total = str(turn.iteration) + game.name + "get_previous_total" + username + "total"+str(idx)
+
             if idx not in previous_costs:
                 previous_costs[idx] = []
             if cache.get(cache_key_t_cost):
@@ -674,6 +676,14 @@ def get_previous_cost(request, username):
                 flow = flow_distribution.path_assignments.get(path=path).flow
                 cache.set(cache_key_flow,flow)
             previous_flows[idx].append(flow)
+            cache.set(cache_key_total,t_cost*flow*Player.objects.filter(player_model= player.player_model).count()/player.player_model.normalization_const)
+        t1  = int(round(time.time() * 1000))
+        for t in range(game.current_turn.iteration):
+            if t not in total_cost:
+                total_cost[t]=0
+            key = str(t) + game.name + "get_previous_total" + username + "total"+str(idx)
+            total_cost[t]+=cache.get(key)
+        t2=  int(round(time.time() * 1000))
 
     """        
     for turn in game.turns.filter(iteration__gte=-1):
@@ -700,13 +710,13 @@ def get_previous_cost(request, username):
     """
 
     response = dict()
-    response['number_pm'] = Player.objects.filter(player_model= player.player_model).count()
+    response['number_pm'] = number_pm
     response['path_ids'] = path_ids
     response['paths'] = paths
     response['previous_costs'] = previous_costs
     response['previous_flows'] = previous_flows
     response['total_cost']=total_cost
-    t2=  int(round(time.time() * 1000))
+
     response['durantion']=t2-t1
     response['mesure']=cache.get("time_mesure")
     response['cache']=cache.get(costs_cache_key)
