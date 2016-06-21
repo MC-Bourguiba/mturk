@@ -13,7 +13,6 @@ import logging
 logger = logging.getLogger(__name__)
 max_turn = 2
 import time
-
 def create_new_player(user, game, superuser,assignmentId,workerId,hitId):
     success = False
     graph = game.graph
@@ -35,9 +34,10 @@ def create_new_player(user, game, superuser,assignmentId,workerId,hitId):
 
 
 def iterate_next_turn(game):
-
-
+    t1  = int(round(time.time() * 1000))
     update_cost(game)
+    t2=  int(round(time.time() * 1000))
+    logger.debug("update_cost_duration: "+str(t2-t1))
     game.turns.add(game.current_turn)
     next_turn = GameTurn(game_object=game)
     next_turn.iteration = game.current_turn.iteration + 1
@@ -47,17 +47,20 @@ def iterate_next_turn(game):
     game.save()
 
 
-
+    t1=  int(round(time.time() * 1000))
     for player in Player.objects.filter(is_a_bot = True,superuser=False,game=game):
          user = player.user
          allocation , path_ids = ai_play_server(user)
          ##logger.debug(allocation)
-
          cache.set(get_hash(user.username) + 'allocation', allocation)
          cache.set(get_hash(user.username) + 'path_ids', path_ids)
+    t2=  int(round(time.time() * 1000))
+    logger.debug("ai_duration: "+str(t2-t1))
     logger.debug('##########iteration : '+str(game.current_turn.iteration)+'#############')
-    saving_learning_rate(game)
-
+    t1=  int(round(time.time() * 1000))
+    #saving_learning_rate(game)
+    t2=  int(round(time.time() * 1000))
+    logger.debug("lr_duration: "+str(t2-t1))
 # Lock to protect against race condition using Redis.
 # TODO: Make this cleaner?
 def create_flow_distribution(game, player, allocation, path_ids, turn):
@@ -155,12 +158,14 @@ def calculate_edge_flow(current_turn, game, use_cache=True):
             if current_turn.iteration == 0:
                 # If we are at the start, just use the default flow_distribution
                 # Must have been instiated!!!
-                flow_distribution = FlowDistribution.objects.get(turn=current_turn,game=game, player=player)
+                flow_distribution = FlowDistribution.objects.filter(turn=current_turn,game=game, player=player)[0]
+                flow_distribution.save()
             else:
                 prev_iteration = current_turn.iteration - 1
 
                 # This should not fail!!!
-                flow_distribution = FlowDistribution.objects.get(turn__iteration=prev_iteration,game=game,player=player)
+                flow_distribution = FlowDistribution.objects.filter(turn__iteration=prev_iteration,game=game,player=player)[0]
+                flow_distribution.save()
 
             for pfa in flow_distribution.path_assignments.all():
                 path_ids.append(pfa.path.id)

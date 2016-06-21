@@ -147,6 +147,7 @@ function submit_distribution(update_state) {
             "username" : get_username(),
             "allocation" : allocation,
             "ids" : paths,
+            "countdown":document.getElementById("time_countdown").innerHTML,
         }),
 
         success : function(json) {
@@ -173,15 +174,19 @@ graph_window.onload = function() {
 
 
 function post_temporary_distribution_loop() {
-    setTimeout(post_temporary_distribution_loop, 1000); // Update every second.
+    setTimeout(post_temporary_distribution_loop, 500); // Update every second.
+
     submit_distribution(true);
+
+
+
 
 
 
 }
 
 function start_heartbeat_loop() {
-    setTimeout(start_heartbeat_loop, 5000); // Update every second.
+    setTimeout(start_heartbeat_loop, 10000); // Update every second.
 
     heartbeat_loop();
 
@@ -220,10 +225,10 @@ $(document).ready(function() {
     console.log($("#bot-hidden")[0].value);
 
     update_from_state(get_username());
-    setTimeout(post_temporary_distribution_loop, 5000); // Some timing bug here! Should not have to wait 5s to post distribution!
+    setTimeout(post_temporary_distribution_loop, 1000); // Some timing bug here! Should not have to wait 5s to post distribution!
     display = $('#time_countdown');
     // startTimer(duration, display);
-   setTimeout(start_heartbeat_loop, 5000);
+   start_heartbeat_loop();
 
 });
 

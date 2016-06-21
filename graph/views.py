@@ -625,10 +625,13 @@ def add_game(request):
   
 @login_required
 def get_previous_cost(request, username):
+    import time
+    t1  = int(round(time.time() * 1000))
     user = User.objects.get(username=username)
     game = user.player.game
     iteration = int(request.GET.dict()['iteration'])
     player = Player.objects.get(user__username=username)
+    costs_cache_key = get_hash(game.pk) + 'iteration %d' % game.current_turn.iteration
     path_ids = list(Path.objects.filter(player_model=player.player_model).values_list('id', flat=True))
     path_idxs = range(len(path_ids))
     total_cost = dict()
@@ -644,22 +647,35 @@ def get_previous_cost(request, username):
         path = Path.objects.get(id=p_id)
         paths[idx] = list(path.edges.values_list('edge_id', flat=True))
 
-        for turn in game.turns.filter(iteration__gte=iteration-1):
 
-            e_costs = turn.graph_cost.edge_costs
-            t_cost = 0
-            flow_distribution = FlowDistribution.objects.get(turn=turn, player=player,game=game)
-            flow = flow_distribution.path_assignments.get(path=path).flow
-            for e in path.edges.all():
-                t_cost += e_costs.get(edge=e).cost
+        for turn in game.turns.filter(iteration__gte=iteration-1):
+            cache_key_t_cost = str(turn.iteration) + game.name + "get_previous_cost" + username + "t_cost"+str(idx)
+            cache_key_flow = str(turn.iteration) + game.name + "get_previous_cost" + username + "flow"+str(idx)
             if idx not in previous_costs:
                 previous_costs[idx] = []
+            if cache.get(cache_key_t_cost):
+                logger.debug("do you even cache broooooooo cost ?")
+                t_cost=cache.get(cache_key_t_cost)
+            else:
+                e_costs = turn.graph_cost.edge_costs
+                t_cost = 0
+                for e in path.edges.all():
+                    t_cost += e_costs.get(edge=e).cost
+                cache.set(cache_key_t_cost,t_cost)
             previous_costs[idx].append(t_cost)
             if idx not in previous_flows:
                 previous_flows[idx] = []
+
+            if cache.get(cache_key_flow):
+                logger.debug("do you even cache broooooooo flow ?")
+                flow= cache.get(cache_key_flow)
+            else:
+                flow_distribution = FlowDistribution.objects.get(turn=turn, player=player,game=game)
+                flow = flow_distribution.path_assignments.get(path=path).flow
+                cache.set(cache_key_flow,flow)
             previous_flows[idx].append(flow)
 
-
+    """        
     for turn in game.turns.filter(iteration__gte=-1):
         for idx, p_id in zip(path_idxs, path_ids):
             path = Path.objects.get(id=p_id)
@@ -681,6 +697,7 @@ def get_previous_cost(request, username):
             if turn.iteration not in total_cost:
                 total_cost[turn.iteration]=0
             total_cost[turn.iteration]+=total_cost_value
+    """
 
     response = dict()
     response['number_pm'] = Player.objects.filter(player_model= player.player_model).count()
@@ -689,6 +706,10 @@ def get_previous_cost(request, username):
     response['previous_costs'] = previous_costs
     response['previous_flows'] = previous_flows
     response['total_cost']=total_cost
+    t2=  int(round(time.time() * 1000))
+    response['durantion']=t2-t1
+    response['mesure']=cache.get("time_mesure")
+    response['cache']=cache.get(costs_cache_key)
     return JsonResponse(response)
 
 
@@ -994,6 +1015,7 @@ def submit_distribution(request):
 
     data = json.loads(request.body)
     user = User.objects.get(username=data['username'])
+
 
     allocation = data['allocation']
     path_ids = data['ids']

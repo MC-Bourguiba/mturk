@@ -16,6 +16,7 @@ from views import *
 
 def get_previous_cost_server_side(user):
     game = user.player.game
+    username=user.username
     iteration = game.current_turn.iteration
     #logger.debug("test user :  "+str(user))
     player = Player.objects.get(user__username=user.username)
@@ -34,18 +35,28 @@ def get_previous_cost_server_side(user):
 
 
         for turn in game.turns.filter(iteration=iteration-1):
-
-            e_costs = turn.graph_cost.edge_costs
-            t_cost = 0
-            flow_distribution = FlowDistribution.objects.get(turn=turn, player=player,game=game)
-            flow = flow_distribution.path_assignments.get(path=path).flow
-            for e in path.edges.all():
-                t_cost += e_costs.get(edge=e).cost
+            cache_key_t_cost = str(turn.iteration) + game.name + "get_previous_cost" + username + "t_cost"+str(idx)
+            cache_key_flow = str(turn.iteration) + game.name + "get_previous_cost" + username + "flow"+str(idx)
             if idx not in previous_costs:
                 previous_costs[idx] = []
+            if cache.get(cache_key_t_cost):
+                t_cost=cache.get(cache_key_t_cost)
+            else:
+                e_costs = turn.graph_cost.edge_costs
+                t_cost = 0
+                for e in path.edges.all():
+                    t_cost += e_costs.get(edge=e).cost
+                cache.set(cache_key_t_cost,t_cost)
             previous_costs[idx].append(t_cost)
             if idx not in previous_flows:
                 previous_flows[idx] = []
+
+            if cache.get(cache_key_flow):
+                flow= cache.get(cache_key_flow)
+            else:
+                flow_distribution = FlowDistribution.objects.get(turn=turn, player=player,game=game)
+                flow = flow_distribution.path_assignments.get(path=path).flow
+                cache.set(cache_key_flow,flow)
             previous_flows[idx].append(flow)
 
     response = dict()
