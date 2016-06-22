@@ -7,7 +7,7 @@
 {% if approve %}
 <h4>Thanks for working on this task! You performed well!</h4>
 {% else %}
-<h4>Thanks forworking on this task!</h4>
+<h4>Thanks for working on this task!</h4>
 {% endif %}
 <div type="hidden">
 <form type ="hidden" method="post" action="https://workersandbox.mturk.com/mturk/externalSubmit">
