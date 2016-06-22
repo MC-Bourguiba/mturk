@@ -50,6 +50,7 @@ def iterate_next_turn(game):
     t1=  int(round(time.time() * 1000))
     for player in Player.objects.filter(is_a_bot = True,superuser=False,game=game):
          user = player.user
+         logger.debug("user :  "+str(user))
          allocation , path_ids = ai_play_server(user)
          ##logger.debug(allocation)
          cache.set(get_hash(user.username) + 'allocation', allocation)
