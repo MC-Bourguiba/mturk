@@ -15,10 +15,12 @@ import time
 
 
 player_timeout = 10
-
+#check max_iteration in views.py as well
+max_iteration = 25
 
 @shared_task
 def game_force_next(game_name):
+    global max_iteration
     game = Game.objects.get(name=game_name)
 
     if game.stopped:
@@ -28,7 +30,7 @@ def game_force_next(game_name):
 
     game.game_loop_time = datetime.now()
     game.save()
-    if game.current_turn.iteration == 100 and game.started and not(game.stopped):
+    if game.current_turn.iteration == max_iteration and game.started and not(game.stopped):
             from graph.pm_pool import switch_game,assign_user_to_player_model
             from graph.views import  set_waiting_time_server, last_game
             if not(last_game()):

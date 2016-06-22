@@ -55,7 +55,7 @@ epsilon = 1E-10
 current_game_stopped = False
 waiting_time = 20
 intermediate_waiting_time =10
-max_iteration = 15
+max_iteration = 25
 cache.set('current_game_stopped ',False)
 cache.set('end_game',False)
 use_intermediate_room = False
