@@ -631,13 +631,10 @@ def get_previous_cost(request, username):
     game = user.player.game
     iteration = int(request.GET.dict()['iteration'])
     player = Player.objects.get(user__username=username)
-    cache_key_paths_ids = str(game)+str(game)+"paths_id"
-    if(not(cache.get(cache_key_paths_ids))):
-        path_ids = list(Path.objects.filter(player_model=player.player_model).values_list('id', flat=True))
-        cache.set(cache_key_paths_ids,path_ids)
-    else:
-        logger.debug("use cache for paths")
-        path_ids=cache.get(cache_key_paths_ids)
+
+    path_ids = list(Path.objects.filter(player_model=player.player_model).values_list('id', flat=True))
+
+
 
     path_idxs = range(len(path_ids))
     total_cost = dict()
