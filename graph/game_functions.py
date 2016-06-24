@@ -50,11 +50,10 @@ def iterate_next_turn(game):
     t1=  int(round(time.time() * 1000))
     for player in Player.objects.filter(is_a_bot = True,superuser=False,game=game):
          user = player.user
-         logger.debug("user :  "+str(user))
          allocation , path_ids = ai_play_server(user)
-         ##logger.debug(allocation)
-         cache.set(get_hash(user.username) + 'allocation', allocation)
-         cache.set(get_hash(user.username) + 'path_ids', path_ids)
+
+         cache.set(get_hash(player.user.username) + 'allocation', allocation)
+         cache.set(get_hash(player.user.username) + 'path_ids', path_ids)
     t2=  int(round(time.time() * 1000))
     logger.debug("ai_duration: "+str(t2-t1))
     logger.debug('##########iteration : '+str(game.current_turn.iteration)+'#############')
@@ -73,8 +72,12 @@ def create_flow_distribution(game, player, allocation, path_ids, turn):
     # FlowDistribution.objects.filter(username=username, turn=turn).delete()
     #logger.debug("test create flow distribution player :"+ str(player))
     # logger.debug("test create flow distribution turn :"+ str(turn))
-
-    num_player_model = Player.objects.filter(player_model = player.player_model).count()
+    cache_key_pm_number= str(game)+str(player)
+    if(not(cache.get(cache_key_pm_number))):
+        num_player_model = Player.objects.filter(player_model = player.player_model).count()
+        cache.set(cache_key_pm_number,num_player_model)
+    else:
+        num_player_model=cache.get(cache_key_pm_number)
 
     flow_distribution, created = FlowDistribution.objects.get_or_create(turn=turn, player=player,game=game)
     flow_distribution.path_assignments.clear()
@@ -154,7 +157,7 @@ def calculate_edge_flow(current_turn, game, use_cache=True):
 
         else:
             flow_distribution = None
-
+            logger.debug("not using cache : "+str(player))
             # Else copy from previous iteration.
             if current_turn.iteration == 0:
                 # If we are at the start, just use the default flow_distribution
