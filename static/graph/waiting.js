@@ -93,7 +93,7 @@ function heartbeat_loop() {
 }
 
 function start_heartbeat_loop() {
-    setTimeout(start_heartbeat_loop, 5000); // Update every second.
+    setTimeout(start_heartbeat_loop, 1000); // Update every second.
     heartbeat_loop();
 
 
