@@ -34,7 +34,7 @@ function sameOrigin(url) {
 
 $(document).ready(function() {
 setInterval(get_countdown ,1000);
-setInterval(heartbeat_loop,1000);
+start_heartbeat_loop();
 });
 
 function get_username() {
@@ -93,7 +93,7 @@ function heartbeat_loop() {
 }
 
 function start_heartbeat_loop() {
-    setTimeout(start_heartbeat_loop, 1000); // Update every second.
+    setTimeout(start_heartbeat_loop, 5000); // Update every second.
     heartbeat_loop();
 
 

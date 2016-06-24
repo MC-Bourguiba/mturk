@@ -18,9 +18,7 @@ def get_previous_cost_server_side(user):
     game = user.player.game
     username=user.username
     iteration = game.current_turn.iteration
-    #logger.debug("test user :  "+str(user))
     player = Player.objects.get(user__username=user.username)
-    #logger.debug("test :  "+str(player.player_model))
     path_ids = list(Path.objects.filter(player_model=player.player_model).values_list('id', flat=True))
     path_idxs = range(len(path_ids))
     paths = dict()
