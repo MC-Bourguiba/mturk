@@ -52,8 +52,8 @@ def get_previous_cost_server_side(user):
             if cache.get(cache_key_flow):
                 flow= cache.get(cache_key_flow)
             else:
-                flow_distribution = FlowDistribution.objects.get(turn=turn, player=player,game=game)
-                flow = flow_distribution.path_assignments.get(path=path).flow
+                flow_distribution = FlowDistribution.objects.filter(turn=turn, player=player,game=game)[0]
+                flow = flow_distribution.path_assignments.filter(path=path)[0].flow
                 cache.set(cache_key_flow,flow)
             previous_flows[idx].append(flow)
 

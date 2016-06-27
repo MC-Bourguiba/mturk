@@ -679,8 +679,8 @@ def get_previous_cost(request, username):
             if cache.get(cache_key_flow):
                 flow= cache.get(cache_key_flow)
             else:
-                flow_distribution = FlowDistribution.objects.get(turn=turn, player=player,game=game)
-                flow = flow_distribution.path_assignments.get(path=path).flow
+                flow_distribution = FlowDistribution.objects.filter(turn=turn, player=player,game=game)[0]
+                flow = flow_distribution.path_assignments.filter(path=path)[0].flow
                 cache.set(cache_key_flow,flow)
             previous_flows[idx].append(flow)
             cache.set(cache_key_total,t_cost*flow*number_pm/player.player_model.normalization_const)
@@ -1142,8 +1142,9 @@ def stop_game_server(game):
 
 
     response = dict()
-    switch_game()
-    assign_user_to_player_model()
+    if not (last_game()):
+        switch_game()
+        assign_user_to_player_model()
     response['use_intermediate'] = use_intermediate_room
     response['use_end'] = no_more_games_left()
 
