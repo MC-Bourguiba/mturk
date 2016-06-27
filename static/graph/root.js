@@ -1036,6 +1036,7 @@ function check_connection(){
         success : function(json) {
             console.log(json);
             console.log(json['graph']);
+            document.getElementById("wait").innerHTML=json['ping'];
 
         },
 

@@ -30,7 +30,7 @@ def game_force_next(game_name):
 
     game.game_loop_time = datetime.now()
     game.save()
-    if game.current_turn.iteration == 5 and game.started and not(game.stopped):
+    if game.current_turn.iteration == max_iteration and game.started and not(game.stopped):
             from graph.pm_pool import switch_game,assign_user_to_player_model
             from graph.views import  set_waiting_time_server, last_game
             if not(last_game()):
