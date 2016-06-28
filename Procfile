@@ -1,3 +1,3 @@
 web: gunicorn game.wsgi  -w 3 --log-file -
-web: newrelic-admin run-program gunicorn appname.wsgi
+data: newrelic-admin run-program gunicorn game.wsgi
 worker: celery -A game worker -l info
