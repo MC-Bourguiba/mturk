@@ -162,6 +162,7 @@ def calculate_edge_flow(current_turn, game, use_cache=True):
             if current_turn.iteration == 0:
                 # If we are at the start, just use the default flow_distribution
                 # Must have been instiated!!!
+                create_default_distribution(player.player_model,game,player)
                 flow_distribution = FlowDistribution.objects.filter(turn=current_turn,game=game, player=player)[0]
                 flow_distribution.save()
             else:

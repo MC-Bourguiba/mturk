@@ -1148,7 +1148,7 @@ def stop_game_server(game):
     response['use_intermediate'] = use_intermediate_room
     response['use_end'] = no_more_games_left()
 
-    return JsonResponse(response)
+    return response
 
 
   
