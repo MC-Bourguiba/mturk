@@ -79,6 +79,8 @@ def change_player(game_name):
 @shared_task
 def waiting_countdown_server():
     game = Game.objects.get(currently_in_use=True)
+    if game.started:
+        return
     val = int (cache.get("waiting_time"))
     val = val-1
     cache.set("waiting_time",val)
