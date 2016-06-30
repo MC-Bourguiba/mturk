@@ -108,6 +108,7 @@ class FlowDistribution(models.Model):
     player = models.ForeignKey('Player')
     turn = models.ForeignKey('GameTurn', blank=True, null=True)
     game= models.ForeignKey('Game', blank=True, null=True)
+    total_cost= models.FloatField(default=0.0)
 
     def __unicode__(self):
         return 'user: ' + str(self.player) + ' turn: ' + str(self.turn.iteration) + ' game: ' + str(self.game)
