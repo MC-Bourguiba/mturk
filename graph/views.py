@@ -681,13 +681,18 @@ def get_previous_cost(request, username):
                 flow = flow_distribution.path_assignments.filter(path=path)[0].flow
                 cache.set(cache_key_flow,flow)
             previous_flows[idx].append(flow)
-            cache.set(cache_key_total,t_cost*flow*number_pm/player.player_model.normalization_const)
+            cache.set(cache_key_total,t_cost*flow*number_pm)
 
         for t in range(game.current_turn.iteration):
             if t not in total_cost:
                 total_cost[t]=0
-            key = str(t) + game.name + "get_previous_total" + username + "total"+str(idx)
-            total_cost[t]+=cache.get(key)
+            if cache.get(cache_key_total):
+                total_cost[t]+=cache.get(cache_key_total)
+            else:
+                t_cost=cache.get(cache_key_t_cost)
+                flow= cache.get(cache_key_flow)
+                total_cost[t]+=t_cost*flow*number_pm
+
         t2=  int(round(time.time() * 1000))
 
 
