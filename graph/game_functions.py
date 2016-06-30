@@ -72,12 +72,9 @@ def create_flow_distribution(game, player, allocation, path_ids, turn):
     # FlowDistribution.objects.filter(username=username, turn=turn).delete()
     #logger.debug("test create flow distribution player :"+ str(player))
     # logger.debug("test create flow distribution turn :"+ str(turn))
-    cache_key_pm_number= str(game)+str(player)+"number_pm"
-    if(not(cache.get(cache_key_pm_number))):
-        num_player_model = Player.objects.filter(player_model = player.player_model).count()
-        cache.set(cache_key_pm_number,num_player_model)
-    else:
-        num_player_model=cache.get(cache_key_pm_number)
+
+    num_player_model = player.player_model.shared_players
+
 
     flow_distribution, created = FlowDistribution.objects.get_or_create(turn=turn, player=player,game=game)
     flow_distribution.path_assignments.clear()

@@ -174,7 +174,7 @@ graph_window.onload = function() {
 
 
 function post_temporary_distribution_loop() {
-    setTimeout(post_temporary_distribution_loop, 500); // Update every second.
+    setTimeout(post_temporary_distribution_loop, 1000); // Update every second.
 
     submit_distribution(true);
 
@@ -225,7 +225,7 @@ $(document).ready(function() {
     console.log($("#bot-hidden")[0].value);
 
     update_from_state(get_username());
-    setTimeout(post_temporary_distribution_loop, 1000); // Some timing bug here! Should not have to wait 5s to post distribution!
+    post_temporary_distribution_loop(); // Some timing bug here! Should not have to wait 5s to post distribution!
     display = $('#time_countdown');
     // startTimer(duration, display);
    start_heartbeat_loop();

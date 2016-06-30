@@ -29,6 +29,7 @@ class PlayerModel(models.Model):
     flow = models.FloatField(null=True, blank=True)
     in_use = models.BooleanField(default=False)
     normalization_const = models.FloatField(null=True, blank=True)
+    shared_players = models.IntegerField(default=0)
     historic_player= models.TextField(default='')
     def get_player(self):
         if hasattr(self, 'player'):
@@ -45,10 +46,8 @@ class PlayerModel(models.Model):
 class Player(models.Model):
     user = models.OneToOneField(User, null=True, blank=True)
     player_model = models.ForeignKey(PlayerModel, blank=True, null=True)
-    # completed_task = models.BooleanField(default=False)
     game = models.ForeignKey('Game', null=True, blank=True)
     is_a_bot = models.BooleanField(default=True)
-    # flow_distribution = models.ForeignKey('FlowDistribution', null=True, blank=True)
     superuser = models.BooleanField(default=False)
     workerId = models.TextField(null=True,blank=True)
     hitId= models.TextField(null=True,blank=True)

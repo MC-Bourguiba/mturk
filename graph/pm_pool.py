@@ -26,6 +26,7 @@ def assign_user_to_player_model():
             player.player_model = random.choice(pm_to_use)
             pm = player.player_model
             pm.in_use= True
+            pm.shared_players+=1
             pm.historic_player=str(pm.historic_player)+str(player)
             player.save()
             from game_functions import create_default_distribution

@@ -644,11 +644,9 @@ def get_previous_cost(request, username):
     previous_costs = dict()
     cache_key_pm_number= str(game)+str(player)+"number_pm"
 
-    if(not(cache.get(cache_key_pm_number))):
-        number_pm = Player.objects.filter(player_model = player.player_model).count()
-        cache.set(cache_key_pm_number,number_pm)
-    else:
-        number_pm=cache.get(cache_key_pm_number)
+
+    number_pm = player.player_model.shared_players
+
 
 
 
