@@ -695,7 +695,7 @@ def get_previous_cost(request, username):
             else:
                 path_flow_and_cost=PathTotalFlowAndCosts.objects.get(path=path,player=player,game__name=game.name,turn__iteration=turn)
                 total_cost[turn]+=path_flow_and_cost.flow*path_flow_and_cost.total_cost/player.player_model.normalization_const
-                cache.set(cache_key_total,path_flow_and_cost.flow*path_flow_and_cost.total_cost/player.player_model.normalization_const)
+                cache.set(cache_key_total,path_flow_and_cost.flow*path_flow_and_cost.total_cost*number_pm/player.player_model.normalization_const)
 
         t2=  int(round(time.time() * 1000))
 
