@@ -658,9 +658,7 @@ def get_previous_cost(request, username):
         for turn in game.turns.filter(iteration__gte=iteration-1):
             cache_key_t_cost = str(turn.iteration) + game.name + "get_previous_cost" + username + "t_cost"+str(idx)
             cache_key_flow = str(turn.iteration) + game.name + "get_previous_flow" + username + "flow"+str(idx)
-
-            flow_distribution = FlowDistribution.objects.filter(turn=turn, player=player,game=game)[0]
-
+            cache_key_total = str(turn.iteration) + game.name + "get_previous_total" + username + "total"+str(idx)
 
             if idx not in previous_costs:
                 previous_costs[idx] = []
@@ -679,22 +677,25 @@ def get_previous_cost(request, username):
             if cache.get(cache_key_flow):
                 flow= cache.get(cache_key_flow)
             else:
-
+                flow_distribution = FlowDistribution.objects.filter(turn=turn, player=player,game=game)[0]
                 flow = flow_distribution.path_assignments.filter(path=path)[0].flow
                 cache.set(cache_key_flow,flow)
             previous_flows[idx].append(flow)
-            flow_distribution.total_cost+=t_cost*flow*number_pm
-            flow_distribution.save()
-
-
-    for t in range(game.current_turn.iteration):
-        cache_key_total = str(t) + game.name + "get_previous_total" + username + "total"
-        if cache.get(cache_key_total):
-            total_cost[t]=cache.get(cache_key_total)
-        else:
-            flow_distribution = FlowDistribution.objects.filter(turn__iteration=t, player=player,game=game)[0]
-            total_cost[t]=flow_distribution.total_cost
-            cache.set(cache_key_total,flow_distribution.total_cost)
+            if(PathTotalFlowAndCosts.objects.filter(path=path,player=player,game=game,turn=turn).count()==0):
+                path_cost_and_flow_per_player_and_iteration = PathTotalFlowAndCosts(path=path,player=player,game=game,turn=turn,flow=flow,total_cost=t_cost)
+                path_cost_and_flow_per_player_and_iteration.save()
+            cache.set(cache_key_total,t_cost*flow*number_pm/player.player_model.normalization_const)
+        t3  = int(round(time.time() * 1000))
+        for turn in range(game.current_turn.iteration):
+            cache_key_total = str(turn) + game.name + "get_previous_total" + username + "total"+str(idx)
+            if turn not in total_cost:
+                total_cost[turn]=0
+            if cache.get(cache_key_total):
+                total_cost[turn]+=cache.get(cache_key_total)
+            else:
+                path_flow_and_cost=PathTotalFlowAndCosts.objects.get(path=path,player=player,game__name=game.name,turn__iteration=turn)
+                total_cost[turn]+=path_flow_and_cost.flow*path_flow_and_cost.total_cost/player.player_model.normalization_const
+                cache.set(cache_key_total,path_flow_and_cost.flow*path_flow_and_cost.total_cost/player.player_model.normalization_const)
 
         t2=  int(round(time.time() * 1000))
 
@@ -708,6 +709,7 @@ def get_previous_cost(request, username):
     response['previous_flows'] = previous_flows
     response['total_cost']=total_cost
     response['duration']=t2-t1
+    response['total_duration']=t2-t3
     logger.debug("get_previous_cost "+str(player)+"for iteration "+str(iteration)+" : "+str(t2-t1))
     return JsonResponse(response)
 
