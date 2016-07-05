@@ -31,7 +31,7 @@
           <span class="icon-bar"></span>
         </button>
       </div>
-      <a class="navbar-brand" href="{% url 'graph' %}">Routing game</a>
+      <a class="navbar-brand" style="font-size: 20px;" href="{% url 'graph' %}">Routing game</a>
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav navbar-right">
           {% block navbar_extra_buttons %}

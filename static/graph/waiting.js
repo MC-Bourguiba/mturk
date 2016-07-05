@@ -35,6 +35,7 @@ function sameOrigin(url) {
 $(document).ready(function() {
 setInterval(get_countdown ,1000);
 start_heartbeat_loop();
+document.getElementById("wait").style.fontSize = "20px";
 });
 
 function get_username() {
@@ -60,6 +61,10 @@ $.ajax({
             }
             else if(json['countdown']>=0){
             console.log("countdown");
+
+            if(json['countdown']<=30){
+                document.getElementById("wait").style.color = "red";
+            }
             document.getElementById("wait").innerHTML=json['countdown'];
             }
             else{
