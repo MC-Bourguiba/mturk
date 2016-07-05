@@ -100,7 +100,7 @@ class PathTotalFlowAndCosts(models.Model):
 
 
     def __unicode__(self):
-        return unicode(self.path) + ' total_flow: ' + str(self.total_flow)+' total_cost: ' +str(self.total_cost)
+        return unicode(self.path) + ' total_flow: ' + str(self.flow)+' total_cost: ' +str(self.total_cost)
 
     class Meta:
         unique_together = ['player', 'turn','game','path']

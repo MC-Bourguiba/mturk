@@ -26,6 +26,7 @@ def get_previous_cost_server_side(user):
     previous_flows = dict()
     previous_costs = dict()
     #logger.debug("test 2 "+str(path_ids))
+    number_pm = player.player_model.shared_players
 
     for idx, p_id in zip(path_idxs, path_ids):
         path = Path.objects.get(id=p_id)
@@ -35,6 +36,7 @@ def get_previous_cost_server_side(user):
         for turn in game.turns.filter(iteration=iteration-1):
             cache_key_t_cost = str(turn.iteration) + game.name + "get_previous_cost" + username + "t_cost"+str(idx)
             cache_key_flow = str(turn.iteration) + game.name + "get_previous_cost" + username + "flow"+str(idx)
+            cache_key_total = str(turn.iteration) + game.name + "get_previous_total" + username + "total"+str(idx)
             if idx not in previous_costs:
                 previous_costs[idx] = []
             if cache.get(cache_key_t_cost):
@@ -56,6 +58,11 @@ def get_previous_cost_server_side(user):
                 flow = flow_distribution.path_assignments.filter(path=path)[0].flow
                 cache.set(cache_key_flow,flow)
             previous_flows[idx].append(flow)
+            if(PathTotalFlowAndCosts.objects.filter(path=path,player=player,game=game,turn=turn).count()==0):
+                path_cost_and_flow_per_player_and_iteration = PathTotalFlowAndCosts(path=path,player=player,game=game,turn=turn,flow=flow,total_cost=t_cost)
+                path_cost_and_flow_per_player_and_iteration.save()
+                logger.debug("save worked ai")
+            cache.set(cache_key_total,t_cost*flow*number_pm/player.player_model.normalization_const)
 
     response = dict()
 

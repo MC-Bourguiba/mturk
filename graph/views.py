@@ -1297,7 +1297,7 @@ def set_waiting_time_server():
     global waiting_time
     global intermediate_waiting_time
     if(Game.objects.filter(started=True).count()==0):
-        cache.set('waiting_time',300)
+        cache.set('waiting_time',100)
     else:
         cache.set('waiting_time',20)
     response = dict()
