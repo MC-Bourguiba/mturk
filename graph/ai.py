@@ -58,11 +58,11 @@ def get_previous_cost_server_side(user):
                 flow = flow_distribution.path_assignments.filter(path=path)[0].flow
                 cache.set(cache_key_flow,flow)
             previous_flows[idx].append(flow)
-            if(PathTotalFlowAndCosts.objects.filter(path=path,player=player,game=game,turn=turn).count()==0):
-                path_cost_and_flow_per_player_and_iteration = PathTotalFlowAndCosts(path=path,player=player,game=game,turn=turn,flow=flow,total_cost=t_cost)
+            if(PathTotalFlowAndCosts.objects.filter(path=path,game=game,iteration=turn.iteration).count()==0):
+                path_cost_and_flow_per_player_and_iteration = PathTotalFlowAndCosts(path=path,game=game,iteration=turn.iteration,total_cost=t_cost)
                 path_cost_and_flow_per_player_and_iteration.save()
                 logger.debug("save worked ai")
-            cache.set(cache_key_total,t_cost*flow*number_pm/player.player_model.normalization_const)
+            cache.set(cache_key_total,t_cost*flow*number_pm)
 
     response = dict()
 

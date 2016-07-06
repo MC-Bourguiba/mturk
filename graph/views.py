@@ -681,21 +681,51 @@ def get_previous_cost(request, username):
                 flow = flow_distribution.path_assignments.filter(path=path)[0].flow
                 cache.set(cache_key_flow,flow)
             previous_flows[idx].append(flow)
-            if(PathTotalFlowAndCosts.objects.filter(path=path,player=player,game=game,turn=turn).count()==0):
-                path_cost_and_flow_per_player_and_iteration = PathTotalFlowAndCosts(path=path,player=player,game=game,turn=turn,flow=flow,total_cost=t_cost)
-                path_cost_and_flow_per_player_and_iteration.save()
-            cache.set(cache_key_total,t_cost*flow*number_pm/player.player_model.normalization_const)
+            if(PathTotalFlowAndCosts.objects.filter(path=path,game=game,iteration=turn.iteration).count()==0):
+                path_cost_per_iteration = PathTotalFlowAndCosts(path=path,game=game,iteration=turn.iteration,total_cost=t_cost)
+                path_cost_per_iteration.save()
+                print("")
+            cache.set(cache_key_total,t_cost*flow*number_pm)
         t3  = int(round(time.time() * 1000))
+        """Turn here is an integer !!! """
         for turn in range(game.current_turn.iteration):
+            if turn == 0 :
+                first_turn= game.turns.first()
+                first_turn.game_object=game
+                first_turn.save()
             cache_key_total = str(turn) + game.name + "get_previous_total" + username + "total"+str(idx)
             if turn not in total_cost:
                 total_cost[turn]=0
-            if cache.get(cache_key_total):
+            if False:
                 total_cost[turn]+=cache.get(cache_key_total)
             else:
-                path_flow_and_cost=PathTotalFlowAndCosts.objects.get(path=path,player=player,game__name=game.name,turn__iteration=turn)
-                total_cost[turn]+=path_flow_and_cost.flow*path_flow_and_cost.total_cost*number_pm/player.player_model.normalization_const
-                cache.set(cache_key_total,path_flow_and_cost.flow*path_flow_and_cost.total_cost*number_pm/player.player_model.normalization_const)
+
+                if(PathTotalFlowAndCosts.objects.filter(path=path,game=game,iteration=turn).count()==0):
+                    game_turn = GameTurn.objects.get(game_object=game,iteration=turn)
+                    e_costs = game_turn.graph_cost.edge_costs
+                    t_cost = 0
+                    for e in path.edges.all():
+                        t_cost += e_costs.get(edge=e).cost
+
+                    path_cost_per_iteration = PathTotalFlowAndCosts(path=path,game=game,iteration=turn,total_cost=t_cost)
+                    path_cost_per_iteration.save()
+                    logger.debug("recomputing path cost")
+                else:
+                    path_cost_per_iteration = PathTotalFlowAndCosts.objects.get(path=path,game=game,iteration=turn)
+                flow_distribution = FlowDistribution.objects.filter(turn__iteration=turn, player=player,game=game)[0]
+                if (flow_distribution.path_assignments.filter(path=path).count()==0):
+                    flow = 1.0/len(path_ids)
+                    logger.debug("flow unavailable")
+                else:
+                    flow = flow_distribution.path_assignments.filter(path=path)[0].flow
+
+                total_cost[turn]+=flow*path_cost_per_iteration.total_cost*number_pm
+                cache.set(cache_key_total,flow*path_cost_per_iteration.total_cost*number_pm)
+
+
+
+
+
 
         t2=  int(round(time.time() * 1000))
 

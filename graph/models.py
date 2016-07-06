@@ -92,18 +92,16 @@ class PathFlowAssignment(models.Model):
 class PathTotalFlowAndCosts(models.Model):
     path = models.ForeignKey('Path')
     game= models.ForeignKey('Game', blank=True, null=True)
-    player = models.ForeignKey('Player')
-    turn = models.ForeignKey('GameTurn', blank=True, null=True)
-    flow = models.FloatField(default=0)
+    iteration = models.IntegerField(default=0)
     total_cost = models.FloatField(default=0)
 
 
 
     def __unicode__(self):
-        return unicode(self.path) + ' total_flow: ' + str(self.flow)+' total_cost: ' +str(self.total_cost)
+        return unicode(self.path) + ' total_cost: ' +str(self.total_cost)
 
     class Meta:
-        unique_together = ['player', 'turn','game','path']
+        unique_together = ['iteration','game','path']
 
 
 
