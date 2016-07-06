@@ -1374,7 +1374,7 @@ def heartbeat(request):
 def check_for_connection_loss(request):
 
     game_name = Game.objects.get(currently_in_use = True).name
-    change_player.apply_async((game_name,), countdown=5.0)
+    change_player.apply_async((game_name,), countdown=1.0)
     response = dict()
     response['graph'] =  Game.objects.get(currently_in_use = True).graph.name
     response['ping']=cache.get('waiting_time')

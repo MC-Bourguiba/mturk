@@ -1021,7 +1021,7 @@ function get_duration() {
 
 function check_connection_loss() {
     current_duration = get_duration();
-    setTimeout(check_connection_loss, (current_duration)*1000);
+    setTimeout(check_connection_loss, 4000);
     check_connection();
 
 
