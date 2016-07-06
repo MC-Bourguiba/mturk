@@ -14,7 +14,7 @@ from django.core.cache import cache
 import time
 
 
-player_timeout = 60
+player_timeout = 6
 #check max_iteration in views.py as well
 max_iteration = 25
 
