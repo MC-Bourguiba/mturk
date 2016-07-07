@@ -777,7 +777,7 @@ def get_user_graph_cost(request,username,graph_name):
         paths[idx] = list(path.edges.values_list('edge_id', flat=True))
 
         # for turn in game.turns.all():
-        for turn in game.turns.filter(iteration__gte=iteration-1):
+        for turn in game.turns.filter(iteration__gte=iteration-1).order_by('iteration'):
             # cache_key_t_cost = str(turn.iteration) + game.name + "get_previous_cost" + username + "t_cost"
             # cache_key_flow_ = str(turn.iteration) + game.name + "get_previous_cost" + username + "flow"
             # if cache.get(cache_key_t_cost):
