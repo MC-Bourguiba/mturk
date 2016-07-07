@@ -655,7 +655,7 @@ def get_previous_cost(request, username):
         paths[idx] = list(path.edges.values_list('edge_id', flat=True))
 
 
-        for turn in game.turns.filter(iteration__gte=iteration-1):
+        for turn in game.turns.filter(iteration__gte=iteration-1,iteration__lte=game.current_turn.iteration-1):
             cache_key_t_cost = str(turn.iteration) + game.name + "get_previous_cost" + username + "t_cost"+str(idx)
             cache_key_flow = str(turn.iteration) + game.name + "get_previous_flow" + username + "flow"+str(idx)
             cache_key_total = str(turn.iteration) + game.name + "get_previous_total" + username + "total"+str(idx)
@@ -753,9 +753,11 @@ def get_user_graph_cost(request,username,graph_name):
     user_with_same_pm = 0
 
 
+
     for used_pm in used_pms:
         if username in used_pm.historic_player:
             pm_to_use = used_pm
+            normalization_const = pm_to_use.normalization_const
     for us in User.objects.all():
         pl = Player.objects.get(user=us)
         if pl.user.username in pm_to_use.historic_player:
@@ -796,7 +798,8 @@ def get_user_graph_cost(request,username,graph_name):
     response['number_of_iterations'] = game.turns.filter(iteration__gte=iteration-1).count()
     response['users_with_same_pm'] = user_with_same_pm
     response['path_ids'] = path_ids
-    response['paths'] = paths
+    response['normalization_const']=normalization_const
+    response['path_used_ids']=range(len(path_ids))
     response['previous_costs'] = previous_costs
     response['previous_flows'] = previous_flows
     return JsonResponse(response)
