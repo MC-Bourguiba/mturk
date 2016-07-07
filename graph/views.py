@@ -376,7 +376,7 @@ def estimate_best_eta_all_turns(game, player):
 
     best_etas = []
 
-    for turn in GameTurn.objects.filter(game=game):
+    for turn in GameTurn.objects.filter(game=game).order_by('iteration'):
         if LearningRate.objects.filter(player=player, turn=turn,game=game).exists():
             lr = LearningRate.objects.get(player=player, turn=turn,game=game)
             best_etas.append(lr.learning_rate)
