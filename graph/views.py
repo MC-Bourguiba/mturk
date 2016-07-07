@@ -746,6 +746,7 @@ def get_previous_cost(request, username):
 
   
 def get_user_graph_cost(request,username,graph_name):
+    user = User.objects.get(username=username)
     game = Game.objects.get(graph__name=graph_name)
     iteration =  0
     used_pms = PlayerModel.objects.filter(graph__name=graph_name)
