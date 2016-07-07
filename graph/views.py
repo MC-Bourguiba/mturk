@@ -409,8 +409,8 @@ def predict_user_flows_all_turns(game, player):
 
     predictions['x'] = []
 
-    for prev_turn, curr_turn in zip(GameTurn.objects.filter(game=game),
-                                    GameTurn.objects.filter(game=game)[1:]):
+    for prev_turn, curr_turn in zip(GameTurn.objects.filter(game=game).order_by('iteration'),
+                                    GameTurn.objects.filter(game=game).order_by('iteraton')[1:]):
         counter += 1
         try:
             learning_rate = LearningRate.objects.get(player=player, turn=prev_turn,game=game).learning_rate
