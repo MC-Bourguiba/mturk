@@ -464,6 +464,27 @@ def get_potential(request, graph_name):
 def get_paths_edges(request, graph_name):
 
     paths = Path.objects.filter(graph__name=graph_name)
+    all_edges= sorted(Edge.objects.filter(graph__name=graph_name))
+    response= dict()
+    response['path_ids']=sorted(list(paths.values_list('id', flat=True)))
+    for path in paths:
+        edges = path.edges.all()
+        tmp_list=[]
+        for e in edges:
+            tmp_list.append(str(e))
+        response['path_'+str(path.id)+'_edges']=sorted(tmp_list)
+    response['all_edges']=all_edges
+    response['graph']=graph_name
+    return JsonResponse(response)
+
+def get_paths_edges_for_user_and_graph(request, graph_name,username):
+
+    paths = Path.objects.filter(graph__name=graph_name)
+    used_pms = PlayerModel.objects.filter(graph__name=graph_name)
+    for used_pm in used_pms:
+        if username in used_pm.historic_player:
+            pm_to_use = used_pm
+    paths = Path.objects.filter(player_model=pm_to_use)
     response= dict()
     response['path_ids']=list(paths.values_list('id', flat=True))
     for path in paths:
