@@ -444,6 +444,8 @@ def get_user_predictions(request, username):
     response['actual'] = actual_flows
     return JsonResponse(response)
 
+
+@login_required
 def get_potential(request, graph):
 
     game = Game.objects.get(graph__name=graph)
