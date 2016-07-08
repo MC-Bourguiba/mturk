@@ -459,6 +459,21 @@ def get_potential(request, graph_name):
     response['potential'] = potential
     response['graph'] = graph_name
     return JsonResponse(response)
+
+
+def get_paths_edges(request, graph_name):
+
+    paths = Path.objects.filter(graph__name=graph_name)
+    response= dict()
+    response['path_ids']=list(paths.values_list('id', flat=True))
+    for path in paths:
+        edges = path.edges.all()
+        tmp_list=[]
+        for e in edges:
+            tmp_list.append(str(e))
+        response['path_'+str(path.id)+'_edges']=tmp_list
+    response['graph']=graph_name
+    return JsonResponse(response)
   
 @login_required
 def get_user_costs(request, graph_name):
