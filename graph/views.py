@@ -446,9 +446,9 @@ def get_user_predictions(request, username):
 
 
 @login_required
-def get_potential(request, graph):
+def get_potential(request, graph_name):
 
-    game = Game.objects.get(graph__name=graph)
+    game = Game.objects.get(graph__name=graph_name)
     potential = []
     for turn in GameTurn.objects.filter(game=game).order_by('iteration'):
         potential.append(turn.graph_cost*turn.graph_cost/2)
