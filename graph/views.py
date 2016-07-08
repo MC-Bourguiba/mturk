@@ -445,13 +445,13 @@ def get_user_predictions(request, username):
     return JsonResponse(response)
 
 
-@login_required
+
 def get_potential(request, graph_name):
 
     game = Game.objects.get(graph__name=graph_name)
     potential = []
     for turn in GameTurn.objects.filter(game=game).order_by('iteration'):
-        sum = 0 
+        sum = 0
         for e in turn.graph_cost.edge_costs.all():
             sum+=e.cost*e.cost/2
         potential.append(sum)
