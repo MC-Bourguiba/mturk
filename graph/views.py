@@ -465,6 +465,9 @@ def get_paths_edges(request, graph_name):
     def extract_num(x):
         values = [int(s) for s in x.split() if s.isdigit()]
         return (values[0],values[1])
+    def extract_num_nodes(x):
+        values = [int(s) for s in x.split() if s.isdigit()]
+        return values[0]
     paths = Path.objects.filter(graph__name=graph_name)
     nodes = Node.objects.filter(graph__name=graph_name)
     list_nodes = []
@@ -484,7 +487,7 @@ def get_paths_edges(request, graph_name):
             tmp_list.append(str(e))
         response['path_'+str(path.id)+'_edges']=sorted(tmp_list,key=extract_num)
     response['all_edges']=sorted(list_edges,key=extract_num)
-    response['nodes']=sorted(list_nodes,key=extract_num)
+    response['nodes']=sorted(list_nodes,key=extract_num_nodes)
     response['graph']=graph_name
     return JsonResponse(response)
 
