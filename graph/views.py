@@ -451,9 +451,10 @@ def get_potential(request, graph_name):
     game = Game.objects.get(graph__name=graph_name)
     potential = []
     for turn in GameTurn.objects.filter(game=game).order_by('iteration'):
+        sum = 0 
         for e in turn.graph_cost.edge_costs.all():
-
-            potential.append(e.cost*e.cost/2)
+            sum+=e.cost*e.cost/2
+        potential.append(sum)
     response = dict()
     response['potential'] = potential
     response['graph'] = graph_name
