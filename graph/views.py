@@ -466,6 +466,10 @@ def get_paths_edges(request, graph_name):
         values = [int(s) for s in x.split() if s.isdigit()]
         return (values[0],values[1])
     paths = Path.objects.filter(graph__name=graph_name)
+    nodes = Node.objects.filter(graph__name=graph_name)
+    list_nodes = []
+    for node in nodes:
+        list_nodes.append(str(node))
 
     all_edges= Edge.objects.filter(graph__name=graph_name)
     list_edges=[]
@@ -480,6 +484,7 @@ def get_paths_edges(request, graph_name):
             tmp_list.append(str(e))
         response['path_'+str(path.id)+'_edges']=sorted(tmp_list,key=extract_num)
     response['all_edges']=sorted(list_edges,key=extract_num)
+    response['nodes']=sorted(list_nodes,key=extract_num)
     response['graph']=graph_name
     return JsonResponse(response)
 
