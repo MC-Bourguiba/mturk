@@ -219,7 +219,7 @@ def show_graph(request):
     connected_users = len(Player.objects.filter(is_a_bot = False))
     if not user.player.superuser:
         template = 'graph/user.djhtml'
-        if not(g.started) or no_more_games_left() or user.player.game==None:
+        if not(g.started) or False or user.player.game==None:
             return HttpResponseRedirect ("/graph/waiting_room/")
         try:
             g = user.player.game
