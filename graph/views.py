@@ -444,7 +444,16 @@ def get_user_predictions(request, username):
     response['actual'] = actual_flows
     return JsonResponse(response)
 
+def get_potential(request, graph):
 
+    game = Game.objects.get(graph__name=graph)
+    potential = []
+    for turn in GameTurn.objects.filter(game=game).order_by('iteration'):
+        potential.append(turn.graph_cost*turn.graph_cost/2)
+    response = dict()
+    response['potential'] = potential
+    response['graph'] = graph
+    return JsonResponse(response)
   
 @login_required
 def get_user_costs(request, graph_name):
