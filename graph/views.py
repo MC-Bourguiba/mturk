@@ -462,8 +462,8 @@ def get_potential(request, graph_name):
 
 
 def get_paths_edges(request, graph_name):
-    def extract_num(s):
-        values = [int(s) for s in str.split() if s.isdigit()]
+    def extract_num(x):
+        values = [int(s) for s in x.split() if s.isdigit()]
         return (values[0],values[1])
     paths = Path.objects.filter(graph__name=graph_name)
 
