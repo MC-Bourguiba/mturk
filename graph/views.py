@@ -464,7 +464,11 @@ def get_potential(request, graph_name):
 def get_paths_edges(request, graph_name):
 
     paths = Path.objects.filter(graph__name=graph_name)
-    all_edges= sorted(Edge.objects.filter(graph__name=graph_name))
+
+    all_edges= Edge.objects.filter(graph__name=graph_name)
+    list_edges=[]
+    for e in all_edges:
+        list_edges.append(str(e))
     response= dict()
     response['path_ids']=sorted(list(paths.values_list('id', flat=True)))
     for path in paths:
@@ -473,7 +477,7 @@ def get_paths_edges(request, graph_name):
         for e in edges:
             tmp_list.append(str(e))
         response['path_'+str(path.id)+'_edges']=sorted(tmp_list)
-    response['all_edges']=all_edges
+    response['all_edges']=sorted(list_edges)
     response['graph']=graph_name
     return JsonResponse(response)
 
