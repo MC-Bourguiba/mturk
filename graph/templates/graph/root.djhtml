@@ -15,39 +15,127 @@
 
 <input type="hidden" id="game_name" name="game_name" value="{{ game_name }}">
 
-<div class="row">
-      <div class="col-md-5">
-          <div class="btn-group btn-toggle" id="graph-user-btn">
-            <button class="btn btn-primary active" id="show-graphs-btn">Graphs</button>
-            <button class="btn btn-default" id="show-users-btn">Users</button>
-            <!-- <button class="btn btn-default" id="show-games-btn">Games</button> -->
-            <!-- <button class="btn btn-default" id="show-users-btn">Users</button> -->
+
+
+            <div class="col-md-3">
+                <button class="btn btn-primary active" id="show-graphs-btn">Graphs</button>
+                <div class="list-group" id="graph-list-display">
+                    {% for name in graph_names %}
+                    <a href="#" class="list-group-item">{{ name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-md-3">
+
+                <button class="btn btn-primary active" id="show-users-btn">Users</button>
+                <div class="list-group " id="user-list-display">
+                    {% for name in usernames %}
+                    <a href="#" class="list-group-item">{{ name }}</a>
+                    {% endfor %}
+                </div>
+
+
+            </div>
+
+
+
+
+
+
+
+
+            <div class="col-md-3">
+                <button class="btn btn-primary active" id="show-graphs-btn">Games</button>
+                <div class="list-group" id="game-list-display">
+                    {% for game in games %}
+                        {% if game.currently_in_use %}
+                            <a href="#" class="list-group-item currently_in_use" style="color:#53AF8B">{{ game }}</a>
+                        {% else %}
+                            <a href="#" class="list-group-item">{{ game }}</a>
+                        {% endif %}
+                    {% endfor %}
+                 </div>
+            </div>
+
+            <div class="col-md-3">
+                <button class="btn btn-primary active" id="show-pm-btn">Player Model</button>
+                <div id="model-display-list">
+                    {% for name in model_names %}
+                        <a href="#" class="list-group-item">
+                        {{ name }}
+                     </a>
+                     {% endfor %}
+                 </div>
+             </div>
+
+{% endblock %}
+
+{% block mid_left %}
+
+{% endblock %}
+
+{% block mid_right %}
+{% endblock %}
+
+{% block bottom %}
+
+
+  <div class="container-fluid" id="user-operation-pane" class="hidden">
+    <div class="row-fluid">
+      <div class="col-md-3">
+      <span class="label label-default" >Player Model</span>
+                <div class="control-group" style="margin-top: 10px; margin-bottom: 10px;" id="fields">
+                    <div class="controls" id="profs">
+                        <form class="input-append">
+                            <div id="field">
+                                <input autocomplete="off" class="input" id="model-name" name="model_name" type="text" placeholder="Model name"/>
+                                <button id="add-model" class="btn add-more" type="button">+</button>
+                             </div>
+                        </form>
+                    </div>
+                </div>
+
+        <div class="input-group" style="margin-top: 10px; margin-bottom: 10px;">
+          <input type="text" class="form-control bfh-number" data-bind="value:replyNumber"
+                 id="flow-input"/>
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" id="assign-flow-btn">Assign flow</button>
+          </span>
+        </div>
+        <span class="label label-default">Simple cost in terms of x. Example: x + 1</span>
+        <div class="input-group" style="margin-top: 10px; margin-bottom: 10px;">
+          <input type="text" class="form-control"
+                 id="cost-input"/>
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" id="assign-cost-btn">Assign cost </button>
+          </span>
+        </div>
+        <button class="btn btn-default" type="button" id="assign-all-cost-btn">Assign cost to all </button>
+        <div class="input-group" style="margin-top: 10px; margin-bottom: 10px;">
+              <input type="text" class="form-control bfh-number" data-bind="value:replyNumber"
+                     id="duration-input"/>
+              <span class="input-group-btn">
+                  <button class="btn btn-default" type="button" id="assign-duration-btn">Assign duration</button>
+              </span>
           </div>
-
-          <div class="list-group" id="graph-list-display">
-            {% for name in graph_names %}
-              <a href="#" class="list-group-item">{{ name }}</a>
-            {% endfor %}
-          </div>
-
-          <div class="list-group hidden" id="user-list-display">
-            {% for name in usernames %}
-              <a href="#" class="list-group-item">{{ name }}</a>
-            {% endfor %}
-          </div>
-
-          <div class="btn-group" role="group">
-            <a id="save-graph-btn" class="btn btn-default" href="#" role="button">Save graph</a>
-            <a id="load-graph-btn" class="btn btn-default" href="#" role="button">Load graph</a>
-            <a id="show-predictions-btn" class="btn btn-default" href="#" role="button">Show predictions</a>
-
-            <div class="input-group" style="margin-top: 10px; margin-bottom: 10px;">
+      <div class="input-group" style="margin-top: 10px; margin-bottom: 10px;">
                 <input type="text" class="form-control bfh-number" data-bind="value:replyNumber"
                        id="game-input"/>
                 <span class="input-group-btn">
                     <button id="add-game-btn" class="btn btn-default" type="button">Add game</button>
                 </span>
             </div>
+
+
+      </div>
+      <div class="col-md-5">
+      <div class="btn-group" role="group">
+            <a id="save-graph-btn" class="btn btn-default" href="#" role="button">Save graph</a>
+            <a id="load-graph-btn" class="btn btn-default" href="#" role="button">Load graph</a>
+            <a id="show-predictions-btn" class="btn btn-default" href="#" role="button">Show predictions</a>
+
+
 
             <a id="go-game-btn" class="btn btn-default" href="#" role="button">Go to game</a>
             <a id="load-game-btn" class="btn btn-default" href="#" role="button">Load game</a>
@@ -60,82 +148,7 @@
              <a id="generate-pm" class="btn btn-default" href="#" role="button">generate PM for selected graph</a>
 
           </div>
-           <p> Connected players : {{connected}}</p>
-      </div>
 
-      <div class="col-md-2">
-          <button class="btn btn-primary active" id="show-graphs-btn">Games</button>
-          <div class="list-group" id="game-list-display">
-              {% for game in games %}
-                  {% if game.currently_in_use %}
-                  <a href="#" class="list-group-item currently_in_use" style="color:#53AF8B">{{ game }}</a>
-                  {% else %}
-                  <a href="#" class="list-group-item">{{ game }}</a>
-                  {% endif %}
-              {% endfor %}
-          </div>
-      </div>
-
-      <div class="col-md-5">
-        <span class="label label-default" >Player Model</span>
-        <div class="control-group" id="fields">
-          <div class="controls" id="profs">
-            <form class="input-append">
-              <div id="field">
-                <input autocomplete="off" class="input" id="model-name" name="model_name" type="text" placeholder="Model name"/>
-                <button id="add-model" class="btn add-more" type="button">+</button>
-              </div>
-            </form>
-          </div>
-        </div>
-        <div id="model-display-list">
-          {% for name in model_names %}
-            <a href="#" class="list-group-item">
-              {{ name }}
-            </a>
-          {% endfor %}
-        </div>
-      </div>
-</div>
-{% endblock %}
-
-{% block mid_left %}
-{% endblock %}
-
-{% block mid_right %}
-{% endblock %}
-
-{% block bottom %}
-  <div class="container-fluid" id="user-operation-pane" class="hidden">
-    <div class="row-fluid">
-      <div class="col-md-3">
-
-        <div class="input-group" style="margin-top: 10px; margin-bottom: 10px;">
-          <input type="text" class="form-control bfh-number" data-bind="value:replyNumber"
-                 id="flow-input"/>
-          <span class="input-group-btn">
-            <button class="btn btn-default" type="button" id="assign-flow-btn">Assign flow</button>
-          </span>
-        </div>
-        <span class="label label-primary">Simple cost in terms of x. Example: x + 1</span>
-        <div class="input-group" style="margin-top: 10px; margin-bottom: 10px;">
-          <input type="text" class="form-control"
-                 id="cost-input"/>
-          <span class="input-group-btn">
-            <button class="btn btn-default" type="button" id="assign-cost-btn">Assign cost </button>
-          </span>
-        </div>
-        <button class="btn btn-default" type="button" id="assign-all-cost-btn">Assign cost to all </button>
-
-      </div>
-      <div class="col-md-3">
-          <div class="input-group" style="margin-top: 10px; margin-bottom: 10px;">
-              <input type="text" class="form-control bfh-number" data-bind="value:replyNumber"
-                     id="duration-input"/>
-              <span class="input-group-btn">
-                  <button class="btn btn-default" type="button" id="assign-duration-btn">Assign duration</button>
-              </span>
-          </div>
       </div>
       <div class="col-md-2" style="overflow: hidden;">
           <div id="user-model-info-pane" style="float: left; margin-right: 10px;" align="left">

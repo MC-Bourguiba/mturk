@@ -234,7 +234,7 @@ def show_graph(request):
             template = 'graph/user_wait.djhtml'
     else:
         context['usernames'] = Player.objects.filter(superuser=False).values_list('user__username', flat=True)
-        context['model_names'] = PlayerModel.objects.all()
+        context['model_names'] = PlayerModel.objects.filter(graph__name=str(g.graph))
         context['graph_names'] = Graph.objects.all()
         context['games'] = Game.objects.all()
         context['connected'] = connected_users
