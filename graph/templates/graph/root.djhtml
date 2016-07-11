@@ -14,6 +14,17 @@
 {% block top_left %}
 
 <input type="hidden" id="game_name" name="game_name" value="{{ game_name }}">
+             <div class="col-md-3">
+
+                <button class="btn btn-primary" id="show-users-btn">Users</button>
+                <div class="list-group active" id="user-list-display">
+                    {% for name in usernames %}
+                    <a href="#" class="list-group-item">{{ name }}</a>
+                    {% endfor %}
+                </div>
+
+
+            </div>
 
 
 
@@ -26,17 +37,7 @@
                 </div>
             </div>
 
-            <div class="col-md-3">
 
-                <button class="btn btn-primary active" id="show-users-btn">Users</button>
-                <div class="list-group " id="user-list-display">
-                    {% for name in usernames %}
-                    <a href="#" class="list-group-item">{{ name }}</a>
-                    {% endfor %}
-                </div>
-
-
-            </div>
 
 
 
@@ -46,7 +47,7 @@
 
 
             <div class="col-md-3">
-                <button class="btn btn-primary active" id="show-graphs-btn">Games</button>
+                <button class="btn btn-primary " id="show-graphs-btn">Games</button>
                 <div class="list-group" id="game-list-display">
                     {% for game in games %}
                         {% if game.currently_in_use %}
@@ -85,7 +86,7 @@
     <div class="row-fluid">
       <div class="col-md-3">
       <span class="label label-default" >Player Model</span>
-                <div class="control-group" style="margin-top: 10px; margin-bottom: 10px;" id="fields">
+                <div class="control-group" style="margin-top: 10px; margin-bottom: 10px;"id="fields">
                     <div class="controls" id="profs">
                         <form class="input-append">
                             <div id="field">
