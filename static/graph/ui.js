@@ -48,17 +48,7 @@ $('.btn-toggle').click(function() {
 });
 
 
-$("#graph-user-btn").click(function() {
-    if ($(this).find("#show-graphs-btn").hasClass("active")) {
-        $("#graph-list-display").removeClass("hidden");
-        $("#user-list-display").addClass("hidden");
 
-    } else {
-        $("#user-list-display").removeClass("hidden");
-        $("#graph-list-display").addClass("hidden");
-
-    }
-});
 
 $("#show-users-btn").click(function() {
 
