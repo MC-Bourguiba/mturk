@@ -1439,7 +1439,7 @@ def check_for_connection_loss(request):
 
     game_name = Game.objects.get(currently_in_use = True).name
     from tasks import change_player
-    change_player()
+    change_player(game_name)
     response = dict()
     response['graph'] =  Game.objects.get(currently_in_use = True).graph.name
     response['ping']=cache.get('waiting_time')
