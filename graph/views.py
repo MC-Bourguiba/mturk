@@ -834,11 +834,8 @@ def get_user_graph_cost(request,username,graph_name):
         path = Path.objects.get(id=p_id)
         paths[idx] = list(path.edges.values_list('edge_id', flat=True))
 
-        # for turn in game.turns.all():
         for turn in game.turns.filter(iteration__gte=iteration-1).order_by('iteration'):
-            # cache_key_t_cost = str(turn.iteration) + game.name + "get_previous_cost" + username + "t_cost"
-            # cache_key_flow_ = str(turn.iteration) + game.name + "get_previous_cost" + username + "flow"
-            # if cache.get(cache_key_t_cost):
+
             e_costs = turn.graph_cost.edge_costs
             t_cost = 0
             flow_distribution = FlowDistribution.objects.get(turn=turn, player =player,game=game )
@@ -891,33 +888,27 @@ def get_paths(request, username):
     if cache.get(path_ids_key):
         prev_alloc = cache.get(allocation_key)
         prev_path_ids = cache.get(path_ids_key)
-        #logger.debug(prev_path_ids)
-        #logger.debug(prev_alloc)
+
 
 
     for idx, p_id in zip(path_idxs, path_ids):
         path = Path.objects.get(id=p_id)
-        #logger.debug(str(path))
         paths[idx] = list(path.edges.values_list('edge_id', flat=True))
-        #logger.debug(paths[idx])
-        # if FlowDistribution.objects.filter(username=username, turn=current_turn).exists():
-        # # if current_turn.flow_distributions.filter(username=username).exists():
-        #     fd = FlowDistribution.objects.get(turn=current_turn, username=username)
-        #     # fd = current_turn.flow_distributions.get(username=username)
-        #     flow.append(fd.path_assignments.get(path__id=p_id).flow)
-        # else:
-        #     flow.append(0.5)
 
         if prev_alloc:
-            #logger.debug(prev_path_ids)
-            #logger.debug(path_ids)
-            #logger.debug("")
-            #logger.debug(prev_alloc[prev_path_ids.index(p_id)])
-
             weights.append(prev_alloc[prev_path_ids.index(p_id)])
 
         else:
-            weights.append(0.5)
+            try:
+                prev_alloc=[]
+                flow_distribution = FlowDistribution.objects.filter(turn=previous_turn,game=game, player=player)[0]
+                for pfa in flow_distribution.path_assignments.all():
+                    path_ids.append(pfa.path.id)
+                    prev_alloc.append(pfa.flow)
+                weights.append(prev_alloc[prev_path_ids.index(p_id)])
+
+            except:
+                weights.append(0.5)
 
         if current_turn.iteration > 0:
             edge_costs = previous_turn.graph_cost.edge_costs
