@@ -900,6 +900,7 @@ def get_paths(request, username):
 
         else:
             try:
+                logger.debug("cache failed")
                 prev_alloc=[]
                 flow_distribution = FlowDistribution.objects.filter(turn=previous_turn,game=game, player=player)[0]
                 for pfa in flow_distribution.path_assignments.all():
