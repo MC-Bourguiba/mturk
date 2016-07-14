@@ -219,7 +219,7 @@ def show_graph(request):
     connected_users = len(Player.objects.filter(is_a_bot = False))
     if not user.player.superuser:
         template = 'graph/user.djhtml'
-        if not(g.started) or False or user.player.game==None:
+        if not(g.started) or no_more_games_left() or user.player.game==None:
             return HttpResponseRedirect ("/graph/waiting_room/")
         try:
             g = user.player.game
@@ -234,7 +234,7 @@ def show_graph(request):
             template = 'graph/user_wait.djhtml'
     else:
         context['usernames'] = Player.objects.filter(superuser=False).values_list('user__username', flat=True)
-        context['model_names'] = PlayerModel.objects.filter(graph__name=str(g.graph))
+        context['model_names'] = PlayerModel.objects.all()
         context['graph_names'] = Graph.objects.all()
         context['games'] = Game.objects.all()
         context['connected'] = connected_users
@@ -444,6 +444,11 @@ def get_user_predictions(request, username):
     response['actual'] = actual_flows
     return JsonResponse(response)
 
+def get_current_iteration(request):
+    game= Game.objects.get(currently_in_use=True)
+    response= dict()
+    response['iteration']=game.current_turn.iteration
+    return JsonResponse(response)
 
 
 def get_potential(request, graph_name):
@@ -727,6 +732,7 @@ def get_previous_cost(request, username):
             if idx not in previous_costs:
                 previous_costs[idx] = []
             if cache.get(cache_key_t_cost):
+                logger.debug("using cache for costs")
                 t_cost=cache.get(cache_key_t_cost)
             else:
                 e_costs = turn.graph_cost.edge_costs
@@ -739,16 +745,15 @@ def get_previous_cost(request, username):
                 previous_flows[idx] = []
 
             if cache.get(cache_key_flow):
+                logger.debug("using cache for flow")
+
                 flow= cache.get(cache_key_flow)
             else:
                 flow_distribution = FlowDistribution.objects.filter(turn=turn, player=player,game=game)[0]
                 flow = flow_distribution.path_assignments.filter(path=path)[0].flow
                 cache.set(cache_key_flow,flow)
             previous_flows[idx].append(flow)
-            if(PathTotalFlowAndCosts.objects.filter(path=path,game=game,iteration=turn.iteration).count()==0):
-                path_cost_per_iteration = PathTotalFlowAndCosts(path=path,game=game,iteration=turn.iteration,total_cost=t_cost)
-                path_cost_per_iteration.save()
-                print("")
+           
             cache.set(cache_key_total,t_cost*flow*number_pm)
         t3  = int(round(time.time() * 1000))
         """Turn here is an integer !!! """
@@ -760,22 +765,10 @@ def get_previous_cost(request, username):
             cache_key_total = str(turn) + game.name + "get_previous_total" + username + "total"+str(idx)
             if turn not in total_cost:
                 total_cost[turn]=0
-            if False:
+            if  cache.get(cache_key_total):
                 total_cost[turn]+=cache.get(cache_key_total)
             else:
-
-                if(PathTotalFlowAndCosts.objects.filter(path=path,game=game,iteration=turn).count()==0):
-                    game_turn = GameTurn.objects.get(game_object=game,iteration=turn)
-                    e_costs = game_turn.graph_cost.edge_costs
-                    t_cost = 0
-                    for e in path.edges.all():
-                        t_cost += e_costs.get(edge=e).cost
-
-                    path_cost_per_iteration = PathTotalFlowAndCosts(path=path,game=game,iteration=turn,total_cost=t_cost)
-                    path_cost_per_iteration.save()
-                    logger.debug("recomputing path cost")
-                else:
-                    path_cost_per_iteration = PathTotalFlowAndCosts.objects.get(path=path,game=game,iteration=turn)
+                path_cost_per_iteration = PathTotalFlowAndCosts.objects.get(path=path,game=game,iteration=turn)
                 flow_distribution = FlowDistribution.objects.filter(turn__iteration=turn, player=player,game=game)[0]
                 if (flow_distribution.path_assignments.filter(path=path).count()==0):
                     flow = 1.0/len(path_ids)
@@ -1226,6 +1219,9 @@ def start_game_server():
         for user in User.objects.all():
             cache.delete(get_hash(user.username) + 'allocation')
             cache.delete(get_hash(user.username) + 'path_ids')
+        from tasks import compute_total_costs_for_all_players
+        compute_total_costs_for_all_players()
+
         from tasks import game_force_next
         game_force_next.apply_async((game.name,), countdown=game.duration)
         return response
