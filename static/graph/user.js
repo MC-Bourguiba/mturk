@@ -66,39 +66,34 @@ $("#clear-edge-btn").click(function(e) {
 function get_flow_allocation() {
     var paths = [];
     var allocation = [];
-    var epsilon = 0.00000001;
 
     $("#path-list tr").each(function(idx, li) {
+        
         paths.push(parseInt($(li).find("a").attr('id')));
         allocation.push(parseFloat($(li).find("input")[0].value/100));
-    });
 
-    var explore_index = 0.5;
+    });
+    
 
     if ($("#game-mode").prop("value") == "single_slider_mode") {
         allocation = [];
-        if ($("#ex").exists()) {
-            explore_index = parseInt($("#ex")[0].value)/100;
-        }
 
         var normalization = 1.0;
         var last_iter = 1;
 
-        if (Object.keys(previous_costs_dict).length > 0) {
-            last_iter = Math.max.apply(Math, Object.keys(previous_costs_dict));
+        if (Object.keys(previous_flows_dict).length > 0) {
+            last_iter = Math.max.apply(Math, Object.keys(previous_flows_dict));
 
             normalization = 0.0;
 
-            for (var k in Object.keys(previous_costs_dict[last_iter])) {
-                var previous_cost = previous_costs_dict[last_iter][k];
-                var previous_flow = previous_flows_dict[last_iter][k];
-                normalization += (previous_flow+epsilon)*Math.exp(-explore_index*previous_cost);
+            for (var k in Object.keys(previous_flows_dict[last_iter])) {
+                normalization += previous_flows_dict[last_iter][k];
             }
         }
 
         for (var p in paths) {
-            if (Object.keys(previous_costs_dict).length == 0) {
-                //console.log("IN HERE");
+            if (Object.keys(previous_flows_dict).length == 0) {
+                
                 average_distr = 1.0/paths.length;
 
                 for (i=0; i < paths.length; i += 1) {
@@ -107,17 +102,14 @@ function get_flow_allocation() {
 
                 break;
             } else {
-                var previous_cost = previous_costs_dict[last_iter][p];
-                var previous_flow = previous_flows_dict[last_iter][p];
-                var alloc = (previous_flow+epsilon)*Math.exp(-explore_index*previous_cost)/normalization;
+                console.log("IN HERE Non average");
+                var alloc = previous_flows_dict[last_iter][p]/normalization;
                 allocation.push(alloc);
             }
         }
     }
 
-    //console.log(allocation);
-    //console.log("explore_index: ");
-   // console.log(explore_index);
+   
     //console.log(normalization);
 
     return [paths, allocation];
@@ -219,6 +211,7 @@ $(document).ready(function() {
     if (editor_window == null) {
         editor_window = document.getElementById("graph-editor").contentWindow;
     }
+    
 
     get_paths(username, current_iteration);
     update_previous_cost(username, current_iteration);
@@ -290,17 +283,17 @@ function update_from_state(username) {
 
 
             // TODO: Fix this so that the previous allocation "sticks"
-            // if (previous_allocation.length > 0) {
-            //     $("#path-list tr").each(function(idx, li) {
-            //         path_id = parseInt($(li).find("a").attr('id'));
-            //         index = path_ids.indexOf(path_id);
-            //         allocation = previous_allocation[index];
-            //         $('#slider').slider('setValue', allocation);
+            if (previous_allocation.length > 0) {
+                 $("#path-list tr").each(function(idx, li) {
+                     path_id = parseInt($(li).find("a").attr('id'));
+                     index = path_ids.indexOf(path_id);
+                     allocation = previous_allocation[index];
+                    $('#slider').slider('setValue', allocation);
 
             //         // paths.push(parseInt($(li).find("a").attr('id')));
             //         // allocation.push(parseFloat($(li).find("input")[0].value/100));
-            //     });
-            // }
+                 });
+             }
 
             if (current_iteration != json['iteration']) {
                 $("#path-btns").toggle(true);
@@ -316,6 +309,7 @@ function update_from_state(username) {
             }
 
             current_iteration = json['iteration'];
+            localStorage.setItem("current_iteration", current_iteration);
             //console.log(current_iteration);
         },
 
@@ -365,9 +359,9 @@ function get_paths(username, iteration) {
                 editor_window.restart();
             });
 
-            $("#ex").on("slideStop", function (ev) {
-                update_slides();
-            });
+            // $("#ex").on("slideStop", function (ev) {
+            //    update_slides();
+            // });
 
 
             // $("#ex").slider({
@@ -506,14 +500,14 @@ function update_previous_cost(username, iteration) {
                for (var key in json['total_cost']) {
 
 
-                    console.log(key);
 
                     val = parseFloat(json['total_cost'][key]);
-                    console.log(val);
+
                     total_cost['total_cost'].push(val);
                 }
 
-            console.log(total_cost);
+           
+            console.log(previous_flow);
             // console.log('previous cost:');
             // console.log(previous_cost);
 

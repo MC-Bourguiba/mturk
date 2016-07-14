@@ -1,0 +1,11 @@
+$("#user-list-display").click(function() {
+    if ($(this).find("#show-graphs-btn").hasClass("active")) {
+        $("#user-list-display").removeClass("hidden");
+        $("#user-list-display").addClass("hidden");
+
+    } else {
+        $("#user-list-display").removeClass("hidden");
+        $("#user-list-display").addClass("hidden");
+
+    }
+});
