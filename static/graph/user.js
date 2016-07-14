@@ -1,7 +1,7 @@
 var graph_window = document.getElementById("graph-editor");
 var generated_paths = [];
 var path_ids = [];
-var current_iteration = 0;
+var current_iteration = 1;
 // var duration = 30;
 var previous_allocation = [];
 var editor_window = null;
