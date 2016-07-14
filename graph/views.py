@@ -797,6 +797,7 @@ def get_previous_cost(request, username):
     response['total_cost']=total_cost
     response['duration']=t2-t1
     response['total_duration']=t2-t3
+    response['iteration']=game.current_turn.iteration
     logger.debug("get_previous_cost "+str(player)+"for iteration "+str(iteration)+" : "+str(t2-t1))
     return JsonResponse(response)
 
