@@ -283,18 +283,7 @@ function update_from_state(username) {
 
 
             // TODO: Fix this so that the previous allocation "sticks"
-            if (previous_allocation.length > 0) {
-                 $("#path-list tr").each(function(idx, li) {
-                     path_id = parseInt($(li).find("a").attr('id'));
-                     index = path_ids.indexOf(path_id);
-                     allocation = previous_allocation[index];
-                    $('#slider').slider('setValue', allocation);
-
-            //         // paths.push(parseInt($(li).find("a").attr('id')));
-            //         // allocation.push(parseFloat($(li).find("input")[0].value/100));
-                 });
-             }
-
+            
             if (current_iteration != json['iteration']) {
                 $("#path-btns").toggle(true);
                 // update_paths(username, json['iteration']);
