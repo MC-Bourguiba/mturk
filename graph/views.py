@@ -881,6 +881,8 @@ def get_paths(request, username):
 
     if current_turn.iteration > 0:
         previous_turn = game.turns.get(iteration=current_turn.iteration - 1)
+    else:
+        previous_turn=game.current_turn
 
     # TODO: Fix the cache key scheme
     path_ids_key = get_hash(user.username) + 'path_ids'
@@ -888,28 +890,22 @@ def get_paths(request, username):
     if cache.get(path_ids_key):
         prev_alloc = cache.get(allocation_key)
         prev_path_ids = cache.get(path_ids_key)
-
+    prev_path_ids =[]
+    prev_alloc=[]
+    flow_distribution = FlowDistribution.objects.filter(turn=previous_turn,game=game, player=player)[0]
+    for pfa in flow_distribution.path_assignments.all():
+        prev_path_ids.append(pfa.path.id)
+        prev_alloc.append(pfa.flow)
 
 
     for idx, p_id in zip(path_idxs, path_ids):
         path = Path.objects.get(id=p_id)
         paths[idx] = list(path.edges.values_list('edge_id', flat=True))
 
-        if prev_alloc:
-            weights.append(prev_alloc[prev_path_ids.index(p_id)])
 
-        else:
-            try:
-                logger.debug("cache failed")
-                prev_alloc=[]
-                flow_distribution = FlowDistribution.objects.filter(turn=previous_turn,game=game, player=player)[0]
-                for pfa in flow_distribution.path_assignments.all():
-                    path_ids.append(pfa.path.id)
-                    prev_alloc.append(pfa.flow)
-                weights.append(prev_alloc[prev_path_ids.index(p_id)])
+        weights.append(prev_alloc[prev_path_ids.index(p_id)])
 
-            except:
-                weights.append(0.5)
+
 
         if current_turn.iteration > 0:
             edge_costs = previous_turn.graph_cost.edge_costs
