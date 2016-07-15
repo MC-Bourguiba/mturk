@@ -716,7 +716,7 @@ def get_previous_cost(request, username):
     number_pm = player.player_model.shared_players
 
 
-
+    reload= False
 
     for idx, p_id in zip(path_idxs, path_ids):
         path = Path.objects.get(id=p_id)
@@ -778,7 +778,7 @@ def get_previous_cost(request, username):
 
                     total_cost[turn]+=flow*path_cost_per_iteration.total_cost
                     cache.set(cache_key_total,flow*path_cost_per_iteration.total_cost)
-                    reload= False
+
                 except:
                     reload = True
 
