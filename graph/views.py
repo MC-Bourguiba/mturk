@@ -767,16 +767,20 @@ def get_previous_cost(request, username):
             if  cache.get(cache_key_total):
                 total_cost[turn]+=cache.get(cache_key_total)
             else:
-                path_cost_per_iteration = PathTotalFlowAndCosts.objects.get(path=path,game=game,iteration=turn)
-                flow_distribution = FlowDistribution.objects.filter(turn__iteration=turn, player=player,game=game)[0]
-                if (flow_distribution.path_assignments.filter(path=path).count()==0):
-                    flow = 1.0/len(path_ids)
-                    logger.debug("flow unavailable")
-                else:
-                    flow = flow_distribution.path_assignments.filter(path=path)[0].flow
+                try:
+                    path_cost_per_iteration = PathTotalFlowAndCosts.objects.get(path=path,game=game,iteration=turn)
+                    flow_distribution = FlowDistribution.objects.filter(turn__iteration=turn, player=player,game=game)[0]
+                    if (flow_distribution.path_assignments.filter(path=path).count()==0):
+                        flow = 1.0/len(path_ids)
+                        logger.debug("flow unavailable")
+                    else:
+                        flow = flow_distribution.path_assignments.filter(path=path)[0].flow
 
-                total_cost[turn]+=flow*path_cost_per_iteration.total_cost
-                cache.set(cache_key_total,flow*path_cost_per_iteration.total_cost)
+                    total_cost[turn]+=flow*path_cost_per_iteration.total_cost
+                    cache.set(cache_key_total,flow*path_cost_per_iteration.total_cost)
+                    reload= False
+                except:
+                    reload = True
 
 
 
@@ -794,6 +798,7 @@ def get_previous_cost(request, username):
     response['previous_costs'] = previous_costs
     response['previous_flows'] = previous_flows
     response['total_cost']=total_cost
+    response['reload']=reload
     response['duration']=t2-t1
     response['total_duration']=t2-t3
     response['iteration']=game.current_turn.iteration
