@@ -156,9 +156,10 @@ def compute_total_costs_for_all_players():
                 cache_key_total = str(turn) + game.name + "get_previous_total" + str(player) + "total"+str(idx)  
                 path_cost_per_iteration = PathTotalFlowAndCosts.objects.get(path=path,game=game,iteration=turn)    
                 cache.set(cache_key_total,flow*path_cost_per_iteration.total_cost)
-    t2 = int(round(time.time() * 1000))   
+    t2 = int(round(time.time() * 1000))
+    logger.debug("total cost time : "+str(t2-t1))
               
-    compute_total_costs_for_all_players.apply_async((), countdown=1.0)
+    compute_total_costs_for_all_players.apply_async((), countdown=0.5)
 
 
 
