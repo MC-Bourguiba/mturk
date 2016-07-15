@@ -159,7 +159,7 @@ def compute_total_costs_for_all_players():
     t2 = int(round(time.time() * 1000))
     logger.debug("total cost time : "+str(t2-t1))
               
-    compute_total_costs_for_all_players.apply_async((), countdown=0.5)
+    compute_total_costs_for_all_players.apply_async((), countdown=game.duration/5)
 
 
 
