@@ -899,8 +899,20 @@ def get_paths(request, username):
             weights.append(prev_alloc[prev_path_ids.index(p_id)])
 
         else:
-            
-            weights.append(0.5)
+            try:
+                if current_turn.iteration > 0:
+                    logger.debug("no cache")
+                    prev_alloc=[]
+                    prev_path_ids=[]
+                    flow_distribution = FlowDistribution.objects.filter(turn=previous_turn,game=game, player=player)[0]
+                    for pfa in flow_distribution.path_assignments.all():
+                        prev_path_ids.append(pfa.path.id)
+                        prev_alloc.append(pfa.flow)
+                    weights.append(prev_alloc[prev_path_ids.index(p_id)])
+                else:
+                    weights.append(0.5)
+            except:            
+                weights.append(0.5)
 
         if current_turn.iteration > 0:
             edge_costs = previous_turn.graph_cost.edge_costs
