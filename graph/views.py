@@ -398,7 +398,6 @@ def estimate_best_eta_all_turns(game, player):
 def predict_user_flows_all_turns(game, player):
     predictions = dict()
     actual = dict()
-    number_of_pm = Player.objects.filter(player_model = player.player_model).count()
     path_ids = list(Path.objects.filter(player_model=player.player_model).values_list('id', flat=True))
 
     for p_id in path_ids:
@@ -421,7 +420,7 @@ def predict_user_flows_all_turns(game, player):
 
             i = 0
             for p_id, prediction, actual_flow in zip(path_ids, x_predicted, actual_flows):
-                predictions[p_id].append(prediction/number_of_pm)
+                predictions[p_id].append(prediction)
                 actual['actual_%s' % str(p_id)].append(actual_flow)
                 i += 1
 
@@ -571,8 +570,8 @@ def get_user_costs(request, graph_name):
                 current_cost += (current_path_cost) * flow
 
             cumulative_cost += current_cost
-            current_costs[player.user.username].append(current_cost/normalization_const*number_of_PM)
-            cumulative_costs[player.user.username].append(cumulative_cost/normalization_const*number_of_PM)
+            current_costs[player.user.username].append(current_cost/normalization_const)
+            cumulative_costs[player.user.username].append(cumulative_cost/normalization_const)
 
         etas = estimate_best_eta_all_turns(game, player)
         user_etas[player.user.username] = etas
@@ -711,7 +710,7 @@ def get_previous_cost(request, username):
 
     previous_flows = dict()
     previous_costs = dict()
-    cache_key_pm_number= str(game)+str(player)+"number_pm"
+
 
 
     number_pm = player.player_model.shared_players
@@ -754,7 +753,7 @@ def get_previous_cost(request, username):
                 cache.set(cache_key_flow,flow)
             previous_flows[idx].append(flow)
            
-            cache.set(cache_key_total,t_cost*flow*number_pm)
+            cache.set(cache_key_total,t_cost*flow)
         t3  = int(round(time.time() * 1000))
         """Turn here is an integer !!! """
         for turn in range(game.current_turn.iteration):
@@ -776,8 +775,8 @@ def get_previous_cost(request, username):
                 else:
                     flow = flow_distribution.path_assignments.filter(path=path)[0].flow
 
-                total_cost[turn]+=flow*path_cost_per_iteration.total_cost*number_pm
-                cache.set(cache_key_total,flow*path_cost_per_iteration.total_cost*number_pm)
+                total_cost[turn]+=flow*path_cost_per_iteration.total_cost
+                cache.set(cache_key_total,flow*path_cost_per_iteration.total_cost)
 
 
 

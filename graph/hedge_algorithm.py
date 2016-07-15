@@ -5,8 +5,6 @@ from models import *
 
 def hedge_Algorithm(losses_vector,previous_distributions,iteration, path_idx):
     lr= learning_rate(iteration)
-    #ub = upper_bound(iteration)
-    #hardcoded for debug purpose
     ub = 1
     next_distributions = dict()
     normalization_const = 0

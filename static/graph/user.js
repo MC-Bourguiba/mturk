@@ -111,7 +111,8 @@ function get_flow_allocation() {
 
    
     //console.log(normalization);
-
+    console.log(paths);
+    console.log(allocation);
     return [paths, allocation];
 }
 
@@ -166,7 +167,7 @@ graph_window.onload = function() {
 
 
 function post_temporary_distribution_loop() {
-    setTimeout(post_temporary_distribution_loop, 500); // Update every second.
+    setTimeout(post_temporary_distribution_loop, 2000); // Update every second.
 
     submit_distribution(true);
 
@@ -481,7 +482,7 @@ function update_previous_cost(username, iteration) {
                         continue;
                     }
 
-                    val = parseFloat(val)*parseInt(json['number_pm']);
+                    val = parseFloat(val);
                     previous_flow[key].push(val);
                 }
             }

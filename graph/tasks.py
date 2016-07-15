@@ -145,7 +145,7 @@ def compute_total_costs_for_all_players():
                     except:
                         logger.debug("problem with saving PathTotalFlowAndCosts")
                         continue
-                cache.set(cache_key_total,t_cost*flow*number_pm)
+                cache.set(cache_key_total,t_cost*flow)
             
             """Turn here is an integer !!! """
             for turn in range(game.current_turn.iteration):
@@ -155,7 +155,7 @@ def compute_total_costs_for_all_players():
                     first_turn.save()
                 cache_key_total = str(turn) + game.name + "get_previous_total" + str(player) + "total"+str(idx)  
                 path_cost_per_iteration = PathTotalFlowAndCosts.objects.get(path=path,game=game,iteration=turn)    
-                cache.set(cache_key_total,flow*path_cost_per_iteration.total_cost*number_pm)
+                cache.set(cache_key_total,flow*path_cost_per_iteration.total_cost)
     t2 = int(round(time.time() * 1000))   
               
     compute_total_costs_for_all_players.apply_async((), countdown=1.0)

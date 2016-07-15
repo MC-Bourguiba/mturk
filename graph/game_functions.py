@@ -92,7 +92,7 @@ def create_flow_distribution(game, player, allocation, path_ids, turn):
         else:
             # if all the weights are non-positive, assign the uniform distribution
             assignment.flow = 1. / nb_paths * player.player_model.flow
-        assignment.flow/=num_player_model
+
         assignment.save()
         flow_distribution.path_assignments.add(assignment)
 
