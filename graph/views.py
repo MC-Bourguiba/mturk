@@ -756,7 +756,7 @@ def get_previous_cost(request, username):
             cache.set(cache_key_total,t_cost*flow)
         t3  = int(round(time.time() * 1000))
         """Turn here is an integer !!! """
-        for turn in range(game.current_turn.iteration):
+        for turn in range(iteration):
             if turn == 0 :
                 first_turn= game.turns.first()
                 first_turn.game_object=game
@@ -770,6 +770,7 @@ def get_previous_cost(request, username):
                 try:
                     path_cost_per_iteration = PathTotalFlowAndCosts.objects.get(path=path,game=game,iteration=turn)
                     flow_distribution = FlowDistribution.objects.filter(turn__iteration=turn, player=player,game=game)[0]
+
                     if (flow_distribution.path_assignments.filter(path=path).count()==0):
                         flow = 1.0/len(path_ids)
                         logger.debug("flow unavailable")
@@ -780,6 +781,7 @@ def get_previous_cost(request, username):
                     cache.set(cache_key_total,flow*path_cost_per_iteration.total_cost)
 
                 except:
+                    logger.debug("problem with path cost iteration ")
                     reload = True
 
 
