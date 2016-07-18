@@ -425,6 +425,7 @@ function update_previous_cost(username, iteration) {
         success : function(json) {
            // console.log(json);
             if(json['reload']){
+                console.log("reloading");
                 window.location.reload();
             }
             var cumulative_cost = {};
